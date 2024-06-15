@@ -283,6 +283,7 @@ const styles = StyleSheet.create({
   inputArea: {
     width: '60%',
     backgroundColor: 'white',
+    color:'black'
   },
   inputBtb: {
     width: '15%',

@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  Keyboard,
 } from 'react-native';
 import database from '@react-native-firebase/database';
 import React, {useState, useEffect, useRef} from 'react';
@@ -13,45 +14,46 @@ import data from '../data/project2-197c0-default-rtdb-export.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 let chapterCount;
-//  const windowWidth = Dimensions.get('window').width;
 
+// menu bi lặp lại ở luật cư trú
 export default function Detail() {
-  const [tittle, setTittle] = useState();
+  const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có 
   const [tittleArray, setTittleArray] = useState([]);
+
+  const [tittle2, setTittle2] = useState();   // để collapse chương nếu có mục 'phần thứ...'          
+  const [tittleArray2, setTittleArray2] = useState([]);
+  
   const [searchCount, setSearchCount] = useState(0);
   const [positionYArr, setPositionYArr] = useState([]);
   const [positionYArrArtical, setPositionYArrArtical] = useState([]);
   const [showArticle, setShowArticle] = useState(false);
+  
   const [inputSearchArtical, setInputSearchArtical] = useState('');
 
-  
   const [currentSearchPoint, setCurrentSearchPoint] = useState(0);
-  
+
   const route = useRoute();
-  
+
   const list = useRef(null);
   const [input, setInput] = useState(route.params ? route.params.input : '');
   const [find, setFind] = useState(route.params ? true : false);
   // const [find, setFind] = useState(true);
   const [go, setGo] = useState(route.params ? true : false);
-  
+
   const [Content, setContent] = useState('');
-  
+
   // console.log('ref3.current',ref3.current);
-  
+
   const reference = database().ref('/Law1');
-  useEffect( ()=>{
-      
+  useEffect(() => {
     reference.on('value', snapshot => {
-        // console.log(snapshot.val());
-      setContent(snapshot.val()[route.name])
+      // setContent(snapshot.val()[route.name]);
+      setContent(data[route.name]);
+
     });
+  }, []);
 
-}
-,[])
-
-
-function collapse(a) {
+  function collapse(a) {      // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có 
     if (a == undefined) {
     } else if (tittleArray.includes(a)) {
       setTittleArray(tittleArray.filter(a1 => a1 !== a));
@@ -61,109 +63,135 @@ function collapse(a) {
     setTittle(null);
   }
 
+  function collapse2(a) {       // để collapse chương nếu có mục 'phần thứ...'
+    if (a == undefined) {
+    } else if (tittleArray2.includes(a)) {
+      setTittleArray2(tittleArray2.filter(a1 => a1 !== a));
+    } else {
+      setTittleArray2([...tittleArray2, a]);
+    }
+    setTittle(null);
+  }
+
 
   let searchResultCount = 0;
 
   function highlight(para, word, i2) {
     // if (typeof para == 'string' ) {
-    if(word.match(/.\w./gm)){
-    let inputRexgex = para[0].match(new RegExp(word, 'igm'));
-    if (inputRexgex) {
-      searchResultCount += inputRexgex.length;
-    }
-    let searchedPara = para[0]
-      .split(new RegExp(word, 'igm'))
-      .reduce((prev, current, i) => {
-        if (!i) {
-          // console.log('para.split(new RegExp(word,))',para.split(new RegExp(word,'igm')))
-          // console.log('current',current);
-          return [current];
-        }
+    if (word.match(/.\w./gm)) {
+      let inputRexgex = para[0].match(new RegExp(word, 'igm'));
+      if (inputRexgex) {
+        searchResultCount += inputRexgex.length;
+      }
+      let searchedPara = para[0]
+        .split(new RegExp(word, 'igm'))
+        .reduce((prev, current, i) => {
+          if (!i) {
+            return [current];
+          }
 
-        function setPositionY({y}) {
-          positionYArr.push(y);
-          positionYArr.sort((a, b) => {
-            if (a > b) {
-              return 1;
-            } else {
-              if (a < b) return -1;
-            }
-          });
-        }
+          function setPositionY({y}) {
+            positionYArr.push(y);
+            positionYArr.sort((a, b) => {
+              if (a > b) {
+                return 1;
+              } else {
+                if (a < b) return -1;
+              }
+            });
+          }
 
-        return prev.concat(
-          <View
-            style={{
-              transform: [
-              {translateY: 4}, 
-              // {translateX: 3}
-            ],
-              backgroundColor:'red',
-              position:'relative',
-              display:'flex',
-              bottom:40,
-              flex:1,
-              textAlignVertical:'center',
-              alignSelf:'center',
-              // height:50,
-              padding:0,
-              margin:0,
-              overflow:'hidden',
-              height:'auto'
-            }}
-            onLayout={event => {
-              event.target.measure((x, y, width, height, pageX, pageY) => {
-                setPositionY({
-                  y: y + pageY,
+          return prev.concat(
+            <View
+              style={{
+                transform: [
+                  {translateY: 4},
+                  // {translateX: 3}
+                ],
+                backgroundColor: 'red',
+                position: 'relative',
+                display: 'flex',
+                bottom: 40,
+                flex: 1,
+                textAlignVertical: 'center',
+                alignSelf: 'center',
+                // height:50,
+                padding: 0,
+                margin: 0,
+                overflow: 'hidden',
+                height: 'auto',
+              }}
+              onLayout={event => {
+                event.target.measure((x, y, width, height, pageX, pageY) => {
+                  setPositionY({
+                    y: y + pageY,
+                  });
                 });
-              });
-            }}
-            >
-            <Text style={styles.highlight} key={`${i2}d`}>
-              {inputRexgex[i - 1]}
-            </Text>
-          </View>,
-         [current],
-        );
-      }, []);
-    return !inputRexgex ? para[0] : searchedPara
-    }else{
-      return para
+              }}>
+              <Text style={styles.highlight} key={`${i2}d`}>
+                {inputRexgex[i - 1]}
+              </Text>
+            </View>,
+            [current],
+          );
+        }, []);
+      return !inputRexgex ? para[0] : searchedPara;
+    } else {
+      return para;
     }
-    
+
     // }
   }
 
   function setPositionYArtical({y, key3}) {
-    // if (find) {
-      // positionYArrArtical.push({[key3]:y});
-      // setPositionYArrArtical1(positionYArrArtical);
-      // console.log('positionYArrArtical1',positionYArrArtical1);
-      positionYArrArtical.push({[key3]: y});
-      // console.log('positionYArrArtical',positionYArrArtical);
+
+    // if(String(positionYArrArtical) == '' ){
+    //   // console.log('rỗng')
     // }
+    // positionYArrArtical.push({[key3]: y});
+
+    console.log((positionYArrArtical))
+    // console.log(String(positionYArrArtical).includes({[key3]: y}))
+
+    var contains = positionYArrArtical.some(elem =>{
+      return key3 == (Object.keys(elem)[0]);
+    });
+    if ( contains ) {
+      console.log('contains')
+    } else {
+      console.log('doesnt');
+      positionYArrArtical.push({[key3]: y});
+    }
+
+
   }
 
   useEffect(() => {
     collapse(tittle);
-    chapterCount = Content && Object.keys(Content).length;
+    chapterCount = data[route.name] && Object.keys(data[route.name]).length;
   }, [tittle]);
-  chapterCount = Content && Object.keys(Content).length;
 
-  function Expand(){
-    for(let b = 0 ; b <= chapterCount-1 ;b ++ ){
-      if(tittleArray == []){
-        setTittleArray([b])
-      }else{
-        setTittleArray(oldArray => [...oldArray, b])
-      // console.log('b',b);
+  useEffect(() => {
+    collapse2(tittle2);
+
+  }, [tittle2]);
+
+
+  chapterCount = data[route.name] && Object.keys(data[route.name]).length;
+
+  function Shrink() {
+    for (let b = 0; b <= chapterCount - 1; b++) {
+      if (tittleArray == []) {
+        setTittleArray([b]);
+      } else {
+        setTittleArray(oldArray => [...oldArray, b]);
       }
+    }
   }
-}
-  
+
   useEffect(() => {
     setGo(false);
-    setSearchCount(0)
+    setSearchCount(0);
   }, [input]);
 
   useEffect(() => {
@@ -172,48 +200,84 @@ function collapse(a) {
     // list.current.scrollTo({
     //   y: positionYArr[1] - 57,
     // });
-
   }, [go]);
 
   useEffect(() => {
     list.current.scrollTo({
-      y: positionYArr[currentSearchPoint-1] - 57,
+      y: positionYArr[currentSearchPoint - 1] - 57,
     });
   }, [currentSearchPoint]);
 
-  let SearchArticalResult = positionYArrArtical.filter( (item)=>{
-    return Object.keys(item)[0].match( new RegExp(inputSearchArtical, 'igm'))
+  let SearchArticalResult = positionYArrArtical.filter(item => {
+    return Object.keys(item)[0].match(new RegExp(inputSearchArtical, 'igm'));
+  });
 
-  })
-  
-  useEffect(() => {setTittleArray([])
+  useEffect(() => {
+    setTittleArray([]);
+    setTittleArray2([]);
+
   }, [find]);
 
-  console.log('go');
+  useEffect(() => {
+    setTittleArray([]);
+    setTittleArray2([]);
+    setFind(false)
+  }, [showArticle]);
 
-  return (
-    <>
-      <ScrollView ref={list} style={ find ? {marginBottom:130} : {marginBottom:50}}>
-        <Text style={styles.titleText}>{`${route.name}`}</Text>
-          {Content &&
-            Content.map((key, i) => (
-              <>
-                {Object.keys(key).map((key1, i1) => (
-                  <>
-                    <TouchableOpacity
+
+  const a = (key, i, key1, i1a) => {
+    // phần nếu không mục 'phần thứ' trong văn bản
+    return Object.keys(key)[0] != '0' ? (
+      <>
+        {/* <TouchableOpacity
                       key={i}
                       style={styles.chapter}
                       onPress={() => {
                         setTittle(i);
                       }}>
-                      <Text key={`${i}a`} style={styles.chapterText}>
+                      <Text key={`${i}a`} 
+                      style={{fontSize:15,color:'black',fontWeight:'bold',padding:9,textAlign:'center',backgroundColor:'gray'}}>
                         {key1}
                       </Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
+        <View
+          key={`${i}b`}
+          style={
+            showArticle || find ||  (!tittleArray2.includes(`${i1a}a${i}`) && !tittleArray.includes(i)) || styles.content //////////////////////////////////////////////////////////////////
+          }
+          >
+          {key[key1].map((key2, i2) => (
+            <View
+              onLayout={event => {
+                event.target.measure((x, y, width, height, pageX, pageY) => {
+                  setPositionYArtical({
+                    y: y + pageY,
+                    key3: Object.keys(key2),
+                  });
+                });
+              }}>
+              <Text key={`${i2}c`} style={styles.dieu}>
+                {go
+                  ? highlight(Object.keys(key2), input, i2)
+                  : Object.keys(key2)}
+              </Text>
+              <Text key={`${i2}d`} style={styles.lines}>
+                {go
+                  ? highlight(Object.values(key2), input, i2)
+                  : Object.values(key2)}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </>
+    ) : (
+      {
+        /* <>
                     <View
                       key={`${i1}b`}
-                      style={(showArticle || find || !tittleArray.includes(i)) || styles.content}>
-                      {key[key1].map((key2, i2) => (
+                      // style={(showArticle || find || !tittleArray.includes(i)) || styles.content}
+                      >
+                      {key.map((key2, i2) => (
                         <View
                           onLayout={event => {
                             event.target.measure(
@@ -241,19 +305,128 @@ function collapse(a) {
                         </View>
                       ))}
                     </View>
-                  </>
-                ))}
-              </>
-            ))}
+                  </> */
+      }
+    );
+  };
+
+  const b = (keyA, i, keyB) => {
+    // phần nếu có mục 'phần' trong văn bản
+
+    return (
+      <>
+        <View
+          key={`${i}b`}
+          style={
+            showArticle || find || !tittleArray.includes(i) || styles.content
+          }
+          >
+          {keyA[keyB].map((keyC, iC) => {
+            // keyC ra object là từng chương hoặc ra điều luôn
+
+            if (Object.keys(keyC)[0].match(/^Chương.*$/gim)) {
+              //nếu có chương
+              return (
+                <>
+            <TouchableOpacity     // đây là chương
+                key={i}
+                // style={styles.chapter}
+                onPress={() => {
+                  setTittle2(`${iC}a${i}`);
+                }}>
+
+                  <Text
+                    key={`${i}a`}
+                    style={{
+                      fontSize: 15,
+                      color: 'white',
+                      fontWeight: 'bold',
+                      padding: 4,
+                      textAlign: 'center',
+                      backgroundColor: 'black',
+                    }}>
+                    {Object.keys(keyC)[0].toUpperCase()}
+                  </Text>
+                  </TouchableOpacity>
+
+                  {a(keyC, i, Object.keys(keyC)[0], iC)}
+                </>
+              );
+            } else {
+              //nếu không có chương
+              return (
+                  <View
+                    onLayout={event => {
+                      event.target.measure(
+                        (x, y, width, height, pageX, pageY) => {
+                          setPositionYArtical({
+                            y: y + pageY,
+                            key3: Object.keys(keyC),
+                          });
+                        },
+                      );
+                    }}>
+                    <Text key={`${iC}c`} style={styles.dieu}>
+                      {go
+                        ? highlight(Object.keys(keyC), input, iC)
+                        : Object.keys(keyC)}
+                    </Text>
+                    <Text key={`${iC}d`} style={styles.lines}>
+                      {go
+                        ? highlight(Object.values(keyC), input, iC)
+                        : Object.values(keyC)}
+                    </Text>
+                  </View>
+              );
+              //  a( keyC,i,Object.keys(keyC)[0],iC)
+            }
+
+          })}
+        </View>
+      </>
+    );
+  };
+
+  return (
+    <>
+      <ScrollView
+        ref={list}
+        style={find ? {marginBottom: 130} : {marginBottom: 50}}>
+        <Text style={styles.titleText}>{`${route.name}`}</Text>
+        {Content &&
+          Content.map((key, i) => (
+            <>
+              <TouchableOpacity
+                key={i}
+                style={styles.chapter}
+                onPress={() => {
+                  setTittle(i);
+                }}>
+                <Text
+                  key={`${i}a`}
+                  style={{
+                    fontSize: 18,
+                    color: 'black',
+                    fontWeight: 'bold',
+                    padding: 9,
+                    textAlign: 'center',
+                  }}>
+                  { Object.keys(key)[0].toUpperCase()}
+                </Text>
+              </TouchableOpacity>
+
+              {Object.keys(key)[0].match(/phần thứ .*/gim)
+                ? b(key, i, Object.keys(key)[0])
+                : a(key, i, Object.keys(key)[0])}
+            </>
+          ))}
       </ScrollView>
       <View style={styles.functionTab}>
-      <TouchableOpacity
+        <TouchableOpacity
           style={styles.tab}
           onPress={() => {
             setTittleArray([]);
-            console.log('c');
-            Expand()
-            
+            Shrink();
           }}>
           <Text style={styles.innerTab}>S</Text>
         </TouchableOpacity>
@@ -261,11 +434,10 @@ function collapse(a) {
           style={styles.tab}
           onPress={() => {
             setTittleArray([]);
-            
           }}>
           <Text style={styles.innerTab}>E</Text>
         </TouchableOpacity>
-       <TouchableOpacity
+        <TouchableOpacity
           style={styles.tab}
           onPress={() => {
             list.current.scrollTo({y: 0});
@@ -295,33 +467,43 @@ function collapse(a) {
             <TouchableOpacity
               style={styles.tabSearch}
               onPress={() => {
-                currentSearchPoint == positionYArr.length ? setCurrentSearchPoint(1) : setCurrentSearchPoint(currentSearchPoint + 1);
+                currentSearchPoint == positionYArr.length
+                  ? setCurrentSearchPoint(1)
+                  : setCurrentSearchPoint(currentSearchPoint + 1);
               }}>
-              <Text style={{transform: [{rotate: '90deg'}],color: 'yellow',textAlign: 'center', fontWeight: 'bold', fontSize: 30,
-   
-}}>{`>`}</Text>
+              <Text
+                style={{
+                  transform: [{rotate: '90deg'}],
+                  color: 'yellow',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 30,
+                }}>{`>`}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.tabSearch}
               onPress={() => {
-                currentSearchPoint == 1 ? setCurrentSearchPoint(positionYArr.length) : setCurrentSearchPoint(currentSearchPoint - 1)
-                
+                currentSearchPoint == 1
+                  ? setCurrentSearchPoint(positionYArr.length)
+                  : setCurrentSearchPoint(currentSearchPoint - 1);
               }}>
-              <Text style={{transform: [{rotate: '90deg'}],color: 'yellow',textAlign: 'center', fontWeight: 'bold', fontSize: 30,
-   
-  }}>{`<`}</Text>
-              </TouchableOpacity>
+              <Text
+                style={{
+                  transform: [{rotate: '90deg'}],
+                  color: 'yellow',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 30,
+                }}>{`<`}</Text>
+            </TouchableOpacity>
             <View style={styles.inputArea}>
               <TextInput
                 style={{width: '85%', color: 'white'}}
                 onChangeText={text => setInput(text)}
                 autoFocus={false}
                 value={input}
-                placeholder=' Input to Search ...'
-                placeholderTextColor={'gray'}
-                  >
-
-                </TextInput>
+                placeholder=" Input to Search ..."
+                placeholderTextColor={'gray'}></TextInput>
               <TouchableOpacity
                 style={{color: 'white', fontSize: 16, width: '15%'}}
                 onPress={() => {
@@ -335,7 +517,10 @@ function collapse(a) {
             </View>
             <TouchableOpacity
               style={styles.searchBtb}
-              onPress={() => setGo(true)}>
+              onPress={() => {
+                setGo(true);
+                Keyboard.dismiss();
+              }}>
               <Text style={{color: 'white', fontWeight: 'bold'}}> Go </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -347,7 +532,12 @@ function collapse(a) {
             </TouchableOpacity>
           </View>
 
-        <Text style={styles.searchCount}>{go && (searchCount ? `có tổng cộng ${currentSearchPoint}/${searchCount} từ` : `Không tìm thấy từ ${input}`) } </Text>
+          <Text style={styles.searchCount}>
+            {go &&
+              (searchCount
+                ? `có tổng cộng ${currentSearchPoint}/${searchCount} từ`
+                : `Không tìm thấy từ ${input}`)}{' '}
+          </Text>
         </View>
       )}
       {showArticle && (
@@ -364,48 +554,68 @@ function collapse(a) {
               position: 'absolute',
             }}
             onPress={() => {
-              setShowArticle(false)
+              setShowArticle(false);
             }}></TouchableOpacity>
-            <View style={styles.listArticle}>
-              <View style={{flexDirection:'row',backgroundColor:'black',height:50}}>
-            <TextInput
-              onChangeText={text => setInputSearchArtical(text)}
-              value={inputSearchArtical}
-              style={{paddingLeft:10,paddingRight:10,color:'white',width:'85%',alignItems:'center'}}
-              placeholder=' Input to Search ...'
-              placeholderTextColor={'gray'}
-              
-
-            >
-
-            </TextInput>
-            <TouchableOpacity
-            onPress={() => setInputSearchArtical('')}
-            style={{width:'15%',display:'flex',alignItems:'center',justifyContent:'center'}}
-            >
-              {
-              inputSearchArtical &&   (<Text style={{height:20,width:20,color:'white',textAlign:'center',verticalAlign:'middle',backgroundColor:'gray', borderRadius:25}}>
-                X
-              </Text>)
-}
-            </TouchableOpacity>
-            </View>
-          <ScrollView >
-            <View style={{height:7}}>
-              {
-                // đây là hàng ảo để thêm margin
-              }
-            </View>
-            { (SearchArticalResult || positionYArrArtical).map((key, i) => (
+          <View style={styles.listArticle}>
+            <View
+              style={{
+                flexDirection: 'row',
+                backgroundColor: 'black',
+                height: 50,
+              }}>
+              <TextInput
+                onChangeText={text => setInputSearchArtical(text)}
+                value={inputSearchArtical}
+                style={{
+                  paddingLeft: 10,
+                  paddingRight: 10,
+                  color: 'white',
+                  width: '85%',
+                  alignItems: 'center',
+                }}
+                placeholder=" Input to Search ..."
+                placeholderTextColor={'gray'}></TextInput>
               <TouchableOpacity
-                style={styles.listItem}
-                onPress={() => {
-                  list.current.scrollTo({y: Object.values(key) - 57});
+                onPress={() => setInputSearchArtical('')}
+                style={{
+                  width: '15%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}>
-                <Text style={styles.listItemText}>{Object.keys(key)}</Text>
+                {inputSearchArtical && (
+                  <Text
+                    style={{
+                      height: 20,
+                      width: 20,
+                      color: 'white',
+                      textAlign: 'center',
+                      verticalAlign: 'middle',
+                      backgroundColor: 'gray',
+                      borderRadius: 25,
+                    }}>
+                    X
+                  </Text>
+                )}
               </TouchableOpacity>
-            ))}
-          </ScrollView>
+            </View>
+            <ScrollView>
+              <View style={{height: 7}}>
+                {
+                  // đây là hàng ảo để thêm margin
+                }
+              </View>
+              {(SearchArticalResult || positionYArrArtical).map((key, i) => (
+                <TouchableOpacity
+                  style={styles.listItem}
+                  onPress={() => {
+                    setShowArticle(false);
+                    list.current.scrollTo({y: Object.values(key) - 57});
+                  }}>
+                  <Text style={styles.listItemText}>{Object.keys(key)}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
         </>
       )}
@@ -452,11 +662,12 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
     paddingLeft: 10,
     paddingRight: 10,
-// position:'relative',
+    // position:'relative',
     justifyContent: 'center',
     // backgroundColor:'purple',
     // alignItems:'center',
     // textAlign:'center',
+    color:'black'
   },
   content: {
     height: 0,
@@ -532,11 +743,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     justifyContent: 'center',
   },
-  searchCount:{
-    color:'white',
-    fontSize:15,
-    textAlign:'center',
-    marginBottom:5
+  searchCount: {
+    color: 'white',
+    fontSize: 15,
+    textAlign: 'center',
+    marginBottom: 5,
   },
   highlight: {
     color: 'red',
@@ -544,7 +755,6 @@ const styles = StyleSheet.create({
     // position:'re',
     display: 'flex',
     textAlign: 'center',
-
   },
   listArticle: {
     position: 'absolute',
