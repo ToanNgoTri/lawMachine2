@@ -45,10 +45,11 @@ import { Alert, Button, Text, View } from 'react-native';
                 <Stack.Screen name="Detail1" component={Detail1} options={{animationEnabled: false, header: () => null}}/>
          
                 <Stack.Screen name="Home" component={Home} options={{animationEnabled: false, header: () => null}}/>
-                <Stack.Screen name={`Search`} component={Detail1} options={{animationEnabled: true}}/>
-                {Content && (Object.keys(Content).map( (key,i) => (
+                {/* <Stack.Screen name={`Search`} component={Detail1} options={{animationEnabled: true}}/> */}
+                {Content && (Object.keys(Content).map( (key,i) => {
+                 if(!key.match(/Search/gim) ) {
 
-                <Stack.Screen  
+              return  (<Stack.Screen  
                 
                 key={i} name={`${key}`} component={Detail5} 
                 // options={{animationEnabled: true}}
@@ -68,9 +69,13 @@ import { Alert, Button, Text, View } from 'react-native';
                   )
                 })
                 }
-                />       
+                />  )
+              }else{
 
-))
+                return  <Stack.Screen name={`Search`} component={Detail1} options={{animationEnabled: true}}/>
+                    
+              }
+              })
 )
   }
 

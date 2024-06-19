@@ -14,8 +14,12 @@ import data from '../data/project2-197c0-default-rtdb-export.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 let chapterCount;
+//lineHeight trong lines phải luôn nhỏ hơn trong highlight và View Hightlight
 
-// menu bi lặp lại ở luật cư trú
+// search result bị xô lệch, đang xử lý theo hướng dúng onLayout trong Text
+// chữ "hộ" search k được
+ // hơi bị leak memory chỗ ScrollVIew nha
+ // dưới mỗi điều có space to là do dữ liệu có dấu xuống hàng \n 
 export default function Detail() {
   const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có 
   const [tittleArray, setTittleArray] = useState([]);
@@ -24,10 +28,13 @@ export default function Detail() {
   const [tittleArray2, setTittleArray2] = useState([]);
   
   const [searchCount, setSearchCount] = useState(0);
-  const [positionYArr, setPositionYArr] = useState([]);
+  const [positionYArr, setPositionYArr] = useState([]);   // tập hợp pos Y Search
   const [positionYArrArtical, setPositionYArrArtical] = useState([]);
   const [showArticle, setShowArticle] = useState(false);
   
+  const [currentY, setCurrentY] = useState(0);
+
+
   const [inputSearchArtical, setInputSearchArtical] = useState('');
 
   const [currentSearchPoint, setCurrentSearchPoint] = useState(0);
@@ -42,13 +49,12 @@ export default function Detail() {
 
   const [Content, setContent] = useState('');
 
-  // console.log('ref3.current',ref3.current);
 
   const reference = database().ref('/Law1');
   useEffect(() => {
     reference.on('value', snapshot => {
-      // setContent(snapshot.val()[route.name]);
-      setContent(data[route.name]);
+      setContent(snapshot.val()[route.name]);
+      // setContent(data[route.name]);
 
     });
   }, []);
@@ -75,10 +81,10 @@ export default function Detail() {
 
 
   let searchResultCount = 0;
-
+  // let c = 0;
   function highlight(para, word, i2) {
     // if (typeof para == 'string' ) {
-    if (word.match(/.\w./gm)) {
+    if (word.match(/.\w./gim)) {
       let inputRexgex = para[0].match(new RegExp(word, 'igm'));
       if (inputRexgex) {
         searchResultCount += inputRexgex.length;
@@ -86,12 +92,33 @@ export default function Detail() {
       let searchedPara = para[0]
         .split(new RegExp(word, 'igm'))
         .reduce((prev, current, i) => {
+          // c ++
+          // console.log(c);
           if (!i) {
-            return [current];
+            // return (
+            // <Text style={{backgroundColor:'orange', position:'relative',  display:'flex',  margin:0    }}
+            // >{current}</Text> 
+            // )
+
+            return [current]
           }
 
-          function setPositionY({y}) {
-            positionYArr.push(y);
+        //  function onLayout (event) {
+            
+        //       // const {y} = event.nativeEvent.layout;
+        //       // console.log('wRef: ' + y);
+
+        //        event.target.measure((x, y, width, height, pageX, pageY) => {
+        //           setPositionYSearch({
+        //             y: y + pageY,
+        //           });
+        //         });
+            
+        //   }
+
+          function setPositionYSearch({y}) {
+
+            positionYArr.push(y+currentY);
             positionYArr.sort((a, b) => {
               if (a > b) {
                 return 1;
@@ -99,40 +126,77 @@ export default function Detail() {
                 if (a < b) return -1;
               }
             });
-          }
+
+              setCurrentSearchPoint(1)
+            if(go){
+              setTimeout(() => {
+                list.current.scrollTo({
+                  y: positionYArr[0] - 57,//- 57
+                  // animated: true
+                });
+                // console.log('positionYArr',positionYArr);
+              }, 1000);
+          
+            }
+                  }
 
           return prev.concat(
+            <>
             <View
               style={{
                 transform: [
-                  {translateY: 4},
+                  {translateY: 6},
                   // {translateX: 3}
                 ],
-                backgroundColor: 'red',
-                position: 'relative',
+                backgroundColor: 'blue',
+                position:'absolute',
                 display: 'flex',
-                bottom: 40,
+                // bottom: 40,
                 flex: 1,
-                textAlignVertical: 'center',
+                // textAlignVertical: 'center',
                 alignSelf: 'center',
-                // height:50,
                 padding: 0,
-                margin: 0,
-                overflow: 'hidden',
-                height: 'auto',
+                // margin: 0,
+                overflow: 'visible',
+                // height: 'auto',
+                lineHeight:21.5,
+                // height:21,
+                // width:'auto',
+                // right:50
               }}
               onLayout={event => {
                 event.target.measure((x, y, width, height, pageX, pageY) => {
-                  setPositionY({
+                  setPositionYSearch({
                     y: y + pageY,
                   });
                 });
-              }}>
-              <Text style={styles.highlight} key={`${i2}d`}>
+              }}
+              >
+                <Text>
+                </Text>
+            </View>
+              <Text 
+      //         onLayout={event => {
+      //         const {y} = event.nativeEvent.layout;
+      //         console.log('height: ' + y);
+      // }}
+
+              style={((searchResultCount - inputRexgex.length +i-1 <  currentSearchPoint) && (searchResultCount - inputRexgex.length +i >=  currentSearchPoint )) ? styles.highlight1 :styles.highlight} key={`${i2}d`}
+              onp
+              >
                 {inputRexgex[i - 1]}
               </Text>
-            </View>,
-            [current],
+              </>
+            ,
+           <Text 
+           style={{
+            // backgroundColor:'orange', 
+           position:'relative',
+           display:'flex',
+          margin:0
+          }}
+           
+           >{current}</Text> ,
           );
         }, []);
       return !inputRexgex ? para[0] : searchedPara;
@@ -145,21 +209,13 @@ export default function Detail() {
 
   function setPositionYArtical({y, key3}) {
 
-    // if(String(positionYArrArtical) == '' ){
-    //   // console.log('rỗng')
-    // }
-    // positionYArrArtical.push({[key3]: y});
-
-    console.log((positionYArrArtical))
-    // console.log(String(positionYArrArtical).includes({[key3]: y}))
+    // console.log((positionYArrArtical))
 
     var contains = positionYArrArtical.some(elem =>{
       return key3 == (Object.keys(elem)[0]);
     });
     if ( contains ) {
-      console.log('contains')
     } else {
-      console.log('doesnt');
       positionYArrArtical.push({[key3]: y});
     }
 
@@ -168,7 +224,7 @@ export default function Detail() {
 
   useEffect(() => {
     collapse(tittle);
-    chapterCount = data[route.name] && Object.keys(data[route.name]).length;
+    chapterCount = Content && Object.keys(Content).length;
   }, [tittle]);
 
   useEffect(() => {
@@ -177,7 +233,7 @@ export default function Detail() {
   }, [tittle2]);
 
 
-  chapterCount = data[route.name] && Object.keys(data[route.name]).length;
+  chapterCount = Content && Object.keys(Content).length;
 
   function Shrink() {
     for (let b = 0; b <= chapterCount - 1; b++) {
@@ -192,21 +248,29 @@ export default function Detail() {
   useEffect(() => {
     setGo(false);
     setSearchCount(0);
+    setCurrentSearchPoint(0);
+
   }, [input]);
 
   useEffect(() => {
     setSearchCount(searchResultCount);
     setPositionYArr([]);
+    setCurrentSearchPoint(0)
     // list.current.scrollTo({
     //   y: positionYArr[1] - 57,
     // });
+
   }, [go]);
 
   useEffect(() => {
+    // console.log('currentSearchPoint',currentSearchPoint);
+    if(currentSearchPoint != 0){
     list.current.scrollTo({
-      y: positionYArr[currentSearchPoint - 1] - 57,
+      y: positionYArr[currentSearchPoint - 1] - 57,//- 57
     });
+  }
   }, [currentSearchPoint]);
+
 
   let SearchArticalResult = positionYArrArtical.filter(item => {
     return Object.keys(item)[0].match(new RegExp(inputSearchArtical, 'igm'));
@@ -228,18 +292,6 @@ export default function Detail() {
   const a = (key, i, key1, i1a) => {
     // phần nếu không mục 'phần thứ' trong văn bản
     return Object.keys(key)[0] != '0' ? (
-      <>
-        {/* <TouchableOpacity
-                      key={i}
-                      style={styles.chapter}
-                      onPress={() => {
-                        setTittle(i);
-                      }}>
-                      <Text key={`${i}a`} 
-                      style={{fontSize:15,color:'black',fontWeight:'bold',padding:9,textAlign:'center',backgroundColor:'gray'}}>
-                        {key1}
-                      </Text>
-                    </TouchableOpacity> */}
         <View
           key={`${i}b`}
           style={
@@ -255,21 +307,21 @@ export default function Detail() {
                     key3: Object.keys(key2),
                   });
                 });
-              }}>
+              }}
+              >
               <Text key={`${i2}c`} style={styles.dieu}>
                 {go
                   ? highlight(Object.keys(key2), input, i2)
                   : Object.keys(key2)}
               </Text>
-              <Text key={`${i2}d`} style={styles.lines}>
+             <Text key={`${i2}d`} style={styles.lines}>
                 {go
                   ? highlight(Object.values(key2), input, i2)
-                  : Object.values(key2)}
+                  : Object.values(key2)[0]}
               </Text>
             </View>
           ))}
         </View>
-      </>
     ) : (
       {
         /* <>
@@ -344,6 +396,7 @@ export default function Detail() {
                       padding: 4,
                       textAlign: 'center',
                       backgroundColor: 'black',
+                      marginBottom:1
                     }}>
                     {Object.keys(keyC)[0].toUpperCase()}
                   </Text>
@@ -390,6 +443,13 @@ export default function Detail() {
   return (
     <>
       <ScrollView
+      onScroll={ event =>{       
+       {const {y} = event.nativeEvent.contentOffset;
+                // console.log('wRef: ' + y);
+                setCurrentY(y)
+       }
+      }}
+
         ref={list}
         style={find ? {marginBottom: 130} : {marginBottom: 50}}>
         <Text style={styles.titleText}>{`${route.name}`}</Text>
@@ -434,6 +494,7 @@ export default function Detail() {
           style={styles.tab}
           onPress={() => {
             setTittleArray([]);
+            setTittleArray2([])
           }}>
           <Text style={styles.innerTab}>E</Text>
         </TouchableOpacity>
@@ -574,7 +635,8 @@ export default function Detail() {
                   alignItems: 'center',
                 }}
                 placeholder=" Input to Search ..."
-                placeholderTextColor={'gray'}></TextInput>
+                placeholderTextColor={'gray'}>
+                </TextInput>
               <TouchableOpacity
                 onPress={() => setInputSearchArtical('')}
                 style={{
@@ -610,7 +672,7 @@ export default function Detail() {
                   style={styles.listItem}
                   onPress={() => {
                     setShowArticle(false);
-                    list.current.scrollTo({y: Object.values(key) - 57});
+                    list.current.scrollTo({y: Object.values(key) - 57});//
                   }}>
                   <Text style={styles.listItemText}>{Object.keys(key)}</Text>
                 </TouchableOpacity>
@@ -652,22 +714,50 @@ const styles = StyleSheet.create({
   },
   dieu: {
     fontWeight: 'bold',
-    marginBottom: 5,
-    marginTop: 5,
+    // marginBottom: 5,
+    marginTop: 10,
     paddingLeft: 10,
     paddingRight: 10,
+    lineHeight:23,
+
   },
   lines: {
     display: 'flex',
+    position:'relative',
     textAlign: 'justify',
-    paddingLeft: 10,
-    paddingRight: 10,
+    paddingLeft: 5,
+    paddingRight: 5,
+    fontSize:14,
+    // height:'auto',
     // position:'relative',
-    justifyContent: 'center',
-    // backgroundColor:'purple',
+    // justifyContent: 'center',
     // alignItems:'center',
     // textAlign:'center',
-    color:'black'
+    color:'black',
+    margin:5,
+    // backgroundColor:'yellow',
+    lineHeight:23,
+    overflow:'visible',
+    
+  },
+  highlight: {
+    color: 'black',
+    backgroundColor: 'yellow',
+    // position:'re',
+    display: 'flex',
+    textAlign: 'center',
+    lineHeight:22.5,
+    // position:'absolute',
+
+  },
+  highlight1:{
+    color: 'black',
+    display: 'flex',
+    textAlign: 'center',
+    position:'relative',
+    backgroundColor: 'orange',
+    lineHeight:22.5,
+
   },
   content: {
     height: 0,
@@ -748,13 +838,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: 'center',
     marginBottom: 5,
-  },
-  highlight: {
-    color: 'red',
-    backgroundColor: 'yellow',
-    // position:'re',
-    display: 'flex',
-    textAlign: 'center',
   },
   listArticle: {
     position: 'absolute',
