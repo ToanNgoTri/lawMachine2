@@ -16,13 +16,12 @@ export default function Detail({navigation}) {
   const [Content, setContent] = useState({});
   const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm 
   const [input, setInput] = useState(undefined);
-  const [name, setName] = useState();
 
-  const [nameArray, setNameArray] = useState([]);
-  const [article, setArticle] = useState();
-  const [articleArray, setArticleArray] = useState([]);
-  const [conditional, setConditional] = useState(1);
-  const [nameArray1, setNameArray1] = useState([]);
+  const [name, setName] = useState();   // dùng để collapse (thu thập key của các law)
+  const [nameArray, setNameArray] = useState([]);   // arrray của các law đã expand
+  
+  const [article, setArticle] = useState();    // dùng để collapse (thu thập key của các 'điều')
+  const [articleArray, setArticleArray] = useState([]);   // arrray của các 'điều' đã expand
 
   
   
@@ -36,46 +35,142 @@ export default function Detail({navigation}) {
 
   },[]);
 
-  function Search(input) {
-    if (conditional == 1) {
-      let replace = `(.*)${input}(.*)`;
-      let re = new RegExp(replace, 'gmi');
-      let chapter = [];
 
-      Object.keys(Content).map((key, i) => {
-        if (key.match(re)) {
-          chapter.push(key);
-        }
-      });
-      setNameArray1(chapter);
-    } else if (conditional == 2) {
+
+  function Search(input) {
       let searchArray = {};
 
-      Object.keys(Content).map((key, i) => {
-        // tham nhap luat (array chuong)
+      function a(key,key1){
+        // Object.keys(key2).map((key3, i3) => {
+        // thama nhap chuowng (array dieu)
+
+        Object.values(key1)[0].map((key2, i1) => {
+          // chọn từng điều
+
+          // Object.keys(key2).map((key5, i5) => {
+
+            let replace = `(.*)${input}(.*)`;
+            let re = new RegExp(replace, 'gmi');
+            if(Object.keys(key2)[0].match(re)){
+              searchArray[key].push({[Object.keys(key2)[0]]: Object.values(key2)[0]});
+            }else if (Object.values(key2)[0].match(re)) {
+              searchArray[key].push({[Object.keys(key2)[0]]: Object.values(key2)[0]});
+            }
+          // }
+        })
+    
+        
+
+}
+
+
+      Object.keys(data).map((key, i) => {   //key là tên của luật
+        // tham nhap luat (array chuong) 
 
         searchArray[key] = [];
-        Content[key].map((key1, i1) => {
-          // ra Object Chuong
 
-          Object.keys(key1).map((key2, i2) => {
-            // thama nhap chuowng (array dieu)
 
-            key1[key2].map((key3, i3) => {
-              // chọn từng điều
 
-              Object.keys(key3).map((key4, i4) => {
-                let replace = `(.*)${input}(.*)`;
-                let re = new RegExp(replace, 'gmi');
-                if(key4.match(re)){
-                  searchArray[key].push({[key4]: key3[key4]});
-                }else if (key3[key4].match(re)) {
-                  searchArray[key].push({[key4]: key3[key4]});
-                }
-              });
+
+        data[key].map((key1, i1) => {         
+          // ra Object Chuong hoặc (array phần thứ...)
+          if(Object.keys(key1)[0].match(/phần thứ .*/gim)){    // nếu có 'phần thứ
+
+            if(Object.keys(Object.values(key1)[0][0])[0].match(/^Chương .*/gim)){    //nếu có chương
+              
+              Object.values(key1)[0].map( (key2,i)=>{
+
+                a(key,key2)
+
+                // Object.values(key2)[0].map((key3, i3) => {
+                //   // chọn từng điều
+
+                //     let replace = `(.*)${input}(.*)`;
+                //     let re = new RegExp(replace, 'gmi');
+                //     if(Object.keys(key3)[0].match(re)){
+                //       searchArray[key].push({[Object.keys(key3)[0]]: Object.values(key3)[0]});
+                //     }else if (Object.values(key3)[0].match(re)) {
+                //       searchArray[key].push({[Object.keys(key3)[0]]: Object.values(key3)[0]});
+                //     }
+                //   // }
+                // })
+
+
+
             });
-          });
+                
+              ;
+
+
+
+
+          
+        
+
+
+
+// console.log('searchArray',searchArray);
+
+
+            }else{     //nếu không có chương
+
+
+
+
+              // Object.keys(key1).map((key2, i2) => {
+              //   // thama nhap chuowng (array dieu)
+    
+              //   key1[key2].map((key3, i3) => {
+              //     // chọn từng điều
+    
+              //     Object.keys(key3).map((key4, i4) => {
+              //       let replace = `(.*)${input}(.*)`;
+              //       let re = new RegExp(replace, 'gmi');
+              //       if(key4.match(re)){
+              //         searchArray[key].push({[key4]: key3[key4]});
+              //       }else if (key3[key4].match(re)) {
+              //         searchArray[key].push({[key4]: key3[key4]});
+              //       }
+              //     });
+              //   });
+              // });
+
+              a(key,key1)
+
+
+
+
+
+              
+            }
+
+
+
+
+
+          }else{ // nếu không có phần thứ...
+            
+                    
+
+            a(key,key1)
+
+
+          }
+
+
+
+
+
+
+
+
+
+
+
         });
+
+
+
       });
 
       let searchResult = {};
@@ -87,8 +182,8 @@ export default function Detail({navigation}) {
       });
 
       setSearchResult(searchResult);
-      // console.log('searchResult',searchResult);
-    }
+      console.log('searchResult',searchResult);
+    
     setArticleArray([]);
     setNameArray([]);
   }
@@ -150,9 +245,34 @@ export default function Detail({navigation}) {
       <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
       <View style={styles.inputContainer}>
         <Text style={styles.inputText}>Tìm kiếm</Text>
+        <View
+              style={{
+                position:'relative',
+                flexDirection: 'row',
+                backgroundColor: 'white',
+                // height: 50,
+                width:'50%'
+              }}>
+
         <TextInput
           style={styles.inputArea}
-          onChangeText={text => setInput(text)}></TextInput>
+          onChangeText={text => setInput(text)}
+            value={input}
+            >
+          </TextInput>
+          <TouchableOpacity
+                onPress={() => setInput('')}
+                style={{width: '15%', display: 'flex',alignItems: 'center',justifyContent: 'center',left:-3
+                }}>
+                {input && (
+                  <Text
+                    style={styles.inputXIcon}>
+                    X
+                  </Text>
+                )}
+              </TouchableOpacity>
+
+          </View>
         <TouchableOpacity
           style={styles.inputBtb}
           onPress={() => {
@@ -161,42 +281,8 @@ export default function Detail({navigation}) {
           <Text style={styles.inputBtbText}>Go!</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.category}>
-        <TouchableOpacity
-          style={
-            conditional == 1 ? styles.ContainerChecked : styles.checkContainer
-          }
-          onPress={() => {
-            {
-              setConditional(1);
-            }
-          }}>
-          <Text style={styles.checkConent}>Tìm tên</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={
-            conditional == 2 ? styles.ContainerChecked : styles.checkContainer
-          }
-          onPress={() => {
-            {
-              setConditional(2);
-            }
-          }}>
-          <Text style={styles.checkConent}>Tìm Content</Text>
-        </TouchableOpacity>
-      </View>
       <View style={{marginTop: 8}}>
-        {conditional == 1 &&
-          nameArray1.map((key, i) => (
-            <TouchableOpacity
-              style={styles.chapter}
-              key={i}
-              onPress={() => navigation.navigate(`${key}`)}>
-              <Text style={styles.chapterText}>{key}</Text>
-            </TouchableOpacity>
-          ))}
-        {conditional == 2 &&
+        {SearchResult &&
           Object.keys(SearchResult).map((key, i) => (
             <>
               <TouchableOpacity
@@ -281,9 +367,10 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   inputArea: {
-    width: '60%',
+    width: '85%',
     backgroundColor: 'white',
-    color:'black'
+    color:'black',
+    paddingLeft:8,
   },
   inputBtb: {
     width: '15%',
@@ -399,4 +486,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  inputXIcon:{
+    height: 20,
+    width: 20,
+    color: 'white',
+    textAlign: 'center',
+    verticalAlign: 'middle',
+    backgroundColor: 'gray',
+    borderRadius: 25,
+}
+
 });

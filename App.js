@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import AppNavigators from './navigators/AppNavigators';
+import StackNavigator from './navigators/AppNavigators';
 
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
 
   return(
 <>
-<AppNavigators/>
+<StackNavigator/>
 </>  )
 }
 

@@ -33,12 +33,12 @@ export default function Detail() {
   const [positionYArrArtical, setPositionYArrArtical] = useState([]);
   const [showArticle, setShowArticle] = useState(false);
   
-  const [currentY, setCurrentY] = useState(0);
+  const [currentY, setCurrentY] = useState(0);    // để lấy vị trí mình đang scroll tới
 
 
-  const [inputSearchArtical, setInputSearchArtical] = useState('');
+  const [inputSearchArtical, setInputSearchArtical] = useState('');   // input phần tìm kiếm 'Điều'
 
-  const [currentSearchPoint, setCurrentSearchPoint] = useState(1);
+  const [currentSearchPoint, setCurrentSearchPoint] = useState(1);    // thứ tự kết quả search đang trỏ tới
 
   const route = useRoute();
 
@@ -85,37 +85,21 @@ export default function Detail() {
   // let c = 0;
   function highlight(para, word, i2) {
     // if (typeof para == 'string' ) {
-    if (word.match(/.\w./gim)) {
-      let inputRexgex = para[0].match(new RegExp(word, 'igm'));
+    if (word.match(/\w+/gim)) {
+      // console.log('a');
+      let inputRexgex = para[0].match(new RegExp(String(word), 'igmu'));
+      // let inputRexgex = para[0].match(new RegExp('hội', 'igmu'));
       if (inputRexgex) {
+
         searchResultCount += inputRexgex.length;
-      }
       let searchedPara = para[0]
-        .split(new RegExp(word, 'igm'))
+        .split(new RegExp(String(word), 'igmu'))
+        // .split(new RegExp('hội', 'igmu'))
         .reduce((prev, current, i) => {
-          // c ++
-          // console.log(c);
           if (!i) {
-            // return (
-            // <Text style={{backgroundColor:'orange', position:'relative',  display:'flex',  margin:0    }}
-            // >{current}</Text> 
-            // )
 
             return [current]
           }
-
-        //  function onLayout (event) {
-            
-        //       // const {y} = event.nativeEvent.layout;
-        //       // console.log('wRef: ' + y);
-
-        //        event.target.measure((x, y, width, height, pageX, pageY) => {
-        //           setPositionYSearch({
-        //             y: y + pageY,
-        //           });
-        //         });
-            
-        //   }
 
           function setPositionYSearch({y}) {
 
@@ -131,7 +115,7 @@ export default function Detail() {
             if(go){
               setTimeout(() => {
                 list.current.scrollTo({
-                  y: positionYArr[0] - 80,//- 57
+                  y: positionYArr[0] - 100,//- 57
                   // animated: true
                 });
                 // console.log('3');
@@ -222,15 +206,23 @@ export default function Detail() {
            >{current}</Text> ,
           );
         }, []);
-      return !inputRexgex ? para[0] : searchedPara;
+        
+      // return !inputRexgex ? para[0] : searchedPara;
+      return searchedPara;
+
+    }else{
+      return para[0];
+
+    }
+
     } else {
-      return para;
+      return para[0];
     }
 
     // }
   }
 
-  let c = positionYArrArtical;
+  let positionYArrArticalDemo = positionYArrArtical;
   function setPositionYArtical({y, key3}) {
 if((!tittleArray.length  && !tittleArray2.length) || go) {
     var contains = positionYArrArtical.some( (elem,i) =>{
@@ -241,7 +233,7 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
     if ( contains ) {
       articleCount++
 
-      c = c.map( (elem,i)=>{
+      positionYArrArticalDemo = positionYArrArticalDemo.map( (elem,i)=>{
         if(Object.keys(elem) == key3){
           return {[key3]:y+currentY}
           
@@ -254,9 +246,7 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
     //  console.log(articleCount);
 
      if(articleCount >= positionYArrArtical.length){
-      setPositionYArrArtical(c)
-
-      console.log('stop');
+      setPositionYArrArtical(positionYArrArticalDemo)
       articleCount = 0
      }
     
@@ -312,9 +302,9 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
 
   useEffect(() => {
     // console.log('currentSearchPoint',currentSearchPoint);
-    if((currentSearchPoint != 0)){ ////////////////////////////////////////////////////////////////////////
+    if((currentSearchPoint != 0) && searchCount){ ////////////////////////////////////////////////////////////////////////
     list.current.scrollTo({
-      y: positionYArr[currentSearchPoint - 1] - 80,//- 57
+      y: positionYArr[currentSearchPoint - 1] - 100,//- 57
     });
   }
   }, [currentSearchPoint]);
@@ -325,9 +315,10 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
   });
 
   useEffect(() => {
+    if(find == true){
     setTittleArray([]);
     setTittleArray2([]);
-
+    }
   }, [find]);
 
   useEffect(() => {
@@ -538,6 +529,7 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
         <TouchableOpacity
           style={styles.tab}
           onPress={() => {
+            setFind(false)
             setTittleArray([]);
             Shrink();
           }}>
@@ -648,9 +640,15 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
 
           <Text style={styles.searchCount}>
             {go &&
-              (searchCount
-                ? `có tổng cộng ${currentSearchPoint}/${searchCount} từ`
-                : `Không tìm thấy từ ${input}`)}{' '}
+              (
+
+                !input.match(/\w+/gim) ? 'Vui lòng nhâp từ khóa' : (searchCount ? `có tổng cộng ${currentSearchPoint}/${searchCount} từ`: `Không tìm thấy từ ${input}`)
+                // searchCount
+                // ? `có tổng cộng ${currentSearchPoint}/${searchCount} từ`
+                // : `Không tìm thấy từ ${input}`
+              )
+                
+                }{' '}
           </Text>
         </View>
       )}
