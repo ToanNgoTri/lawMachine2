@@ -14,6 +14,7 @@ import data from '../data/project2-197c0-default-rtdb-export.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 let chapterCount;
+let articleCount = 0
 //lineHeight trong lines phải luôn nhỏ hơn trong highlight và View Hightlight
 
 // search result bị xô lệch, đang xử lý theo hướng dúng onLayout trong Text
@@ -37,7 +38,7 @@ export default function Detail() {
 
   const [inputSearchArtical, setInputSearchArtical] = useState('');
 
-  const [currentSearchPoint, setCurrentSearchPoint] = useState(0);
+  const [currentSearchPoint, setCurrentSearchPoint] = useState(1);
 
   const route = useRoute();
 
@@ -127,42 +128,54 @@ export default function Detail() {
               }
             });
 
-              setCurrentSearchPoint(1)
             if(go){
               setTimeout(() => {
                 list.current.scrollTo({
-                  y: positionYArr[0] - 57,//- 57
+                  y: positionYArr[0] - 80,//- 57
                   // animated: true
                 });
-                // console.log('positionYArr',positionYArr);
-              }, 1000);
+                // console.log('3');
+              }, 500);
           
             }
                   }
 
           return prev.concat(
+          //   <Text 
+          //   style=
+          //   {{textAlign:'center', 
+          //   lineHeight:22,
+          //   display:'flex',
+          //   flexDirection:'row',
+          //   // height:23,
+          //   overflow:'hidden',
+          //   backgroundColor:'orange',
+          //   padding:0,
+          //   margin:0
+          // >
+          // }}
             <>
+            
             <View
               style={{
                 transform: [
-                  {translateY: 6},
-                  // {translateX: 3}
+                  // {translateY: 18},
+                //   // {translateX: 3},
+                // { scale: 0 }
                 ],
                 backgroundColor: 'blue',
-                position:'absolute',
-                display: 'flex',
                 // bottom: 40,
                 flex: 1,
                 // textAlignVertical: 'center',
                 alignSelf: 'center',
                 padding: 0,
-                // margin: 0,
+                margin: 0,
                 overflow: 'visible',
                 // height: 'auto',
-                lineHeight:21.5,
-                // height:21,
-                // width:'auto',
-                // right:50
+                // lineHeight:22,
+                // height:22,
+                // width:15,
+                right:-50
               }}
               onLayout={event => {
                 event.target.measure((x, y, width, height, pageX, pageY) => {
@@ -172,9 +185,16 @@ export default function Detail() {
                 });
               }}
               >
-                <Text>
-                </Text>
+                {/* <Text style={{backgroundColor:'red',position:'absolute',
+                lineHeight:22, 
+                display: 'flex',
+                right:-50              
+              }}>g
+                </Text> */}
+
+
             </View>
+            
               <Text 
       //         onLayout={event => {
       //         const {y} = event.nativeEvent.layout;
@@ -186,6 +206,7 @@ export default function Detail() {
               >
                 {inputRexgex[i - 1]}
               </Text>
+              {/* </Text> */}
               </>
             ,
            <Text 
@@ -193,7 +214,9 @@ export default function Detail() {
             // backgroundColor:'orange', 
            position:'relative',
            display:'flex',
-          margin:0
+          margin:0,
+          lineHeight:23,
+          // backgroundColor:'green'
           }}
            
            >{current}</Text> ,
@@ -207,19 +230,42 @@ export default function Detail() {
     // }
   }
 
+  let c = positionYArrArtical;
   function setPositionYArtical({y, key3}) {
-
-    // console.log((positionYArrArtical))
-
-    var contains = positionYArrArtical.some(elem =>{
-      return key3 == (Object.keys(elem)[0]);
+if((!tittleArray.length  && !tittleArray2.length) || go) {
+    var contains = positionYArrArtical.some( (elem,i) =>{
+      // console.log('a');
+      return key3 == (Object.keys(elem));
     });
+    
     if ( contains ) {
+      articleCount++
+
+      c = c.map( (elem,i)=>{
+        if(Object.keys(elem) == key3){
+          return {[key3]:y+currentY}
+          
+        }else{
+          return elem
+        }
+        
+      })
+  
+    //  console.log(articleCount);
+
+     if(articleCount >= positionYArrArtical.length){
+      setPositionYArrArtical(c)
+
+      console.log('stop');
+      articleCount = 0
+     }
+    
     } else {
-      positionYArrArtical.push({[key3]: y});
-    }
 
+      positionYArrArtical.push({[key3]: y+currentY});
+      }
 
+  }
   }
 
   useEffect(() => {
@@ -249,24 +295,26 @@ export default function Detail() {
     setGo(false);
     setSearchCount(0);
     setCurrentSearchPoint(0);
+    // setPositionYArrArtical([])
 
   }, [input]);
 
   useEffect(() => {
     setSearchCount(searchResultCount);
     setPositionYArr([]);
-    setCurrentSearchPoint(0)
+    setCurrentSearchPoint(1)
     // list.current.scrollTo({
     //   y: positionYArr[1] - 57,
     // });
+    // setPositionYArrArtical([]);
 
   }, [go]);
 
   useEffect(() => {
     // console.log('currentSearchPoint',currentSearchPoint);
-    if(currentSearchPoint != 0){
+    if((currentSearchPoint != 0)){ ////////////////////////////////////////////////////////////////////////
     list.current.scrollTo({
-      y: positionYArr[currentSearchPoint - 1] - 57,//- 57
+      y: positionYArr[currentSearchPoint - 1] - 80,//- 57
     });
   }
   }, [currentSearchPoint]);
@@ -288,7 +336,6 @@ export default function Detail() {
     setFind(false)
   }, [showArticle]);
 
-
   const a = (key, i, key1, i1a) => {
     // phần nếu không mục 'phần thứ' trong văn bản
     return Object.keys(key)[0] != '0' ? (
@@ -298,16 +345,20 @@ export default function Detail() {
             showArticle || find ||  (!tittleArray2.includes(`${i1a}a${i}`) && !tittleArray.includes(i)) || styles.content //////////////////////////////////////////////////////////////////
           }
           >
-          {key[key1].map((key2, i2) => (
+          {key[key1].map((key2, i2) => {
+            // console.log('b',Object.keys(key2));
+         return (
             <View
               onLayout={event => {
                 event.target.measure((x, y, width, height, pageX, pageY) => {
                   setPositionYArtical({
                     y: y + pageY,
-                    key3: Object.keys(key2),
+                    key3: Object.keys(key2)[0]
+                    
                   });
                 });
               }}
+              style={go ? {width:'100%'}:{width:'99%'} }
               >
               <Text key={`${i2}c`} style={styles.dieu}>
                 {go
@@ -320,7 +371,7 @@ export default function Detail() {
                   : Object.values(key2)[0]}
               </Text>
             </View>
-          ))}
+          )})}
         </View>
     ) : (
       {
@@ -414,11 +465,13 @@ export default function Detail() {
                         (x, y, width, height, pageX, pageY) => {
                           setPositionYArtical({
                             y: y + pageY,
-                            key3: Object.keys(keyC),
+                            key3: Object.keys(keyC)[0],
                           });
                         },
                       );
-                    }}>
+                    }}
+                    style={go ? {width:'100%'}:{width:'99%'} }
+                    >
                     <Text key={`${iC}c`} style={styles.dieu}>
                       {go
                         ? highlight(Object.keys(keyC), input, iC)
@@ -718,8 +771,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingLeft: 10,
     paddingRight: 10,
-    lineHeight:23,
-
+    lineHeight:22,
+    // backgroundColor:'blue',
+    alignItems:'center',
+    justifyContent:'center'
   },
   lines: {
     display: 'flex',
@@ -734,10 +789,10 @@ const styles = StyleSheet.create({
     // alignItems:'center',
     // textAlign:'center',
     color:'black',
-    margin:5,
+    // margin:5,
     // backgroundColor:'yellow',
-    lineHeight:23,
-    overflow:'visible',
+    lineHeight:22,
+    overflow:'hidden',
     
   },
   highlight: {
@@ -746,8 +801,9 @@ const styles = StyleSheet.create({
     // position:'re',
     display: 'flex',
     textAlign: 'center',
-    lineHeight:22.5,
+    lineHeight:22,
     // position:'absolute',
+    position:'relative',
 
   },
   highlight1:{
@@ -756,7 +812,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     position:'relative',
     backgroundColor: 'orange',
-    lineHeight:22.5,
+    lineHeight:22,
 
   },
   content: {
