@@ -64,7 +64,7 @@ export default function Detail({navigation}) {
 }
 
 
-      Object.keys(data).map((key, i) => {   //key là tên của luật
+      Object.keys(Content).map((key, i) => {   //key là tên của luật
         // tham nhap luat (array chuong) 
 
         searchArray[key] = [];
@@ -72,7 +72,7 @@ export default function Detail({navigation}) {
 
 
 
-        data[key].map((key1, i1) => {         
+        Content[key].map((key1, i1) => {         
           // ra Object Chuong hoặc (array phần thứ...)
           if(Object.keys(key1)[0].match(/phần thứ .*/gim)){    // nếu có 'phần thứ
 
@@ -182,7 +182,7 @@ export default function Detail({navigation}) {
       });
 
       setSearchResult(searchResult);
-      console.log('searchResult',searchResult);
+      // console.log('searchResult',searchResult);
     
     setArticleArray([]);
     setNameArray([]);
@@ -354,6 +354,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 30,
     textAlign: 'center',
+    fontWeight:'bold',
+    color:'white'
   },
   inputContainer: {
     display: 'flex',
@@ -365,6 +367,8 @@ const styles = StyleSheet.create({
     width: '15%',
     fontSize: 12,
     color: 'white',
+    fontWeight:'bold',
+
   },
   inputArea: {
     width: '85%',
@@ -388,7 +392,8 @@ const styles = StyleSheet.create({
     height: 0,
     display: 'flex',
     position: 'relative',
-    padding: 0,
+    // paddingRight: 10,
+    // paddingLeft: 10,
     margin: 0,
     overflow: 'hidden',
   },
@@ -401,13 +406,16 @@ const styles = StyleSheet.create({
     marginBottom: 1,
     display:'flex',
     flexDirection:'row',
+    paddingLeft:50,
+    paddingRight:50
+
   },
   chapterText: {
     textAlign: 'center',
-    color: 'yellow',
-    fontSize: 15,
+    color: 'black',
+    fontSize: 16,
     fontWeight: 'bold',
-    backgroundColor:'red'
+    // backgroundColor:'red'
   },
   chapterArrow:{
     backgroundColor:'blue',
@@ -431,13 +439,20 @@ const styles = StyleSheet.create({
     // alignItems:'center',
     display: 'flex',
     textAlign: 'center',
+    borderBottomColor:'white',
+    borderBottomWidth:1,
+
   },
   article: {
     color: 'white',
     overflow: 'hidden',
+    paddingRight: 10,
+    paddingLeft: 10,
+    textAlign:'center',
   },
   lines: {
     color: 'white',
+    
   },
   category: {
     display: 'flex',
@@ -473,6 +488,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     flex: 1,
     display: 'flex',
+    paddingRight: 10,
+    paddingLeft: 10,
+    textAlign: 'justify',
+    paddingTop:5,
+    paddingBottom:10
+
   },
   checkConent: {
     fontWeight: 'bold',
@@ -485,6 +506,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    
   },
   inputXIcon:{
     height: 20,

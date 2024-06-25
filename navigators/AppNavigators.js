@@ -10,34 +10,55 @@ import Detail1 from '../screens/Detail1';
 import Detail4 from '../screens/Detail4';
 import Detail5 from '../screens/Detail5';
 import data from '../data/project2-197c0-default-rtdb-export.json';
-import {Alert, Button, Text, View,Image} from 'react-native';
+import {Alert, Button, Text, View,Image,StyleSheet} from 'react-native';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const AppNavigators = () => {
+const AppNavigators = () => { 
+  
   return (
-      <Tab.Navigator>
+      <Tab.Navigator 
+      // screenOptions={({ route }) => (
+      //   console.log(route.name)
+
+      // )}
+      >
         <Tab.Screen
+        
           name="Home"
           component={Home}
           options={{header: () => null,
-            tabBarIcon: () => (
+            tabBarIcon: ({ focused, color, size }) => {
+            return (
+              <View
+              style= {focused ?styles.tabItemActive : styles.tabItemInactive}
+              >
               <Image source={require('../assets/home.png')}
-                style= {{width:25, height:25,color:'red',backgroundColor:'transparent',position: 'absolute',}}>
-              </Image>
-            ),
+                style= {{width:35, height:35,color:'white'}}>
+              </Image></View>
+            )
+          }
+            
+            ,tabBarLabel:() => {return null},
   }}
+            
         />
         <Tab.Screen
           name="Search"
           component={Detail1}
           options={{header: () => null,
-          tabBarIcon: () => (
-            <Image source={require('../assets/search.png')}
-              style= {{width:25, height:25}}>
-
-              </Image>)
+            tabBarIcon: ({ focused, color, size }) => {
+              return (
+                <View
+                style= {focused ?styles.tabItemActive : styles.tabItemInactive}
+                >
+                <Image source={require('../assets/search.png')}
+                  style= {{width:35, height:35,color:'white'}}>
+                </Image></View>
+              )
+            }
+                ,tabBarLabel:() => {return null}
           }}
 
         />
@@ -65,6 +86,11 @@ const StackNavigator = ({navigation}) => {
   return (
     <NavigationContainer>
       <Stack.Navigator
+      //       screenOptions={({ route }) => (
+      //   console.log(route.name)
+
+      // )}
+
         // initialRouteName="Home"
         // screenOptions={
         //   {
@@ -105,4 +131,31 @@ const StackNavigator = ({navigation}) => {
   );
 };
 
+
+const styles = StyleSheet.create({
+  tabItemActive:{
+    width:'100%', 
+    height:'102%',
+    backgroundColor:'red',
+    position: 'absolute',
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    // padding:0,
+    // margin:0,
+    // overflow:'hidden'
+  },
+  tabItemInactive:{
+    width:'100%', 
+    height:'102%',
+    backgroundColor:'gray',
+    position: 'absolute',
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center'
+
+  }
+
+
+})
 export default StackNavigator;

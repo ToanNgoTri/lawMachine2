@@ -1,5 +1,5 @@
 import {
-    Text,StyleSheet,TouchableOpacity,View,ScrollView,TextInput,FlatList,ActivityIndicator
+    Text,StyleSheet,TouchableOpacity,View,ScrollView,TextInput,FlatList,ActivityIndicator,Image,Keyboard
   } from 'react-native';
 import database from '@react-native-firebase/database';
 import { useState, useEffect } from 'react';
@@ -18,7 +18,7 @@ import data from '../data/project2-197c0-default-rtdb-export.json'
       const [totalPaper,setTotalPaper] = useState(2);
 
       const reference = database().ref('/Law1');
-
+    
     const Render = ({item})=>{
         return(
             <TouchableOpacity onPress={() => navigation.navigate(`${item}`)}>
@@ -83,16 +83,46 @@ import data from '../data/project2-197c0-default-rtdb-export.json'
                 flexDirection: 'row',
                 // backgroundColor: 'black',
                 height: 50,
+                paddingLeft:10,
+                paddingRight:10,
+                display:'flex',
+                // justifyContent:'center',
+                alignItems:'center',
+
+            }}>
+                {/* <Text 
+                style={{
+                    display:'flex',
+                color:'black',
+                fontWeight:'bold',
+                alignItems:'center',
+                textAlign:'center',
+                fontSize:20,
+                justifyContent:'center'
+                // paddingLeft:30,
+                // paddingRight:30
+
               }}>
+                    Search
+                </Text> */}
+                <Image source={require('../assets/abc.png')}
+                style= {{
+                        width:30, height:10,color:'red',position: 'absolute',
+                marginLeft:8,
+                // paddingRight:30
+            }}>
+              </Image>
               <TextInput
                 onChangeText={text => setInputSearchLaw(text)}
                 value={inputSearchLaw}
-                style={styles.inputSearchArea}
+                style={inputSearchLaw ?styles.inputSearchArea :styles.placeholder }
                 placeholder="Search Law ..."
-                placeholderTextColor={'gray'}>
+                placeholderTextColor={'gray'}
+                keyboardAppearance=''
+                >
                 </TextInput>
               <TouchableOpacity
-                onPress={() => setInputSearchLaw('')}
+                onPress={() => {setInputSearchLaw('');Keyboard.dismiss()}}
                 style={{width: '10%', display: 'flex',alignItems: 'center',justifyContent: 'center',
                 }}>
                 {inputSearchLaw && (
@@ -195,11 +225,23 @@ import data from '../data/project2-197c0-default-rtdb-export.json'
         textAlign:'center',
     },
     inputSearchArea:{
-        paddingLeft: 10,
-        paddingRight: 10,
+        paddingLeft: 40,
+        paddingRight: 40,
+        fontSize:18,
         color: 'black',
         width: '90%',
         alignItems: 'center',
+        height:50
+    },
+    placeholder:{
+        fontSize:15,
+        paddingLeft: 40,
+        paddingRight: 40,
+        color: 'black',
+        width: '90%',
+        alignItems: 'center',
+        height:50
+
     },
     inputXIcon:{
         height: 20,
