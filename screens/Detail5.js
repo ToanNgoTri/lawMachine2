@@ -12,15 +12,16 @@ import React, {useState, useEffect, useRef} from 'react';
 import {useRoute} from '@react-navigation/native';
 import data from '../data/project2-197c0-default-rtdb-export.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 let chapterCount;
 let articleCount = 0
 //lineHeight trong lines phải luôn nhỏ hơn trong highlight và View Hightlight
 
 // search result bị xô lệch, đang xử lý theo hướng dúng onLayout trong Text
-// chữ "hộ" search k được
  // hơi bị leak memory chỗ ScrollVIew nha
  // dưới mỗi điều có space to là do dữ liệu có dấu xuống hàng \n 
+ // khi shrink thì nên shrink chương luôn (nếu luật có "phần thứ")
 export default function Detail() {
   const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có 
   const [tittleArray, setTittleArray] = useState([]);
@@ -46,10 +47,13 @@ export default function Detail() {
   const [input, setInput] = useState(route.params ? route.params.input : '');
   const [find, setFind] = useState(route.params ? true : false);
   // const [find, setFind] = useState(true);
-  const [go, setGo] = useState(route.params ? true : false);
+  const [go, setGo] = useState(route.params ?  true : false);
 
   const [Content, setContent] = useState('');
+  
+ console.log('find',find)
 
+  
 
   const reference = database().ref('/Law1');
   useEffect(() => {
@@ -533,7 +537,9 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
             setTittleArray([]);
             Shrink();
           }}>
-          <Text style={styles.innerTab}>S</Text>
+          {/* <Text style={styles.innerTab}>S</Text> */}
+          <Ionicons name="chevron-collapse-outline" style={styles.innerTab}></Ionicons>
+
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tab}
@@ -541,14 +547,17 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
             setTittleArray([]);
             setTittleArray2([])
           }}>
-          <Text style={styles.innerTab}>E</Text>
+          {/* <Text style={styles.innerTab}>E</Text> */}
+          <Ionicons name="chevron-expand-outline" style={styles.innerTab}></Ionicons>
+
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tab}
           onPress={() => {
             list.current.scrollTo({y: 0});
           }}>
-          <Text style={styles.innerTab}>Top</Text>
+          {/* <Text style={styles.innerTab}>Top</Text> */}
+          <Ionicons name="arrow-up-outline" style={styles.innerTab}></Ionicons>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -556,14 +565,16 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
           onPress={() => {
             setFind(!find);
           }}>
-          <Text style={styles.innerTab}>Find</Text>
+          {/* <Text style={styles.innerTab}>Find</Text> */}
+          <Ionicons name="search-outline" style={styles.innerTab}></Ionicons>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tab}
           onPress={() => {
             setShowArticle(!showArticle);
           }}>
-          <Text style={styles.innerTab}>Menu</Text>
+          {/* <Text style={styles.innerTab}>Menu</Text> */}
+          <Ionicons name="menu-outline" style={styles.innerTab}></Ionicons>
         </TouchableOpacity>
       </View>
 
@@ -577,14 +588,21 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
                   ? setCurrentSearchPoint(1)
                   : setCurrentSearchPoint(currentSearchPoint + 1);
               }}>
-              <Text
+              {/* <Text
                 style={{
                   transform: [{rotate: '90deg'}],
                   color: 'yellow',
                   textAlign: 'center',
                   fontWeight: 'bold',
                   fontSize: 30,
-                }}>{`>`}</Text>
+                }}>{`>`}</Text> */}
+              <Ionicons name="caret-down-outline" style={{
+                  color: 'yellow',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 25,
+                }}></Ionicons>
+
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.tabSearch}
@@ -593,14 +611,22 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
                   ? setCurrentSearchPoint(positionYArr.length)
                   : setCurrentSearchPoint(currentSearchPoint - 1);
               }}>
-              <Text
+              {/* <Text
                 style={{
                   transform: [{rotate: '90deg'}],
                   color: 'yellow',
                   textAlign: 'center',
                   fontWeight: 'bold',
-                  fontSize: 30,
-                }}>{`<`}</Text>
+                  fontSize: 20,
+                }}>{`<`}</Text> */}
+
+<Ionicons name="caret-up-outline" style={{
+                  color: 'yellow',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 25,
+                }}></Ionicons>
+
             </TouchableOpacity>
             <View style={styles.inputArea}>
               <TextInput
@@ -615,10 +641,18 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
                 onPress={() => {
                   setInput('');
                 }}>
-                <Text
-                  style={{color: 'white', fontSize: 16, textAlign: 'center'}}>
+                {/* <Text
+                  style={{color: 'black', fontSize: 16, textAlign: 'center',    width:20,
+                  height:20,
+                  backgroundColor:'white',borderRadius:25
+              }}>
                   X
-                </Text>
+                </Text> */}
+                { input &&   <Ionicons name="close-circle-outline" style={{color: 'white', fontSize: 20, textAlign: 'center',    width:20,
+                  height:20,
+              }}></Ionicons>}
+  
+
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -742,12 +776,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   titleText: {
-    fontSize: 30,
+    fontSize: 28,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
     marginBottom: 30,
     textAlign: 'center',
+    paddingLeft:10,
+    paddingRight:10,
+    
   },
   chapter: {
     height: 60,
@@ -824,7 +861,7 @@ const styles = StyleSheet.create({
     // left: '80%',
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent:'space-evenly' ,
     bottom: 0,
     backgroundColor: 'gray',
     height: 50,

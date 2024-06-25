@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 
 import database from '@react-native-firebase/database';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import data from '../data/project2-197c0-default-rtdb-export.json';
 
 import React, {useEffect, useState} from 'react';
@@ -244,14 +246,17 @@ export default function Detail({navigation}) {
     <ScrollView style={{backgroundColor: 'green'}}>
       <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
       <View style={styles.inputContainer}>
-        <Text style={styles.inputText}>Tìm kiếm</Text>
+      <Ionicons name="text-outline" style={styles.inputText}></Ionicons>
+
+        {/* <Text style={styles.inputText}>Tìm kiếm</Text> */}
         <View
               style={{
                 position:'relative',
                 flexDirection: 'row',
                 backgroundColor: 'white',
                 // height: 50,
-                width:'50%'
+                width:'60%',
+                borderRadius:15
               }}>
 
         <TextInput
@@ -264,12 +269,16 @@ export default function Detail({navigation}) {
                 onPress={() => setInput('')}
                 style={{width: '15%', display: 'flex',alignItems: 'center',justifyContent: 'center',left:-3
                 }}>
-                {input && (
+                {/* {input && (
                   <Text
                     style={styles.inputXIcon}>
                     X
                   </Text>
-                )}
+                )} */}
+             { input &&   (<Ionicons name="close-circle-outline" style={{color: 'black', fontSize: 20, textAlign: 'center',    width:20,
+                  height:20,
+              }}></Ionicons>)}
+
               </TouchableOpacity>
 
           </View>
@@ -278,7 +287,9 @@ export default function Detail({navigation}) {
           onPress={() => {
             Search(input);
           }}>
-          <Text style={styles.inputBtbText}>Go!</Text>
+          {/* <Text style={styles.inputBtbText}>Go!</Text> */}
+          <Ionicons name="caret-forward-outline" style={styles.inputBtbText}></Ionicons>
+
         </TouchableOpacity>
       </View>
       <View style={{marginTop: 8}}>
@@ -300,13 +311,17 @@ export default function Detail({navigation}) {
               onPress={() => navigation.navigate(`${key}`,{input:input})}
               style={styles.chapterArrow}
               >
-              <Text
+                      <Ionicons 
+                      name="return-down-forward-outline" 
+                      style={{fontWeight:'bold',color:'white', textAlign:'center',fontSize:17}}></Ionicons>
+
+              {/* <Text
               style={{fontWeight:'bold',color:'white', textAlign:'center',fontSize:17}}
               
               
               >
                   {'->'}
-                  </Text>
+                  </Text> */}
                 </TouchableOpacity>
               </TouchableOpacity>
               {SearchResult[key].map((key1, i1) => (
@@ -361,20 +376,26 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-around',
+    // backgroundColor:'red'
   },
   inputText: {
-    width: '15%',
-    fontSize: 12,
+    width: '8%',
+    fontSize: 30,
     color: 'white',
     fontWeight:'bold',
-
+// backgroundColor:'red',
+alignItems:'center',
+justifyContent:'center',
+display:'flex',
+right:-5
   },
   inputArea: {
     width: '85%',
     backgroundColor: 'white',
     color:'black',
     paddingLeft:8,
+    borderRadius:15
   },
   inputBtb: {
     width: '15%',
@@ -383,10 +404,12 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    right:5
   },
   inputBtbText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize:20
   },
   content: {
     height: 0,
@@ -418,7 +441,7 @@ const styles = StyleSheet.create({
     // backgroundColor:'red'
   },
   chapterArrow:{
-    backgroundColor:'blue',
+    backgroundColor:'black',
     borderRadius:25,
     // alignItems:'flex-end',
     display:'flex',

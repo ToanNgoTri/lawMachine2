@@ -10,59 +10,80 @@ import Detail1 from '../screens/Detail1';
 import Detail4 from '../screens/Detail4';
 import Detail5 from '../screens/Detail5';
 import data from '../data/project2-197c0-default-rtdb-export.json';
-import {Alert, Button, Text, View,Image,StyleSheet} from 'react-native';
+import {
+  Alert,
+  Button,
+  Text,
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const AppNavigators = () => { 
-  
+const AppNavigators = () => {
   return (
-      <Tab.Navigator 
-      // screenOptions={({ route }) => (
-      //   console.log(route.name)
+    <Tab.Navigator
+    // screenOptions={({ route }) => (
+    //   console.log(route.name)
 
-      // )}
-      >
-        <Tab.Screen
-        
-          name="Home"
-          component={Home}
-          options={{header: () => null,
-            tabBarIcon: ({ focused, color, size }) => {
+    // )}
+    >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          header: () => null,
+          tabBarIcon: ({focused, color, size}) => {
             return (
               <View
-              style= {focused ?styles.tabItemActive : styles.tabItemInactive}
-              >
-              <Image source={require('../assets/home.png')}
+                style={focused ? styles.tabItemActive : styles.tabItemInactive}>
+                {/* <Image source={require('../assets/home.png')}
                 style= {{width:35, height:35,color:'white'}}>
-              </Image></View>
-            )
-          }
-            
-            ,tabBarLabel:() => {return null},
-  }}
-            
-        />
-        <Tab.Screen
-          name="Search"
-          component={Detail1}
-          options={{header: () => null,
-            tabBarIcon: ({ focused, color, size }) => {
-              return (
-                <View
-                style= {focused ?styles.tabItemActive : styles.tabItemInactive}
-                >
-                <Image source={require('../assets/search.png')}
-                  style= {{width:35, height:35,color:'white'}}>
-                </Image></View>
-              )
-            }
-                ,tabBarLabel:() => {return null}
-          }}
+              </Image> */}
+                <Ionicons
+                  name="home-outline"
+                  style={
+                    focused ? styles.IconActive : styles.IconInActive
+                  }></Ionicons>
+              </View>
+            );
+          },
 
-        />
-      </Tab.Navigator>
+          tabBarLabel: () => {
+            return null;
+          },
+        }}
+      />
+      <Tab.Screen
+        name="Search"
+        component={Detail1}
+        options={{
+          header: () => null,
+          tabBarIcon: ({focused, color, size}) => {
+            return (
+              <View
+                style={focused ? styles.tabItemActive : styles.tabItemInactive}>
+                {/* <Image source={require('../assets/search.png')}
+                  style= {{width:35, height:35,color:'white'}}>
+                </Image> */}
+                <Ionicons
+                  name="search-outline"
+                  style={
+                    focused ? styles.IconActive : styles.IconInActive
+                  }></Ionicons>
+              </View>
+            );
+          },
+          tabBarLabel: () => {
+            return null;
+          },
+        }}
+      />
+    </Tab.Navigator>
   );
 };
 
@@ -77,8 +98,6 @@ const StackNavigator = ({navigation}) => {
     });
   }, []);
 
-
-
   function TopBarNav({route}) {
     <Text>{route.name}</Text>;
   }
@@ -91,71 +110,98 @@ const StackNavigator = ({navigation}) => {
 
       // )}
 
-        // initialRouteName="Home"
-        // screenOptions={
-        //   {
-        //     header: ({route}) => <Text>{route.name}</Text>
-        //   }
-        // }
-        >
-         
-                <Stack.Screen name="Home" component={AppNavigators} options={{animationEnabled: false, header: () => null}}/>
+      // initialRouteName="Home"
+      // screenOptions={
+      //   {
+      //     header: ({route}) => <Text>{route.name}</Text>
+      //   }
+      // }
+      >
+        <Stack.Screen
+          name="Home"
+          component={AppNavigators}
+          options={{animationEnabled: false, header: () => null}}
+        />
 
-                {/* <Stack.Screen name="Luật Cư Trú năm 2020" component={Detail5}  */}
-                {/* /> */}
+        {/* <Stack.Screen name="Luật Cư Trú năm 2020" component={Detail5}  */}
+        {/* /> */}
 
         {Content &&
           Object.keys(Content).map((key, i) => (
-                <Stack.Screen
-                  key={i}
-                  name={`${key}`}
-                  component={Detail5}
-                  // options={{animationEnabled: true}}
-                  options={({navigation}) => ({
-                    title: '',
-                    headerRight: () => (
-                      <>
-                        <Button
-                          title="alert"
-                          onPress={() => {
+            <Stack.Screen
+              key={i}
+              name={`${key}`}
+              component={Detail5}
+              // options={{animationEnabled: true}}
+              options={({navigation}) => ({
+                title: '',
+                headerRight: () => (
+                  <>
+                    <TouchableOpacity 
+                    style={styles.iconInfoContainer} 
+                    onPress={
+                      () => {
+                        // navigation.navigate('Search')
                             Alert.alert('Waring', 'Giai đoạn 2 đang cập nhật...');
-                          }}></Button>
-                      </>
-                    ),
-                  })}
-                />
-              ))
-          }
+                      }}
+                      
+                      >
+
+                      <Ionicons
+                        name="alert-outline"
+                        style={styles.IconInfo}></Ionicons>
+                    </TouchableOpacity>
+                  </>
+                ),
+              })}
+            />
+          ))}
       </Stack.Navigator>
-      </NavigationContainer>
+    </NavigationContainer>
   );
 };
 
-
 const styles = StyleSheet.create({
-  tabItemActive:{
-    width:'100%', 
-    height:'102%',
-    backgroundColor:'red',
+  tabItemActive: {
+    width: '100%',
+    height: '102%',
+    // backgroundColor:'red',
     position: 'absolute',
-    display:'flex',
-    alignItems:'center',
-    justifyContent:'center',
-    // padding:0,
-    // margin:0,
-    // overflow:'hidden'
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'yellow',
   },
-  tabItemInactive:{
-    width:'100%', 
-    height:'102%',
-    backgroundColor:'gray',
+  tabItemInactive: {
+    width: '100%',
+    height: '102%',
+    backgroundColor: 'white',
     position: 'absolute',
-    display:'flex',
-    alignItems:'center',
-    justifyContent:'center'
-
-  }
-
-
-})
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  IconActive: {
+    fontSize: 20,
+    color: 'green',
+  },
+  IconInActive: {
+    fontSize: 20,
+    color: 'black',
+  },
+  IconInfo: {
+    fontSize: 25,
+    display: 'flex',
+    color: 'white',
+  },
+  iconInfoContainer: {
+    width: 50,
+    height: 40,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'black',
+    borderRadius: 25,
+  },
+});
 export default StackNavigator;

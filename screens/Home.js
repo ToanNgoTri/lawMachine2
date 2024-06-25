@@ -3,7 +3,8 @@ import {
   } from 'react-native';
 import database from '@react-native-firebase/database';
 import { useState, useEffect } from 'react';
-import data from '../data/project2-197c0-default-rtdb-export.json'
+import data from '../data/project2-197c0-default-rtdb-export.json';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
   export default function Home({ navigation }) {  
@@ -18,7 +19,6 @@ import data from '../data/project2-197c0-default-rtdb-export.json'
       const [totalPaper,setTotalPaper] = useState(2);
 
       const reference = database().ref('/Law1');
-    
     const Render = ({item})=>{
         return(
             <TouchableOpacity onPress={() => navigation.navigate(`${item}`)}>
@@ -126,11 +126,9 @@ import data from '../data/project2-197c0-default-rtdb-export.json'
                 style={{width: '10%', display: 'flex',alignItems: 'center',justifyContent: 'center',
                 }}>
                 {inputSearchLaw && (
-                  <Text
-                    style={styles.inputXIcon}>
-                    X
-                  </Text>
-                )}
+             <Ionicons name="close-circle-outline" style={{color: 'black', fontSize: 25, textAlign: 'center'
+         }}></Ionicons>
+           )}
               </TouchableOpacity>
             </View>
 
