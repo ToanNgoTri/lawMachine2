@@ -54,14 +54,17 @@ export default function Detail({navigation}) {
           // chọn từng điều
 
           // Object.keys(key2).map((key5, i5) => {
-
             let replace = `(.*)${input}(.*)`;
             let re = new RegExp(replace, 'gmi');
             if(Object.keys(key2)[0].match(re)){
               searchArray[key].push({[Object.keys(key2)[0]]: Object.values(key2)[0]});
-            }else if (Object.values(key2)[0].match(re)) {
+            
+            }
+            else if(Object.values(key2)[0] != ''){
+            if (Object.values(key2)[0].match(re)) {
               searchArray[key].push({[Object.keys(key2)[0]]: Object.values(key2)[0]});
             }
+          }
           // }
         })
     

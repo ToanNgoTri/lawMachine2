@@ -31,10 +31,9 @@ let eachSectionWithChapter = []
  
  export default function Detail() {
   // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có 
-  const [tittleArray, setTittleArray] = useState([]);
+  const [tittleArray, setTittleArray] = useState([]);   // đây là 'phần thứ...' hoặc chương (nói chung là section cao nhất)
 
-  // const [tittle2, setTittle2] = useState();   // để collapse chương nếu có mục 'phần thứ...'          
-  const [tittleArray2, setTittleArray2] = useState([]);
+  const [tittleArray2, setTittleArray2] = useState([]);   // nếu có 'phần thứ...' thì đây sẽ là chương 
   
   const [searchCount, setSearchCount] = useState(0);
   const [positionYArr, setPositionYArr] = useState([]);   // tập hợp pos Y Search
@@ -53,7 +52,7 @@ let eachSectionWithChapter = []
   const list = useRef(null);
   const [input, setInput] = useState(route.params ? route.params.input : '');
   const [find, setFind] = useState(route.params ? true : false);
-  // const [find, setFind] = useState(true);
+
   const [go, setGo] = useState(route.params ?  true : false);
 
   const [Content, setContent] = useState('');
@@ -75,13 +74,10 @@ let eachSectionWithChapter = []
       setTittleArray([...tittleArray, a]);
     }
 
-// console.log('eachSectionWithChapter[a]',eachSectionWithChapter[a]);
 let contain = false
     if(eachSectionWithChapter[a]){
       for( let m = 0 ; m < eachSectionWithChapter[a].length; m++){
         if(tittleArray2.includes(eachSectionWithChapter[a][m])){
-        // console.log(eachSectionWithChapter[a][m]);
-      // tittleArray2.push(eachSectionWithChapter[a][m]);
       contain = true
     }else{
       contain = false
@@ -90,24 +86,17 @@ let contain = false
   }
     
 
-    console.log(contain);
-    let abc = tittleArray2
+    let tittleArray2Copy = tittleArray2
   for( let m = 0 ; m < eachSectionWithChapter[a].length; m++){
     if(!contain){
       if(!tittleArray2.includes(eachSectionWithChapter[a][m])){
       tittleArray2.push(eachSectionWithChapter[a][m])  
-}else{
 }
-  
 }else{
-  
-  abc = abc.filter(item => item != eachSectionWithChapter[a][m])
-
-      }
-
+  tittleArray2Copy = tittleArray2Copy.filter(item => item != eachSectionWithChapter[a][m])
+  setTittleArray2(tittleArray2Copy)
 }
-setTittleArray2(abc)
-console.log('abc',abc);
+}
 
     }
 }
@@ -129,7 +118,6 @@ console.log('abc',abc);
   function highlight(para, word, i2) {
     // if (typeof para == 'string' ) {
     if (word.match(/\w+/gim)) {
-      // console.log('a');
       let inputRexgex = para[0].match(new RegExp(String(word), 'igmu'));
       // let inputRexgex = para[0].match(new RegExp('hội', 'igmu'));
       if (inputRexgex) {
@@ -159,9 +147,7 @@ console.log('abc',abc);
               setTimeout(() => {
                 list.current.scrollTo({
                   y: positionYArr[0] - 100,//- 57
-                  // animated: true
                 });
-                // console.log('3');
               }, 500);
           
             }
@@ -270,7 +256,6 @@ console.log('abc',abc);
   function setPositionYArtical({y, key3}) {
 if((!tittleArray.length  && !tittleArray2.length) || go) {
     var contains = positionYArrArtical.some( (elem,i) =>{
-      // console.log('a');
       return key3 == (Object.keys(elem));
     });
     
@@ -287,7 +272,6 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
         
       })
   
-    //  console.log(articleCount);
 
      if(articleCount >= positionYArrArtical.length){
       setPositionYArrArtical(positionYArrArticalDemo)
@@ -380,13 +364,10 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
     setFind(false)
   }, [showArticle]);
 
-// console.log('tittleArray',tittleArray);
-let t
+
+  let t
   const a = (key, i, key1, i1a,t) => {
     // phần nếu không mục 'phần thứ' trong văn bản
-    // console.log(tittleArray2.includes(String(t)));
-
-    // console.log('t',t);
 
 
     return Object.keys(key)[0] != '0' ? (
@@ -408,7 +389,6 @@ let t
 
           >
           {key[key1].map((key2, i2) => {
-            // console.log('b',Object.keys(key2));
          return (
             <View
               onLayout={event => {
@@ -449,9 +429,7 @@ let t
     }
   });
 
-// console.log(eachSectionWithChapter);
 
-console.log('tittleArray2',tittleArray2);
   const b = (keyA, i, keyB) => {
     // phần nếu có mục 'phần' trong văn bản
     return (
@@ -469,7 +447,6 @@ console.log('tittleArray2',tittleArray2);
               //nếu có chương
               let t = 0
 
-              // console.log(keyA[keyB].length);
               sumChapterArray[i+1] = keyA[keyB].length ? keyA[keyB].length :0
             sum = sumChapterArray.slice(0,i+1).reduce((total,currentValue) => {
               if(currentValue){
@@ -485,7 +462,6 @@ if(!eachSectionWithChapter[i]){
   eachSectionWithChapter[i].push(t)
 }
  
-// console.log('sum',sum);
               return (
                 <>
             <TouchableOpacity     // đây là chương
@@ -566,7 +542,6 @@ if(!eachSectionWithChapter[i]){
       <ScrollView
       onScroll={ event =>{       
        {const {y} = event.nativeEvent.contentOffset;
-                // console.log('wRef: ' + y);
                 setCurrentY(y)
        }
       }}
