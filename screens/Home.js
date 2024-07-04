@@ -15,7 +15,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
       const [inputSearchLaw,setInputSearchLaw] = useState('');
       const [searchLawResult,setSearchLawResult] = useState([]);
-      const [currentPaper,setCurrentPaper] = useState(0);
+      const [currentPaper,setCurrentPaper] = useState(1);
       const [totalPaper,setTotalPaper] = useState(2);
 
       const reference = database().ref('/Law1');
@@ -66,9 +66,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
     // console.log(totalPaper);
     
     const loadMoreItem = ()=>{
-        // console.log('totalPaper',totalPaper);
+        console.log('totalPaper',totalPaper);
+        console.log('currentPaper',currentPaper);
         if(currentPaper<totalPaper){            // bị lỗi: tuy totalPaper đã dc thêm mới nhưng trong if() vẫn false
             setCurrentPaper(currentPaper+1)
+            console.log('được cộng');
         }
         setShowContent(Content.slice(0,7*currentPaper));
         // console.log('currentPaper',currentPaper);
@@ -155,10 +157,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
   } */}
 
   <FlatList
-  data={showContent && (searchLawResult || showContent)}
+  data={Content && (searchLawResult || Content)}
   renderItem={Render}
-  ListFooterComponent={(totalPaper > currentPaper) && renderLoader} //(totalPaper > currentPaper) && 
-  onEndReached={ loadMoreItem}
+//   ListFooterComponent={(totalPaper > currentPaper) && renderLoader} //(totalPaper > currentPaper) && 
+//   onEndReached={ loadMoreItem}
   >
 
     

@@ -14,6 +14,8 @@ import data from '../data/project2-197c0-default-rtdb-export.json';
 
 import React, {useEffect, useState} from 'react';
 
+
+// lúc ấn X để xóa hay nhập input hay bị đơ
 export default function Detail({navigation}) {
   const [Content, setContent] = useState({});
   const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm 
@@ -25,7 +27,7 @@ export default function Detail({navigation}) {
   const [article, setArticle] = useState();    // dùng để collapse (thu thập key của các 'điều')
   const [articleArray, setArticleArray] = useState([]);   // arrray của các 'điều' đã expand
 
-  
+  const [warning,setWanring] =  useState(false)
   
   const reference = database().ref('/Law1');
   
@@ -41,6 +43,8 @@ export default function Detail({navigation}) {
 
   function Search(input) {
       let searchArray = {};
+
+      if (input.match(/\w+/gim)) {
 
       function a(key,key1){
         // Object.keys(key2).map((key3, i3) => {
@@ -188,6 +192,10 @@ export default function Detail({navigation}) {
     
     setArticleArray([]);
     setNameArray([]);
+
+  }else{
+    setWanring(true)
+  }
   }
 
   function collapse(a) {
@@ -242,20 +250,38 @@ export default function Detail({navigation}) {
     collapseArticle(article);
   }, [article]);
 
+  useEffect(() => {
+    setWanring(false);
+  }, [input]);
+
+  const NoneOfResutl = ()=>{
+    return(
+      <View style={{ height:250,alignItems:'center',justifyContent:'flex-end'}}>
+<Text style={{fontSize:40,textAlign: 'center',
+}}> Không có kết quả nào </Text> 
+</View>
+    )
+  }
+// console.log(Object.keys('SearchResult1',SearchResult));
   return (
-    <ScrollView style={{backgroundColor: 'green'}}>
+    <ScrollView keyboardShouldPersistTaps='handled'>
+      <View style={{backgroundColor: 'green'}}>
       <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
       <View style={styles.inputContainer}>
       <Ionicons name="text-outline" style={styles.inputText}></Ionicons>
 
         {/* <Text style={styles.inputText}>Tìm kiếm</Text> */}
+        <View  style={{
+                flexDirection: 'column',
+                width:'60%',
+
+              }}>
         <View
               style={{
                 position:'relative',
                 flexDirection: 'row',
                 backgroundColor: 'white',
                 // height: 50,
-                width:'60%',
                 borderRadius:15
               }}>
 
@@ -263,24 +289,23 @@ export default function Detail({navigation}) {
           style={styles.inputArea}
           onChangeText={text => setInput(text)}
             value={input}
+            isFo
             >
           </TextInput>
-          <TouchableOpacity
+          {/* <TouchableOpacity
                 onPress={() => setInput('')}
                 style={{width: '15%', display: 'flex',alignItems: 'center',justifyContent: 'center',left:-3
                 }}>
-                {/* {input && (
-                  <Text
-                    style={styles.inputXIcon}>
-                    X
-                  </Text>
-                )} */}
              { input &&   (<Ionicons name="close-circle-outline" style={{color: 'black', fontSize: 20, textAlign: 'center',    width:20,
                   height:20,
               }}></Ionicons>)}
 
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
+          </View>
+          <Text style={{color:'orange', fontSize:16, textAlign:'center',fontWeight:'bold'}}>
+            {warning ? 'Vui lòng nhập từ khóa':' '}
+          </Text>
           </View>
         <TouchableOpacity
           style={styles.inputBtb}
@@ -292,8 +317,12 @@ export default function Detail({navigation}) {
 
         </TouchableOpacity>
       </View>
-      <View style={{marginTop: 8}}>
-        {SearchResult &&
+      </View>
+      <View style={{marginTop: 1}}>
+        { 
+
+        Array.isArray(SearchResult) ? null : 
+        !Object.keys(SearchResult).length  ? <NoneOfResutl/> :
           Object.keys(SearchResult).map((key, i) => (
             <>
               <TouchableOpacity
@@ -375,20 +404,22 @@ const styles = StyleSheet.create({
   inputContainer: {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'space-around',
     // backgroundColor:'red'
   },
   inputText: {
-    width: '8%',
+    width: '15%',
     fontSize: 30,
     color: 'white',
     fontWeight:'bold',
 // backgroundColor:'red',
-alignItems:'center',
-justifyContent:'center',
-display:'flex',
-right:-5
+      alignItems:'center',
+      justifyContent:'center',
+      display:'flex',
+      // right:-5,
+      top:10,
+      textAlign:'center'
   },
   inputArea: {
     width: '85%',
@@ -404,7 +435,9 @@ right:-5
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    right:5
+    right:5,
+    top:10
+
   },
   inputBtbText: {
     color: 'white',

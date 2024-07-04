@@ -14,19 +14,26 @@ import data from '../data/project2-197c0-default-rtdb-export.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-let chapterCount;
+let TopUnitCount;   // là đơn vị lớn nhất vd là 'phần thứ' hoặc chương
 let articleCount = 0
+let sumChapterArray = [] // array mà mỗi phần tử là 'phần thứ...' có tổng bn chương
+sumChapterArray[0] = 0  
+let sum // sum của các chương trong luật có phần thứ
+
+let eachSectionWithChapter = []
 //lineHeight trong lines phải luôn nhỏ hơn trong highlight và View Hightlight
+
+// để searchArticle transition vào cho đẹp
 
 // search result bị xô lệch, đang xử lý theo hướng dúng onLayout trong Text
  // hơi bị leak memory chỗ ScrollVIew nha
- // dưới mỗi điều có space to là do dữ liệu có dấu xuống hàng \n 
- // khi shrink thì nên shrink chương luôn (nếu luật có "phần thứ")
-export default function Detail() {
-  const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có 
+// chỗ chapter nếu bung được thì bung hết
+ 
+ export default function Detail() {
+  // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có 
   const [tittleArray, setTittleArray] = useState([]);
 
-  const [tittle2, setTittle2] = useState();   // để collapse chương nếu có mục 'phần thứ...'          
+  // const [tittle2, setTittle2] = useState();   // để collapse chương nếu có mục 'phần thứ...'          
   const [tittleArray2, setTittleArray2] = useState([]);
   
   const [searchCount, setSearchCount] = useState(0);
@@ -50,10 +57,6 @@ export default function Detail() {
   const [go, setGo] = useState(route.params ?  true : false);
 
   const [Content, setContent] = useState('');
-  
- console.log('find',find)
-
-  
 
   const reference = database().ref('/Law1');
   useEffect(() => {
@@ -71,17 +74,53 @@ export default function Detail() {
     } else {
       setTittleArray([...tittleArray, a]);
     }
-    setTittle(null);
+
+// console.log('eachSectionWithChapter[a]',eachSectionWithChapter[a]);
+let contain = false
+    if(eachSectionWithChapter[a]){
+      for( let m = 0 ; m < eachSectionWithChapter[a].length; m++){
+        if(tittleArray2.includes(eachSectionWithChapter[a][m])){
+        // console.log(eachSectionWithChapter[a][m]);
+      // tittleArray2.push(eachSectionWithChapter[a][m]);
+      contain = true
+    }else{
+      contain = false
+      break
+    }
   }
+    
+
+    console.log(contain);
+    let abc = tittleArray2
+  for( let m = 0 ; m < eachSectionWithChapter[a].length; m++){
+    if(!contain){
+      if(!tittleArray2.includes(eachSectionWithChapter[a][m])){
+      tittleArray2.push(eachSectionWithChapter[a][m])  
+}else{
+}
+  
+}else{
+  
+  abc = abc.filter(item => item != eachSectionWithChapter[a][m])
+
+      }
+
+}
+setTittleArray2(abc)
+console.log('abc',abc);
+
+    }
+}
 
   function collapse2(a) {       // để collapse chương nếu có mục 'phần thứ...'
+    
     if (a == undefined) {
     } else if (tittleArray2.includes(a)) {
       setTittleArray2(tittleArray2.filter(a1 => a1 !== a));
     } else {
       setTittleArray2([...tittleArray2, a]);
     }
-    setTittle(null);
+    // setTittle(null);
   }
 
 
@@ -227,6 +266,7 @@ export default function Detail() {
   }
 
   let positionYArrArticalDemo = positionYArrArtical;
+
   function setPositionYArtical({y, key3}) {
 if((!tittleArray.length  && !tittleArray2.length) || go) {
     var contains = positionYArrArtical.some( (elem,i) =>{
@@ -262,27 +302,36 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
   }
   }
 
-  useEffect(() => {
-    collapse(tittle);
-    chapterCount = Content && Object.keys(Content).length;
-  }, [tittle]);
+  // useEffect(() => {
+    
+  // }, [tittle]);
 
-  useEffect(() => {
-    collapse2(tittle2);
+  // useEffect(() => {
+    
 
-  }, [tittle2]);
+  // }, [tittle2]);
 
 
-  chapterCount = Content && Object.keys(Content).length;
+  TopUnitCount = Content && Object.keys(Content).length;
 
   function Shrink() {
-    for (let b = 0; b <= chapterCount - 1; b++) {
+    for (let b = 0; b <= TopUnitCount - 1; b++) {
       if (tittleArray == []) {
         setTittleArray([b]);
       } else {
         setTittleArray(oldArray => [...oldArray, b]);
       }
     }
+
+    for (let b = 0; b <= sum2 - 1; b++) {
+      if (tittleArray2 == []) {
+        setTittleArray2([b]);
+      } else {
+        setTittleArray2(oldArray => [...oldArray, b+1]);
+      }
+    }
+
+
   }
 
   useEffect(() => {
@@ -331,14 +380,32 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
     setFind(false)
   }, [showArticle]);
 
-  const a = (key, i, key1, i1a) => {
+// console.log('tittleArray',tittleArray);
+let t
+  const a = (key, i, key1, i1a,t) => {
     // phần nếu không mục 'phần thứ' trong văn bản
+    // console.log(tittleArray2.includes(String(t)));
+
+    // console.log('t',t);
+
+
     return Object.keys(key)[0] != '0' ? (
         <View
           key={`${i}b`}
           style={
-            showArticle || find ||  (!tittleArray2.includes(`${i1a}a${i}`) && !tittleArray.includes(i)) || styles.content //////////////////////////////////////////////////////////////////
+            showArticle || find || 
+          (  t == undefined ? ( !tittleArray.includes(i) )
+            :   (!tittleArray2.includes(t)  ) )
+            
+            
+            ||  styles.content //////////////////////////////////////////////////////////////////
+
+            
           }
+          // style={
+          //   showArticle || find ||  !tittleArray2.includes(String(t)) ||  styles.content //////////////////////////////////////////////////////////////////
+          // }
+
           >
           {key[key1].map((key2, i2) => {
             // console.log('b',Object.keys(key2));
@@ -370,73 +437,71 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
         </View>
     ) : (
       {
-        /* <>
-                    <View
-                      key={`${i1}b`}
-                      // style={(showArticle || find || !tittleArray.includes(i)) || styles.content}
-                      >
-                      {key.map((key2, i2) => (
-                        <View
-                          onLayout={event => {
-                            event.target.measure(
-                              (x, y, width, height, pageX, pageY) => {
-                                setPositionYArtical({
-                                  y: y + pageY,
-                                  key3: Object.keys(key2),
-                                });
-                              },
-                            );
-                          }}>
-                          <Text key={`${i2}c`} style={styles.dieu}>
-                            {go
-                              ? highlight(Object.keys(key2), input, i2)
-                              : Object.keys(key2)}
-                          </Text>
-                          <Text key={`${i2}d`} style={styles.lines}>
-                            {
-                              go
-                                ? highlight(Object.values(key2), input, i2)
-                                : Object.values(key2)
-
-                                }
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
-                  </> */
       }
     );
   };
 
+
+
+  let sum2 = sumChapterArray.reduce((total,currentValue) => {
+    if(currentValue){
+    return total + currentValue;
+    }
+  });
+
+// console.log(eachSectionWithChapter);
+
+console.log('tittleArray2',tittleArray2);
   const b = (keyA, i, keyB) => {
     // phần nếu có mục 'phần' trong văn bản
-
     return (
       <>
         <View
           key={`${i}b`}
-          style={
-            showArticle || find || !tittleArray.includes(i) || styles.content
-          }
+          // style={
+          //   showArticle || find || !tittleArray.includes(i) || styles.content
+          // }
           >
           {keyA[keyB].map((keyC, iC) => {
             // keyC ra object là từng chương hoặc ra điều luôn
-
+            
             if (Object.keys(keyC)[0].match(/^Chương.*$/gim)) {
               //nếu có chương
+              let t = 0
+
+              // console.log(keyA[keyB].length);
+              sumChapterArray[i+1] = keyA[keyB].length ? keyA[keyB].length :0
+            sum = sumChapterArray.slice(0,i+1).reduce((total,currentValue) => {
+              if(currentValue){
+              return total + currentValue;
+              }
+            });
+
+
+t = sum + iC+1
+if(!eachSectionWithChapter[i]){
+  eachSectionWithChapter[i] = [t]
+}else if(!eachSectionWithChapter[i].includes(t)){
+  eachSectionWithChapter[i].push(t)
+}
+ 
+// console.log('sum',sum);
               return (
                 <>
             <TouchableOpacity     // đây là chương
                 key={i}
                 // style={styles.chapter}
                 onPress={() => {
-                  setTittle2(`${iC}a${i}`);
+                  // setTittle2(`${iC}a${i}`);
+                  // collapse2(`${iC}a${i}`);
+                  collapse2(t);
+
                 }}>
 
                   <Text
                     key={`${i}a`}
                     style={{
-                      fontSize: 15,
+                      fontSize: 14,
                       color: 'white',
                       fontWeight: 'bold',
                       padding: 4,
@@ -448,12 +513,18 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
                   </Text>
                   </TouchableOpacity>
 
-                  {a(keyC, i, Object.keys(keyC)[0], iC)}
+                  {a(keyC, i, Object.keys(keyC)[0], iC,t)}
+                  
                 </>
               );
             } else {
               //nếu không có chương
               return (
+                <View
+                style={
+                  showArticle || find ||  !tittleArray.includes(i) || styles.content //////////////////////////////////////////////////////////////////
+                }
+      >
                   <View
                     onLayout={event => {
                       event.target.measure(
@@ -478,12 +549,14 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
                         : Object.values(keyC)}
                     </Text>
                   </View>
+                  </View>
               );
               //  a( keyC,i,Object.keys(keyC)[0],iC)
             }
 
           })}
         </View>
+        
       </>
     );
   };
@@ -499,7 +572,9 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
       }}
 
         ref={list}
-        style={find ? {marginBottom: 130} : {marginBottom: 50}}>
+        style={find ? {marginBottom: 100} : {marginBottom: 50}}
+        showsVerticalScrollIndicator={true}
+        >
         <Text style={styles.titleText}>{`${route.name}`}</Text>
         {Content &&
           Content.map((key, i) => (
@@ -508,7 +583,8 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
                 key={i}
                 style={styles.chapter}
                 onPress={() => {
-                  setTittle(i);
+                  collapse(i);
+                  // setTittle(i);
                 }}>
                 <Text
                   key={`${i}a`}
@@ -561,20 +637,20 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.tab}
+          style={find ? styles.ActiveTab : styles.tab}
           onPress={() => {
             setFind(!find);
           }}>
           {/* <Text style={styles.innerTab}>Find</Text> */}
-          <Ionicons name="search-outline" style={styles.innerTab}></Ionicons>
+          <Ionicons name="search-outline" style={find ? styles.ActiveInner :styles.innerTab}></Ionicons>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.tab}
+          style={showArticle ? styles.ActiveTab : styles.tab}
           onPress={() => {
             setShowArticle(!showArticle);
           }}>
           {/* <Text style={styles.innerTab}>Menu</Text> */}
-          <Ionicons name="menu-outline" style={styles.innerTab}></Ionicons>
+          <Ionicons name="menu-outline" style={showArticle ? styles.ActiveInner :styles.innerTab}></Ionicons>
         </TouchableOpacity>
       </View>
 
@@ -630,14 +706,22 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
             </TouchableOpacity>
             <View style={styles.inputArea}>
               <TextInput
-                style={{width: '85%', color: 'white'}}
+                style={{width: '75%', color: 'white', }}
                 onChangeText={text => setInput(text)}
                 autoFocus={false}
                 value={input}
                 placeholder=" Input to Search ..."
-                placeholderTextColor={'gray'}></TextInput>
+                placeholderTextColor={'gray'}>
+
+                </TextInput>
+                <Text
+       style={{width: '18%', color: 'white',fontSize:9,textAlign:'center'}}
+
+>
+                  {searchCount ? `${currentSearchPoint}/${searchCount}`: searchCount}
+                </Text>
               <TouchableOpacity
-                style={{color: 'white', fontSize: 16, width: '15%'}}
+                style={{color: 'white', fontSize: 16, width: '12%',marginRight:4}}
                 onPress={() => {
                   setInput('');
                 }}>
@@ -663,27 +747,28 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
               }}>
               <Text style={{color: 'white', fontWeight: 'bold'}}> Go </Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.tabSearch}
               onPress={() => {
                 setFind(!find);
               }}>
               <Text style={styles.innerTab}>X</Text>
-            </TouchableOpacity>
+
+            </TouchableOpacity> */}
           </View>
 
-          <Text style={styles.searchCount}>
+          {/* <Text style={styles.searchCount}>
             {go &&
               (
 
-                !input.match(/\w+/gim) ? 'Vui lòng nhâp từ khóa' : (searchCount ? `có tổng cộng ${currentSearchPoint}/${searchCount} từ`: `Không tìm thấy từ ${input}`)
+                !input.match(/\w+/gim) ? 'Vui lòng nhập từ khóa' : (searchCount ? `có tổng cộng ${currentSearchPoint}/${searchCount} từ`: `Không tìm thấy từ ${input}`)
                 // searchCount
                 // ? `có tổng cộng ${currentSearchPoint}/${searchCount} từ`
                 // : `Không tìm thấy từ ${input}`
               )
                 
                 }{' '}
-          </Text>
+          </Text> */}
         </View>
       )}
       {showArticle && (
@@ -784,7 +869,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingLeft:10,
     paddingRight:10,
-    
+    color:'gray'
   },
   chapter: {
     height: 60,
@@ -809,7 +894,8 @@ const styles = StyleSheet.create({
     lineHeight:22,
     // backgroundColor:'blue',
     alignItems:'center',
-    justifyContent:'center'
+    justifyContent:'center',
+    color:'black'
   },
   lines: {
     display: 'flex',
@@ -863,11 +949,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent:'space-evenly' ,
     bottom: 0,
-    backgroundColor: 'gray',
-    height: 50,
+    backgroundColor: 'black',
+    height: 52,
+    paddingTop:2
   },
   tab: {
-    backgroundColor: 'red',
+    backgroundColor: 'white',
     borderRadius: 30,
     width: 50,
     height: 50,
@@ -877,11 +964,30 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
   },
+  ActiveTab:{
+    backgroundColor: 'yellow',
+    borderRadius: 30,
+    width: 50,
+    height: 50,
+    // marginBottom:10,
+    textAlign: 'center',
+    justifyContent: 'center',
+    display: 'flex',
+    alignItems: 'center',
+
+  },
   innerTab: {
-    color: 'yellow',
+    color: 'black',
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  ActiveInner:{
+    color: 'black',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 18,
+
   },
   findArea: {
     display: 'flex',
@@ -897,21 +1003,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     marginTop: 6,
-    marginBottom: 0,
+    marginBottom: 6,
   },
-  tabSearch: {
-    width: '10%',
-  },
+  // tabSearch: {
+  //   width: '10%',
+  // },
   inputArea: {
-    width: '50%',
+    width: '55%',
     backgroundColor: 'black',
     color: 'white',
     alignItems: 'center',
     borderRadius: 13,
     paddingLeft: 15,
-    paddingRight: 5,
+    // paddingRight: 5,
     fontSize: 15,
     flexDirection: 'row',
+    justifyContent:'space-around'
   },
   searchBtb: {
     backgroundColor: 'brown',
