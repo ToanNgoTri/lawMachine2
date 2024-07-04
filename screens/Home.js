@@ -157,6 +157,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
   } */}
 
   <FlatList
+  keyboardShouldPersistTaps='handled'
   data={Content && (searchLawResult || Content)}
   renderItem={Render}
 //   ListFooterComponent={(totalPaper > currentPaper) && renderLoader} //(totalPaper > currentPaper) && 
