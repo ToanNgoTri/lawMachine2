@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Keyboard
 } from 'react-native';
 
 import database from '@react-native-firebase/database';
@@ -12,7 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import data from '../data/project2-197c0-default-rtdb-export.json';
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState,useRef} from 'react';
 
 
 // lúc ấn X để xóa hay nhập input hay bị đơ
@@ -20,6 +21,7 @@ export default function Detail({navigation}) {
   const [Content, setContent] = useState({});
   const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm 
   const [input, setInput] = useState(undefined);
+  const [valueInput, setValueInput] = useState('');
 
   const [name, setName] = useState();   // dùng để collapse (thu thập key của các law)
   const [nameArray, setNameArray] = useState([]);   // arrray của các law đã expand
@@ -28,7 +30,8 @@ export default function Detail({navigation}) {
   const [articleArray, setArticleArray] = useState([]);   // arrray của các 'điều' đã expand
 
   const [warning,setWanring] =  useState(false)
-  
+  const list = useRef(null);
+
   const reference = database().ref('/Law1');
   
   useEffect(() => {
@@ -44,7 +47,7 @@ export default function Detail({navigation}) {
   function Search(input) {
       let searchArray = {};
 
-      if (input.match(/\w+/gim)) {
+      if ((input && input.match(/\w+/gim)) || input.match(/\(/img) || input.match(/\)/img)) {
 
       function a(key,key1){
         // Object.keys(key2).map((key3, i3) => {
@@ -192,7 +195,7 @@ export default function Detail({navigation}) {
 
       setSearchResult(searchResult);
       // console.log('searchResult',searchResult);
-    
+      searchResult = []
     setArticleArray([]);
     setNameArray([]);
 
@@ -230,6 +233,7 @@ export default function Detail({navigation}) {
       // let s5 = para.replace(re1, "$5");    // khúc sau
 
       // return <Text>{s2}<Text style={styles.highlight}>{s4}</Text>{s5}</Text>
+
       let inputRexgex = para.match(new RegExp(word,'igm'));
       return (
         <Text >
@@ -255,25 +259,43 @@ export default function Detail({navigation}) {
 
   useEffect(() => {
     setWanring(false);
+
   }, [input]);
 
   const NoneOfResutl = ()=>{
     return(
       <View style={{ height:250,alignItems:'center',justifyContent:'flex-end'}}>
-<Text style={{fontSize:40,textAlign: 'center',
+<Text style={{fontSize:40,textAlign: 'center',color:'black'
 }}> Không có kết quả nào </Text> 
 </View>
     )
   }
 // console.log(Object.keys('SearchResult1',SearchResult));
   return (
-    <ScrollView keyboardShouldPersistTaps='handled'>
+    <>
+         { Boolean(Object.keys(SearchResult).length) &&  (<TouchableOpacity
+          
+          onPress={() => {
+            list.current.scrollTo({y: 0});
+          }}
+          style={styles.tabSearch}
+          >
+          <Ionicons name="arrow-up-outline" style={{
+                  color: 'rgb(240,240,208)',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 25,
+                }}></Ionicons>
+        </TouchableOpacity>)
+}
+    <ScrollView keyboardShouldPersistTaps='handled' 
+            ref={list}
+            >
       <View style={{backgroundColor: 'green'}}>
       <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
       <View style={styles.inputContainer}>
-      <Ionicons name="text-outline" style={styles.inputText}></Ionicons>
+      <Ionicons name="library-outline" style={styles.inputText}></Ionicons>
 
-        {/* <Text style={styles.inputText}>Tìm kiếm</Text> */}
         <View  style={{
                 flexDirection: 'column',
                 width:'60%',
@@ -292,7 +314,7 @@ export default function Detail({navigation}) {
           style={styles.inputArea}
           onChangeText={text => setInput(text)}
             value={input}
-            isFo
+            
             >
           </TextInput>
           {/* <TouchableOpacity
@@ -306,24 +328,40 @@ export default function Detail({navigation}) {
               </TouchableOpacity> */}
 
           </View>
-          <Text style={{color:'orange', fontSize:16, textAlign:'center',fontWeight:'bold'}}>
+          <Text style={{color:'orange', fontSize:14, textAlign:'center',fontWeight:'bold'}}>
             {warning ? 'Vui lòng nhập từ khóa':' '}
           </Text>
           </View>
         <TouchableOpacity
           style={styles.inputBtb}
           onPress={() => {
-            Search(input);
+            Keyboard.dismiss();
+
+              let inputSearchLawReg = input
+              if(input.match(/\(/img)){
+                inputSearchLawReg = input.replace(/\(/img,'\\(')
+              }
+              if(input.match(/\)/img)){
+                inputSearchLawReg = inputSearchLawReg.replace(/\)/img,'\\)')
+              }
+              setValueInput(inputSearchLawReg);
+
+
+            Search(valueInput);
+
+// console.log(inputSearchLawReg);
+
+
           }}>
-          {/* <Text style={styles.inputBtbText}>Go!</Text> */}
-          <Ionicons name="caret-forward-outline" style={styles.inputBtbText}></Ionicons>
+          <Ionicons
+                  name="search-outline"
+                  style={styles.inputBtbText}></Ionicons>
 
         </TouchableOpacity>
       </View>
       </View>
       <View style={{marginTop: 1}}>
         { 
-
         Array.isArray(SearchResult) ? null : 
         !Object.keys(SearchResult).length  ? <NoneOfResutl/> :
           Object.keys(SearchResult).map((key, i) => (
@@ -340,20 +378,13 @@ export default function Detail({navigation}) {
                   {key} có {0 || SearchResult[key].length} kết quả
                 </Text>
                 <TouchableOpacity
-              onPress={() => navigation.navigate(`${key}`,{input:input})}
+              onPress={() => navigation.navigate(`${key}`,{input:valueInput})}
               style={styles.chapterArrow}
               >
                       <Ionicons 
                       name="return-down-forward-outline" 
                       style={{fontWeight:'bold',color:'white', textAlign:'center',fontSize:17}}></Ionicons>
 
-              {/* <Text
-              style={{fontWeight:'bold',color:'white', textAlign:'center',fontSize:17}}
-              
-              
-              >
-                  {'->'}
-                  </Text> */}
                 </TouchableOpacity>
               </TouchableOpacity>
               {SearchResult[key].map((key1, i1) => (
@@ -368,7 +399,7 @@ export default function Detail({navigation}) {
                           setArticle(`${i}${i1}a${i2}c`);
                         }}>
                         <Text style={styles.article} key={`${i2}c`}>
-                          { highlight(key2, input)}
+                          { highlight(key2, valueInput)}
                         </Text>
                       </TouchableOpacity>
                       <Text
@@ -379,7 +410,7 @@ export default function Detail({navigation}) {
                         }
                         key={`${i2}d`}>
                         {
-                          highlight(key1[key2], input)
+                          highlight(key1[key2], valueInput)
                         }
                       </Text>
                     </>
@@ -390,6 +421,7 @@ export default function Detail({navigation}) {
           ))}
       </View>
     </ScrollView>
+    </>
   );
 }
 
@@ -434,7 +466,7 @@ const styles = StyleSheet.create({
   inputBtb: {
     width: '15%',
     height: 30,
-    backgroundColor: 'blue',
+    backgroundColor: 'black',
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
@@ -575,6 +607,19 @@ const styles = StyleSheet.create({
     verticalAlign: 'middle',
     backgroundColor: 'gray',
     borderRadius: 25,
-}
+},
+tabSearch: {
+  display:'flex',
+  position:'absolute',
+  height:55,
+  width:55,
+  right:25,
+  bottom:20,
+  justifyContent:'center',
+  borderRadius:30,
+  opacity:.6,
+  backgroundColor:'gray',
+  zIndex:10
+},
 
 });

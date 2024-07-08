@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Keyboard,
+  Alert,
 } from 'react-native';
 import database from '@react-native-firebase/database';
 import React, {useState, useEffect, useRef} from 'react';
@@ -51,6 +52,7 @@ let eachSectionWithChapter = []
 
   const list = useRef(null);
   const [input, setInput] = useState(route.params ? route.params.input : '');
+  const [valueInput, setValueInput] = useState('');
   const [find, setFind] = useState(route.params ? true : false);
 
   const [go, setGo] = useState(route.params ?  true : false);
@@ -128,7 +130,6 @@ let contain = false
         // .split(new RegExp('hội', 'igmu'))
         .reduce((prev, current, i) => {
           if (!i) {
-
             return [current]
           }
 
@@ -154,41 +155,17 @@ let contain = false
                   }
 
           return prev.concat(
-          //   <Text 
-          //   style=
-          //   {{textAlign:'center', 
-          //   lineHeight:22,
-          //   display:'flex',
-          //   flexDirection:'row',
-          //   // height:23,
-          //   overflow:'hidden',
-          //   backgroundColor:'orange',
-          //   padding:0,
-          //   margin:0
-          // >
-          // }}
             <>
-            
             <View
               style={{
-                transform: [
-                  // {translateY: 18},
-                //   // {translateX: 3},
-                // { scale: 0 }
-                ],
                 backgroundColor: 'blue',
-                // bottom: 40,
                 flex: 1,
-                // textAlignVertical: 'center',
                 alignSelf: 'center',
                 padding: 0,
                 margin: 0,
                 overflow: 'visible',
-                // height: 'auto',
-                // lineHeight:22,
-                // height:22,
-                // width:15,
-                right:-50
+                right:-50,
+                height:go ? 9: 1
               }}
               onLayout={event => {
                 event.target.measure((x, y, width, height, pageX, pageY) => {
@@ -198,14 +175,6 @@ let contain = false
                 });
               }}
               >
-                {/* <Text style={{backgroundColor:'red',position:'absolute',
-                lineHeight:22, 
-                display: 'flex',
-                right:-50              
-              }}>g
-                </Text> */}
-
-
             </View>
             
               <Text 
@@ -224,19 +193,16 @@ let contain = false
             ,
            <Text 
            style={{
-            // backgroundColor:'orange', 
            position:'relative',
            display:'flex',
           margin:0,
           lineHeight:23,
-          // backgroundColor:'green'
           }}
            
            >{current}</Text> ,
           );
         }, []);
         
-      // return !inputRexgex ? para[0] : searchedPara;
       return searchedPara;
 
     }else{
@@ -286,16 +252,6 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
   }
   }
 
-  // useEffect(() => {
-    
-  // }, [tittle]);
-
-  // useEffect(() => {
-    
-
-  // }, [tittle2]);
-
-
   TopUnitCount = Content && Object.keys(Content).length;
 
   function Shrink() {
@@ -318,28 +274,31 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
 
   }
 
-  useEffect(() => {
-    setGo(false);
-    setSearchCount(0);
-    setCurrentSearchPoint(0);
-    // setPositionYArrArtical([])
+  // useEffect(() => {
+  //   setGo(false);
+  //   setSearchCount(0);
+  //   setCurrentSearchPoint(0);
 
+  // }, [input]);
+
+  // useEffect(() => {
+  //   setSearchCount(searchResultCount);
+  //   setPositionYArr([]);
+  //   setCurrentSearchPoint(1)
+
+  // }, [go]);
+
+    useEffect(() => {
+    setGo(false);
   }, [input]);
 
   useEffect(() => {
     setSearchCount(searchResultCount);
     setPositionYArr([]);
-    setCurrentSearchPoint(1)
-    // list.current.scrollTo({
-    //   y: positionYArr[1] - 57,
-    // });
-    // setPositionYArrArtical([]);
-
   }, [go]);
 
   useEffect(() => {
-    // console.log('currentSearchPoint',currentSearchPoint);
-    if((currentSearchPoint != 0) && searchCount){ ////////////////////////////////////////////////////////////////////////
+    if((currentSearchPoint != 0) && searchCount){ 
     list.current.scrollTo({
       y: positionYArr[currentSearchPoint - 1] - 100,//- 57
     });
@@ -348,7 +307,17 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
 
 
   let SearchArticalResult = positionYArrArtical.filter(item => {
-    return Object.keys(item)[0].match(new RegExp(inputSearchArtical, 'igm'));
+    let abc =inputSearchArtical
+    if(inputSearchArtical.match(/\(/img)){
+      abc = inputSearchArtical.replace(/\(/img,'\\(')
+    }
+
+    if(inputSearchArtical.match(/\)/img)){
+      abc = abc.replace(/\)/img,'\\)')
+    }
+
+
+    return Object.keys(item)[0].match(new RegExp(abc, 'igm'));
   });
 
   useEffect(() => {
@@ -361,9 +330,8 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
   useEffect(() => {
     setTittleArray([]);
     setTittleArray2([]);
-    setFind(false)
+    setFind(false);
   }, [showArticle]);
-
 
   let t
   const a = (key, i, key1, i1a,t) => {
@@ -383,10 +351,6 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
 
             
           }
-          // style={
-          //   showArticle || find ||  !tittleArray2.includes(String(t)) ||  styles.content //////////////////////////////////////////////////////////////////
-          // }
-
           >
           {key[key1].map((key2, i2) => {
          return (
@@ -403,14 +367,14 @@ if((!tittleArray.length  && !tittleArray2.length) || go) {
               style={go ? {width:'100%'}:{width:'99%'} }
               >
               <Text key={`${i2}c`} style={styles.dieu}>
-                {go
-                  ? highlight(Object.keys(key2), input, i2)
-                  : Object.keys(key2)}
+                {
+                  highlight(Object.keys(key2), valueInput, i2)
+                  }
               </Text>
              <Text key={`${i2}d`} style={styles.lines}>
-                {go
-                  ? highlight(Object.values(key2), input, i2)
-                  : Object.values(key2)[0]}
+                {
+                  highlight(Object.values(key2), valueInput, i2)
+                  }
               </Text>
             </View>
           )})}
@@ -515,19 +479,18 @@ if(!eachSectionWithChapter[i]){
                     style={go ? {width:'100%'}:{width:'99%'} }
                     >
                     <Text key={`${iC}c`} style={styles.dieu}>
-                      {go
-                        ? highlight(Object.keys(keyC), input, iC)
-                        : Object.keys(keyC)}
+                      {
+                        highlight(Object.keys(keyC), valueInput, iC)
+                      }
                     </Text>
                     <Text key={`${iC}d`} style={styles.lines}>
-                      {go
-                        ? highlight(Object.values(keyC), input, iC)
-                        : Object.values(keyC)}
+                      {
+                        highlight(Object.values(keyC), valueInput, iC)
+                        }
                     </Text>
                   </View>
                   </View>
               );
-              //  a( keyC,i,Object.keys(keyC)[0],iC)
             }
 
           })}
@@ -580,6 +543,45 @@ if(!eachSectionWithChapter[i]){
             </>
           ))}
       </ScrollView>
+
+{ (Boolean(searchCount) && !Boolean(tittleArray.length) && !Boolean(tittleArray2.length)) &&   ( <View style={{right:25,display:'flex',flexDirection:'column', 
+      position:'absolute',justifyContent:'space-between',
+      height:130,opacity:.6,bottom:find?140:80 ,
+      }}>
+            <TouchableOpacity
+              style={styles.tabSearch}
+              onPress={() => {
+                currentSearchPoint == 1
+                  ? setCurrentSearchPoint(positionYArr.length)
+                  : setCurrentSearchPoint(currentSearchPoint - 1);
+              }}>
+              <Ionicons name="caret-up-outline" style={{
+                  color: 'rgb(240,240,208)',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 25,
+                }}></Ionicons>
+
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.tabSearch}
+              onPress={() => {
+                currentSearchPoint == positionYArr.length
+                  ? setCurrentSearchPoint(1)
+                  : setCurrentSearchPoint(currentSearchPoint + 1);
+              }}>
+              <Ionicons name="caret-down-outline" style={{
+                  color: 'rgb(240,240,208)',
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 25,
+                }}></Ionicons>
+
+            </TouchableOpacity>
+
+      </View>)
+ }
+
       <View style={styles.functionTab}>
         <TouchableOpacity
           style={styles.tab}
@@ -632,125 +634,64 @@ if(!eachSectionWithChapter[i]){
       {find && (
         <View style={styles.findArea}>
           <View style={styles.searchView}>
-            <TouchableOpacity
-              style={styles.tabSearch}
-              onPress={() => {
-                currentSearchPoint == positionYArr.length
-                  ? setCurrentSearchPoint(1)
-                  : setCurrentSearchPoint(currentSearchPoint + 1);
-              }}>
-              {/* <Text
-                style={{
-                  transform: [{rotate: '90deg'}],
-                  color: 'yellow',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                  fontSize: 30,
-                }}>{`>`}</Text> */}
-              <Ionicons name="caret-down-outline" style={{
-                  color: 'yellow',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                  fontSize: 25,
-                }}></Ionicons>
-
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.tabSearch}
-              onPress={() => {
-                currentSearchPoint == 1
-                  ? setCurrentSearchPoint(positionYArr.length)
-                  : setCurrentSearchPoint(currentSearchPoint - 1);
-              }}>
-              {/* <Text
-                style={{
-                  transform: [{rotate: '90deg'}],
-                  color: 'yellow',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                  fontSize: 20,
-                }}>{`<`}</Text> */}
-
-<Ionicons name="caret-up-outline" style={{
-                  color: 'yellow',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                  fontSize: 25,
-                }}></Ionicons>
-
-            </TouchableOpacity>
             <View style={styles.inputArea}>
               <TextInput
-                style={{width: '75%', color: 'white', }}
+                style={{width: '65%', color: 'white', }}
                 onChangeText={text => setInput(text)}
                 autoFocus={false}
                 value={input}
-                placeholder=" Input to Search ..."
+                placeholder=" Vui lòng nhập từ khóa ..."
                 placeholderTextColor={'gray'}>
 
                 </TextInput>
                 <Text
-       style={{width: '18%', color: 'white',fontSize:9,textAlign:'center'}}
-
+       style={{width: '23%', color: 'white',fontSize:9,textAlign:'right',paddingRight:3}}
 >
                   {searchCount ? `${currentSearchPoint}/${searchCount}`: searchCount}
                 </Text>
               <TouchableOpacity
-                style={{color: 'white', fontSize: 16, width: '12%',marginRight:4}}
+                style={{color: 'white', fontSize: 16, width: '12%'}}
                 onPress={() => {
                   setInput('');
                 }}>
-                {/* <Text
-                  style={{color: 'black', fontSize: 16, textAlign: 'center',    width:20,
-                  height:20,
-                  backgroundColor:'white',borderRadius:25
-              }}>
-                  X
-                </Text> */}
-                { input &&   <Ionicons name="close-circle-outline" style={{color: 'white', fontSize: 20, textAlign: 'center',    width:20,
+                { input &&   <Ionicons name="close-circle-outline" style={{color: 'white', fontSize: 20, textAlign: 'center',    width:'100%',
                   height:20,
               }}></Ionicons>}
-  
-
               </TouchableOpacity>
             </View>
             <TouchableOpacity
               style={styles.searchBtb}
               onPress={() => {
                 setGo(true);
+                if ((input && input.match(/\w+/gim)) || input.match(/\(/img) || input.match(/\)/img)) {
+                  let inputSearchLawReg = input
+                  if(input.match(/\(/img)){
+                    inputSearchLawReg = input.replace(/\(/img,'\\(')
+                  }
+                  if(input.match(/\)/img)){
+                    inputSearchLawReg = inputSearchLawReg.replace(/\)/img,'\\)')
+                  }
+
+                  setValueInput(inputSearchLawReg)
+                  // console.log(inputSearchLawReg);
+                }else{
+                  Alert.alert('Thông báo','Bạn chưa nhập từ khóa')
+
+                }
+
+                setCurrentSearchPoint(1)
                 Keyboard.dismiss();
               }}>
-              <Text style={{color: 'white', fontWeight: 'bold'}}> Go </Text>
+                <Ionicons name="return-down-forward-outline" style={{color: 'white', fontWeight: 'bold',fontSize:18}}></Ionicons>
             </TouchableOpacity>
-            {/* <TouchableOpacity
-              style={styles.tabSearch}
-              onPress={() => {
-                setFind(!find);
-              }}>
-              <Text style={styles.innerTab}>X</Text>
-
-            </TouchableOpacity> */}
           </View>
-
-          {/* <Text style={styles.searchCount}>
-            {go &&
-              (
-
-                !input.match(/\w+/gim) ? 'Vui lòng nhập từ khóa' : (searchCount ? `có tổng cộng ${currentSearchPoint}/${searchCount} từ`: `Không tìm thấy từ ${input}`)
-                // searchCount
-                // ? `có tổng cộng ${currentSearchPoint}/${searchCount} từ`
-                // : `Không tìm thấy từ ${input}`
-              )
-                
-                }{' '}
-          </Text> */}
         </View>
       )}
       {showArticle && (
         <>
-          <TouchableOpacity //ovrlay
+          <TouchableOpacity //overlay
             style={{
-              opacity: 0.3,
+              opacity: 0.6,
               backgroundColor: 'rgb(245,245,247)',
               left: 0,
               right: 0,
@@ -889,7 +830,6 @@ const styles = StyleSheet.create({
     // backgroundColor:'yellow',
     lineHeight:22,
     overflow:'hidden',
-    
   },
   highlight: {
     color: 'black',
@@ -980,11 +920,17 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginBottom: 6,
   },
-  // tabSearch: {
-  //   width: '10%',
-  // },
+  tabSearch: {
+    display:'flex',
+    width:55,
+    height:55,
+    // marginTop:20,
+    borderRadius:30,
+    backgroundColor:'gray',
+    justifyContent:'center'
+  },
   inputArea: {
-    width: '55%',
+    width: '75%',
     backgroundColor: 'black',
     color: 'white',
     alignItems: 'center',
@@ -999,12 +945,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'brown',
     color: 'white',
     borderRadius: 30,
-    width: 60,
-    height: 30,
+    width: '18%',
+    height: 35,
     display: 'flex',
     alignItems: 'center',
     textAlign: 'center',
     justifyContent: 'center',
+    
   },
   searchCount: {
     color: 'white',
@@ -1012,6 +959,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 5,
   },
+
+
+  
   listArticle: {
     position: 'absolute',
     width: 200,

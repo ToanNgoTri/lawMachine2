@@ -42,7 +42,16 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
       useEffect( ()=>{
         setSearchLawResult(Content && Content.filter( (item)=>{
-            return item.match(new RegExp(inputSearchLaw, 'igm'));
+            let inputSearchLawReg = inputSearchLaw
+            if(inputSearchLaw.match(/\(/img)){
+              inputSearchLawReg = inputSearchLaw.replace(/\(/img,'\\(')
+            }
+        
+            if(inputSearchLaw.match(/\)/img)){
+                inputSearchLawReg = inputSearchLawReg.replace(/\)/img,'\\)')
+              }
+  
+            return item.match(new RegExp(inputSearchLawReg, 'igm'));
         }))
     }
     ,[inputSearchLaw])
