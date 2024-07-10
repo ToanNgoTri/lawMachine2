@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -19,19 +19,74 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const AppNavigators = () => {
+const AppNavigators = ({navigation}) => {
+  const [tabName, setTabName] = useState('home');
   return (
     <Tab.Navigator
-    // screenOptions={({ route }) => (
-    //   console.log(route.name)
+      // screenOptions={({ route }) => (
+      //   console.log(route.name)
 
-    // )}
-    >
+      // )}
+      
+      // screenOptions={
+        
+      //   ({route, navigation}) => ({
+      //   tabBarIcon: ({focused, color, size}) => {
+      //     return (
+      //       <View
+      //         style={{
+      //           width: '1000%',
+      //           height: 50,
+      //           left: 0,
+      //           display: 'flex',
+      //           flexDirection: 'row',
+      //           backgroundColor:'red'
+      //         }}>
+      //         <TouchableOpacity
+      //           style={
+      //             tabName == 'home'
+      //               ? styles.tabItemActive
+      //               : styles.tabItemInactive
+      //           }
+      //           onPress={() => {
+      //             setTabName('home');
+      //             navigation.navigate('Home');
+      //           }}>
+      //           <Ionicons
+      //             name="home-outline"
+      //             style={
+      //               tabName == 'home' ? styles.IconActive : styles.IconInActive
+      //             }></Ionicons>
+      //         </TouchableOpacity>
+      //         <TouchableOpacity
+      //           style={
+      //             tabName == 'search'
+      //               ? styles.tabItemActive
+      //               : styles.tabItemInactive
+      //           }
+      //           onPress={() => {
+      //             setTabName('search');
+      //             navigation.navigate('Search');
+      //           }}>
+      //           <Ionicons
+      //             name="search-outline"
+      //             style={
+      //               tabName == 'search'
+      //                 ? styles.IconActive
+      //                 : styles.IconInActive
+      //             }></Ionicons>
+      //         </TouchableOpacity>
+      //       </View>
+      //     );
+      //   },
+      // })}
+      >
       <Tab.Screen
         name="Home"
         component={Home}
@@ -41,9 +96,6 @@ const AppNavigators = () => {
             return (
               <View
                 style={focused ? styles.tabItemActive : styles.tabItemInactive}>
-                {/* <Image source={require('../assets/home.png')}
-                style= {{width:35, height:35,color:'white'}}>
-              </Image> */}
                 <Ionicons
                   name="home-outline"
                   style={
@@ -67,9 +119,6 @@ const AppNavigators = () => {
             return (
               <View
                 style={focused ? styles.tabItemActive : styles.tabItemInactive}>
-                {/* <Image source={require('../assets/search.png')}
-                  style= {{width:35, height:35,color:'white'}}>
-                </Image> */}
                 <Ionicons
                   name="search-outline"
                   style={
@@ -137,16 +186,12 @@ const StackNavigator = ({navigation}) => {
                 title: '',
                 headerRight: () => (
                   <>
-                    <TouchableOpacity 
-                    style={styles.iconInfoContainer} 
-                    onPress={
-                      () => {
+                    <TouchableOpacity
+                      style={styles.iconInfoContainer}
+                      onPress={() => {
                         // navigation.navigate('Search')
-                            Alert.alert('Waring', 'Giai đoạn 2 đang cập nhật...');
-                      }}
-                      
-                      >
-
+                        Alert.alert('Waring', 'Giai đoạn 2 đang cập nhật...');
+                      }}>
                       <Ionicons
                         name="alert-outline"
                         style={styles.IconInfo}></Ionicons>
@@ -166,17 +211,17 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '102%',
     // backgroundColor:'red',
-    position: 'absolute',
+    position: 'relative',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'orange',
   },
   tabItemInactive: {
-    width: '100%',
+    position: 'relative',
+    width: '50%',
     height: '102%',
     backgroundColor: 'white',
-    position: 'absolute',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

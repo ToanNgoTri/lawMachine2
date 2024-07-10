@@ -47,7 +47,7 @@ export default function Detail({navigation}) {
   function Search(input) {
       let searchArray = {};
 
-      if ((input && input.match(/\w+/gim)) || input.match(/\(/img) || input.match(/\)/img)) {
+      if ( (input && input.match(/\w+/gim)) || input.match(/\(/img) || input.match(/\)/img)) {
 
       function a(key,key1){
         // Object.keys(key2).map((key3, i3) => {
@@ -347,7 +347,7 @@ export default function Detail({navigation}) {
               setValueInput(inputSearchLawReg);
 
 
-            Search(valueInput);
+            Search(inputSearchLawReg);
 
 // console.log(inputSearchLawReg);
 
@@ -378,7 +378,7 @@ export default function Detail({navigation}) {
                   {key} có {0 || SearchResult[key].length} kết quả
                 </Text>
                 <TouchableOpacity
-              onPress={() => navigation.navigate(`${key}`,{input:valueInput})}
+              onPress={() => navigation.navigate(`${key}`,{input:input})}
               style={styles.chapterArrow}
               >
                       <Ionicons 
