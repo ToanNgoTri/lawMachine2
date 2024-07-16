@@ -7,6 +7,8 @@ import {
   TextInput,
   Keyboard,
   Alert,
+  Animated,
+  
 } from 'react-native';
 import database from '@react-native-firebase/database';
 import React, {useState, useEffect, useRef} from 'react';
@@ -36,7 +38,7 @@ export default function Detail() {
 
   const [tittleArray2, setTittleArray2] = useState([]); // nếu có 'phần thứ...' thì đây sẽ là chương
 
-  const [searchCount, setSearchCount] = useState(0);
+  // const [searchCount, setSearchCount] = useState(0);
   const [positionYArr, setPositionYArr] = useState([]); // tập hợp pos Y Search
   const [positionYArrArtical, setPositionYArrArtical] = useState([]);
   const [showArticle, setShowArticle] = useState(false);
@@ -49,10 +51,14 @@ export default function Detail() {
 
   const route = useRoute();
 
+  const animatedForNavi = useRef(new Animated.Value(0)).current;
+  // const animatedForFind = useRef(new Animated.Value(50)).current
+
   const list = useRef(null);
+
   const [input, setInput] = useState(route.params ? route.params.input : '');
   const [valueInput, setValueInput] = useState('');
-  const [find, setFind] = useState(route.params ? true : false);
+  const [find, setFind] = useState(false);
 
   const [go, setGo] = useState(route.params ? true : false);
 
@@ -63,28 +69,41 @@ export default function Detail() {
   function pushToSearch() {
     setGo(true);
 
-    if (
-      (input && input.match(/\w+/gim)) ||
-      input.match(/\(/gim) ||
-      input.match(/\)/gim)
-    ) {
-      let inputSearchLawReg = input;
-      if (input.match(/\(/gim)) {
-        inputSearchLawReg = input.replace(/\(/gim, '\\(');
-      }
-      if (input.match(/\)/gim)) {
-        inputSearchLawReg = inputSearchLawReg.replace(/\)/gim, '\\)');
-      }
+    if (input) {
+      if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!)/gim)) {
+        let inputSearchLawReg = input;
+        if (input.match(/\(/gim)) {
+          inputSearchLawReg = input.replace(/\(/gim, '\\(');
+        }
+        if (input.match(/\)/gim)) {
+          inputSearchLawReg = inputSearchLawReg.replace(/\)/gim, '\\)');
+        }
+        if (input.match(/\./gim)) {
+          inputSearchLawReg = inputSearchLawReg.replace(/\./gim, '\\.');
+        }
+        if (input.match(/\+/gim)) {
+          inputSearchLawReg = inputSearchLawReg.replace(/\+/gim, '\\+');
+        }
+        if(input.match(/\//img)){
+          inputSearchLawReg = inputSearchLawReg.replace(/\//img,'.')
+        }
+        if(input.match(/\\/img)){
+          inputSearchLawReg = inputSearchLawReg.replace(/\\/img,'.')
+        }
 
-      setValueInput(inputSearchLawReg);
-      // console.log(inputSearchLawReg);
+
+
+        setValueInput(inputSearchLawReg);
+      } else {
+        Alert.alert('Thông báo', 'Vui lòng nhập từ khóa hợp lệ');
+      }
+      // setSearchCount(searchResultCount);
+
+      setCurrentSearchPoint(1);
+      Keyboard.dismiss();
     } else {
-      Alert.alert('Thông báo', 'Bạn chưa nhập từ khóa');
+      Alert.alert('Thông báo', 'Vui lòng nhập từ khóa hợp lệ');
     }
-    // setSearchCount(searchResultCount);
-
-    setCurrentSearchPoint(1);
-    Keyboard.dismiss();
   }
 
   useEffect(() => {
@@ -126,7 +145,6 @@ export default function Detail() {
         }
       }
 
-      // console.log('eachSectionWithChapter[a]', eachSectionWithChapter[a]);
 
       let tittleArray2Copy = tittleArray2;
       for (let m = 0; m < eachSectionWithChapter[a].length; m++) {
@@ -156,13 +174,13 @@ export default function Detail() {
     // setTittle(null);
   }
 
-  // console.log(searchCount);
 
   let searchResultCount = 0;
   // let c = 0;
   function highlight(para, word, i2) {
     // if (typeof para == 'string' ) {
-    if (word.match(/\w+/gim)) {
+    // if (word.match(/\w+/gim) || word.match(/\(/gim)|| word.match(/\)/gim) || word.match(/\./img) || word.match(/\+/img)) {
+    if (word.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;)/gim)) {
       let inputRexgex = para[0].match(new RegExp(String(word), 'igmu'));
       // let inputRexgex = para[0].match(new RegExp('hội', 'igmu'));
       if (inputRexgex) {
@@ -307,6 +325,7 @@ export default function Detail() {
         setTittleArray2(oldArray => [...oldArray, b + 1]);
       }
     }
+    // console.log(tittleArray);
   }
 
   // useEffect(() => {
@@ -352,18 +371,48 @@ export default function Detail() {
     return Object.keys(item)[0].match(new RegExp(abc, 'igm'));
   });
 
+  let transY = animatedForNavi.interpolate({
+    inputRange: [-100,0, 80, 90, 100],
+    outputRange: [0,0, -60, 0, 0],
+  });
+
+  let transX = animatedForNavi.interpolate({
+    inputRange: [-100, 0],
+    outputRange: [0, 200],
+  });
+
+  let Opacity = animatedForNavi.interpolate({
+    inputRange: [-100, 0],
+    outputRange: [.7, 0],
+  });
+
+
+  let MagginBottom = animatedForNavi.interpolate({
+    inputRange: [-100,0, 80, 90, 100],
+    outputRange: [50,50, 110, 0, 0],
+  });
+
   useEffect(() => {
     if (find == true) {
       setTittleArray([]);
       setTittleArray2([]);
     }
+    // Animated.timing(animatedForNavi, {
+    //   toValue:find ? 50 : 0,
+    //   duration: 1000,
+    //   useNativeDriver: false,
+    // }).start();
+    // setShowArticle(false)
+    Keyboard.dismiss()
+
   }, [find]);
 
   useEffect(() => {
-    setTittleArray([]);
-    setTittleArray2([]);
-    setFind(false);
+    // setTittleArray([]);
+    // setTittleArray2([]);
+
   }, [showArticle]);
+
 
   const a = (key, i, key1, i1a, t) => {
     // phần nếu không mục 'phần thứ' trong văn bản
@@ -406,7 +455,8 @@ export default function Detail() {
     );
   };
 
-  let sumChapter = sumChapterArray.reduce((total, currentValue) => {      // tổng chapter nếu có phần thứ
+  let sumChapter = sumChapterArray.reduce((total, currentValue) => {
+    // tổng chapter nếu có phần thứ
     if (currentValue) {
       return total + currentValue;
     }
@@ -511,51 +561,55 @@ export default function Detail() {
 
   return (
     <>
-      <ScrollView
-        onScroll={event => {
-          {
-            const {y} = event.nativeEvent.contentOffset;
-            setCurrentY(y);
-          }
-        }}
-        ref={list}
-        style={find ? {marginBottom: 100} : {marginBottom: 50}}
-        showsVerticalScrollIndicator={true}>
-        <Text style={styles.titleText}>{`${route.name}`}</Text>
-        {Content &&
-          Content.map((key, i) => (
-            <>
-              <TouchableOpacity
-                key={i}
-                style={styles.chapter}
-                onPress={() => {
-                  collapse(i);
-                  // setTittle(i);
-                }}>
-                <Text
-                  key={`${i}a`}
-                  style={{
-                    fontSize: 18,
-                    color: 'black',
-                    fontWeight: 'bold',
-                    padding: 9,
-                    textAlign: 'center',
+      <Animated.View style={{marginBottom: MagginBottom}}>
+        <ScrollView
+          onScroll={event => {
+            {
+              const {y} = event.nativeEvent.contentOffset;
+              setCurrentY(y);
+            }
+          }}
+          ref={list}
+          // style={  find ? {marginBottom: 60} : {marginBottom: 0}}
+          // style={  find ? {setTimeout( ()=>{ return {'marginBottom': 60}},400)} : {marginBottom: 0}}
+
+          showsVerticalScrollIndicator={true}>
+          <Text style={styles.titleText}>{`${route.name}`}</Text>
+          {Content &&
+            Content.map((key, i) => (
+              <>
+                <TouchableOpacity
+                  key={i}
+                  style={styles.chapter}
+                  onPress={() => {
+                    collapse(i);
+                    // setTittle(i);
                   }}>
-                  {Object.keys(key)[0].toUpperCase()}
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    key={`${i}a`}
+                    style={{
+                      fontSize: 18,
+                      color: 'black',
+                      fontWeight: 'bold',
+                      padding: 9,
+                      textAlign: 'center',
+                    }}>
+                    {Object.keys(key)[0].toUpperCase()}
+                  </Text>
+                </TouchableOpacity>
 
-              {Object.keys(key)[0].match(/phần thứ .*/gim)
-                ? b(key, i, Object.keys(key)[0])
-                : a(key, i, Object.keys(key)[0])}
-            </>
-          ))}
-      </ScrollView>
-
+                {Object.keys(key)[0].match(/phần thứ .*/gim)
+                  ? b(key, i, Object.keys(key)[0])
+                  : a(key, i, Object.keys(key)[0])}
+              </>
+            ))}
+        </ScrollView>
+      </Animated.View>
       {Boolean(searchResultCount) &&
         !Boolean(tittleArray.length) &&
-        !Boolean(tittleArray2.length) && (
-          <View
+        !Boolean(tittleArray2.length) &&
+        searchResultCount > 1 && (
+          <Animated.View
             style={{
               right: 25,
               display: 'flex',
@@ -564,7 +618,8 @@ export default function Detail() {
               justifyContent: 'space-between',
               height: 130,
               opacity: 0.6,
-              bottom: find ? 140 : 80,
+              transform: [{translateY: transY}],
+              bottom: 80,
             }}>
             <TouchableOpacity
               style={styles.tabSearch}
@@ -598,68 +653,13 @@ export default function Detail() {
                   fontSize: 25,
                 }}></Ionicons>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         )}
 
-      <View style={styles.functionTab}>
-        <TouchableOpacity
-          style={styles.tab}
-          onPress={() => {
-            setFind(false);
-            setTittleArray([]);
-            Shrink();
-          }}>
-          {/* <Text style={styles.innerTab}>S</Text> */}
-          <Ionicons
-            name="chevron-collapse-outline"
-            style={styles.innerTab}></Ionicons>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tab}
-          onPress={() => {
-            setTittleArray([]);
-            setTittleArray2([]);
-          }}>
-          {/* <Text style={styles.innerTab}>E</Text> */}
-          <Ionicons
-            name="chevron-expand-outline"
-            style={styles.innerTab}></Ionicons>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tab}
-          onPress={() => {
-            list.current.scrollTo({y: 0});
-          }}>
-          {/* <Text style={styles.innerTab}>Top</Text> */}
-          <Ionicons name="arrow-up-outline" style={styles.innerTab}></Ionicons>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={find ? styles.ActiveTab : styles.tab}
-          onPress={() => {
-            setFind(!find);
-          }}>
-          {/* <Text style={styles.innerTab}>Find</Text> */}
-          <Ionicons
-            name="search-outline"
-            style={find ? styles.ActiveInner : styles.innerTab}></Ionicons>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={showArticle ? styles.ActiveTab : styles.tab}
-          onPress={() => {
-            setShowArticle(!showArticle);
-          }}>
-          {/* <Text style={styles.innerTab}>Menu</Text> */}
-          <Ionicons
-            name="menu-outline"
-            style={
-              showArticle ? styles.ActiveInner : styles.innerTab
-            }></Ionicons>
-        </TouchableOpacity>
-      </View>
-
-      {find && (
-        <View style={styles.findArea}>
+      {
+        // <Animated.View style={styles.findArea}>
+        <Animated.View
+          style={{...styles.findArea, transform: [{translateY: transY}]}}>
           <View style={styles.searchView}>
             <View style={styles.inputArea}>
               <TextInput
@@ -713,25 +713,190 @@ export default function Detail() {
                 }}></Ionicons>
             </TouchableOpacity>
           </View>
-        </View>
-      )}
+        </Animated.View>
+      }
+
+      <View style={styles.functionTab}>
+        <TouchableOpacity
+          style={styles.tab}
+          onPress={() => {
+            setFind(false);
+
+            let timeOut = setTimeout(() => {
+              setShowArticle(false)
+              return()=>{
+                 
+
+              }
+            },  600);
+
+              
+
+            setTittleArray([]);
+            Shrink();
+
+            Animated.timing(animatedForNavi, {
+              toValue: 0,
+              // toValue:100,
+              duration:  600,
+              useNativeDriver: false,
+            }).start();
+
+            // console.log(showArticle);
+          }}>
+          {/* <Text style={styles.innerTab}>S</Text> */}
+          <Ionicons
+            name="chevron-collapse-outline"
+            style={styles.innerTab}></Ionicons>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tab}
+          onPress={() => {
+            setTittleArray([]);
+            setTittleArray2([]);
+            setFind(false);
+            let timeOut = setTimeout(() => {
+              setShowArticle(false)
+              return()=>{
+                 
+
+              }
+            },  600);
+
+            Animated.timing(animatedForNavi, {
+              toValue: 0,
+              // toValue:100,
+              duration:  600,
+              useNativeDriver: false,
+            }).start();
+
+          }}>
+          {/* <Text style={styles.innerTab}>E</Text> */}
+          <Ionicons
+            name="chevron-expand-outline"
+            style={styles.innerTab}></Ionicons>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.tab}
+          onPress={() => {
+            list.current.scrollTo({y: 0});
+            let timeOut = setTimeout(() => {
+              setShowArticle(false)
+              return()=>{
+                 
+
+              }
+            },  600);
+
+          }}>
+          <Ionicons name="arrow-up-outline" style={styles.innerTab}></Ionicons>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={find ? styles.ActiveTab : styles.tab}
+          onPress={() => {
+            setFind(!find);
+            let timeOut = setTimeout(() => {
+              setShowArticle(false)
+              return()=>{
+                 
+
+              }
+            },  600);
+            Animated.timing(animatedForNavi, {
+              toValue: !find ? 80 : 0,
+              // toValue:100,
+              duration:  600,
+              useNativeDriver: false,
+            }).start();
+          }}>
+          {/* <Text style={styles.innerTab}>Find</Text> */}
+          <Ionicons
+            name="search-outline"
+            style={find ? styles.ActiveInner : styles.innerTab}></Ionicons>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={showArticle && !find ? styles.ActiveTab : styles.tab}
+          onPress={() => {
+
+            if(showArticle){
+              let timeOut = setTimeout(() => {
+                setShowArticle(false)
+                return()=>{
+                 
+                  
+                }
+              },  600);
+            }else{
+            setShowArticle(true);
+
+          }
+            setFind(false);
+            Keyboard.dismiss()
+            Animated.timing(animatedForNavi, {
+              toValue: !showArticle ? -100 : 0,
+              duration:  600,
+              useNativeDriver: false,
+            }).start();
+
+            setTittleArray([]);
+            setTittleArray2([]);
+        
+          }}>
+
+          <Ionicons
+            name="menu-outline"
+            style={
+              showArticle ? styles.ActiveInner : styles.innerTab
+            }></Ionicons>
+        </TouchableOpacity>
+      </View>
+
+        <>
       {showArticle && (
         <>
+        <Animated.View 
+        style={{
+          backgroundColor: 'rgb(245,245,247)',
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          display: 'flex',
+          position: 'absolute',
+          opacity:Opacity,
+          
+        }}
+>
           <TouchableOpacity //overlay
-            style={{
-              opacity: 0.6,
-              backgroundColor: 'rgb(245,245,247)',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              display: 'flex',
-              position: 'absolute',
-            }}
+                    style={{
+                      left: 0,
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      display: 'flex',
+                      position: 'absolute',
+                    }}
+            
             onPress={() => {
-              setShowArticle(false);
+              // Keyboard.dismiss()
+            let timeOut = setTimeout(() => {
+              setShowArticle(false)
+              return()=>{
+              }
+
+            },  600);
+              Animated.timing(animatedForNavi, {
+                toValue: !showArticle ? -100 : 0,
+                duration:  600,
+                useNativeDriver: false,
+              }).start();
+  
             }}></TouchableOpacity>
-          <View style={styles.listArticle}>
+            </Animated.View>
+
+          <Animated.View
+            style={{...styles.listArticle, transform: [{translateX: transX}]}}>
             <View
               style={{
                 flexDirection: 'row',
@@ -774,7 +939,9 @@ export default function Detail() {
                 )}
               </TouchableOpacity>
             </View>
-            <ScrollView>
+            <ScrollView
+            keyboardShouldPersistTaps='handled' 
+            >
               <View style={{height: 7}}>
                 {
                   // đây là hàng ảo để thêm margin
@@ -785,15 +952,24 @@ export default function Detail() {
                   style={styles.listItem}
                   onPress={() => {
                     setShowArticle(false);
-                    list.current.scrollTo({y: Object.values(key) - 57}); //
+                    list.current.scrollTo({y: Object.values(key) - 57}); 
+                    Animated.timing(animatedForNavi, {
+                      toValue: !showArticle ? -100 : 0,
+                      duration:  600,
+                      useNativeDriver: false,
+                    }).start();
+        
+
                   }}>
                   <Text style={styles.listItemText}>{Object.keys(key)}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
-          </View>
+          </Animated.View>
+          </>
+          )}
+
         </>
-      )}
     </>
   );
 }
@@ -892,6 +1068,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     height: 52,
     paddingTop: 2,
+    zIndex: 10,
   },
   tab: {
     backgroundColor: 'white',
@@ -931,7 +1108,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: 'red',
     flexDirection: 'column',
-    bottom: 50,
+    // bottom:50,
+    bottom: -10,
     position: 'absolute',
     right: 0,
     left: 0,
@@ -990,6 +1168,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     display: 'flex',
     right: 0,
+    marginBottom:50
+    // transform:[{translateX:200}]
+    // right:'100%'
     // paddingTop: 10,
   },
   listItem: {

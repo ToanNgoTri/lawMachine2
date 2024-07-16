@@ -1,14 +1,16 @@
-import React, { lazy } from 'react';
+// import React, { lazy } from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import database from '@react-native-firebase/database';
-import {useState, useEffect} from 'react';
+import {useState, useEffect,useContext,useRef} from 'react';
 
 import Home from '../screens/Home';
-import Detail1 from '../screens/Detail1';
+import {Detail1} from '../screens/Detail1';
 import Detail4 from '../screens/Detail4';
 import Detail5 from '../screens/Detail5';
+import {RefForSearch} from '../App'
+import {RefForHome} from '../App'
 import data from '../data/project2-197c0-default-rtdb-export.json';
 import {
   Alert,
@@ -18,6 +20,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  Animated
 } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -26,7 +29,23 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const AppNavigators = ({navigation}) => {
-  const [tabName, setTabName] = useState('home');
+  // const [tabName, setTabName] = useState('home');
+
+  const animatedValue = useRef(new Animated.Value(1)).current
+
+  const SearchScrollview = useContext(RefForSearch)
+  const HomeFlatlist = useContext(RefForHome)
+
+  // console.log(context.value);
+
+  // useEffect(()=>{
+  //   Animated.timing(animatedValue, {
+  //     toValue:10,
+  //     duration: 500,
+  //     useNativeDriver: false,
+  //   }).start();
+  // },[animatedValue])
+
   return (
     <Tab.Navigator
       // screenOptions={({ route }) => (
@@ -86,29 +105,62 @@ const AppNavigators = ({navigation}) => {
       //     );
       //   },
       // })}
+      lazy={false}
       >
+        
       <Tab.Screen
+      
         name="Home"
         component={Home}
         options={{
           header: () => null,
           tabBarIcon: ({focused, color, size}) => {
             return (
-              <View
-                style={focused ? styles.tabItemActive : styles.tabItemInactive}>
+              <Animated.View
+        //         style={focused ? {width: '100%',
+        //         height: '102%',
+        //         position: 'relative',
+        //         display: 'flex',
+        //         alignItems: 'center',
+        //         justifyContent: 'center',
+        //         borderTopColor:'red',
+        //         borderTopWidth:animatedValue,
+        //     } : {    position: 'relative',
+        //     width: '100%',
+        //     height: '102%',
+        //     display: 'flex',
+        //     alignItems: 'center',
+        //     justifyContent: 'center',
+        //     borderTopWidth:0,
+
+        // }}
+        style={focused ? styles.tabItemActive : styles.tabItemInactive}
+
+        >
                 <Ionicons
                   name="home-outline"
                   style={
                     focused ? styles.IconActive : styles.IconInActive
                   }></Ionicons>
-              </View>
+              </Animated.View>
             );
           },
 
           tabBarLabel: () => {
             return null;
           },
+          
         }}
+        listeners={{
+          tabPress: (props)=>{
+            // const { route, index, focused } = scene;
+            // console.log(navigation);
+            // if(){
+              HomeFlatlist.forHome.current.scrollToOffset({ animated: true, offset: 0 });
+            // }
+          }
+        }}
+
       />
       <Tab.Screen
         name="Search"
@@ -131,6 +183,14 @@ const AppNavigators = ({navigation}) => {
             return null;
           },
         }}
+        listeners={{
+          tabPress: (props)=>{
+            // const { route, index, focused } = scene;
+            // console.log(navigation);
+            SearchScrollview.forSearch.current.scrollTo({y: 0});
+          }
+        }}
+
       />
     </Tab.Navigator>
   );
@@ -170,10 +230,8 @@ const StackNavigator = ({navigation}) => {
           name="Home"
           component={AppNavigators}
           options={{animationEnabled: false, header: () => null}}
+          
         />
-
-        {/* <Stack.Screen name="Luật Cư Trú năm 2020" component={Detail5}  */}
-        {/* /> */}
 
         {Content &&
           Object.keys(Content).map((key, i) => (
@@ -210,28 +268,29 @@ const styles = StyleSheet.create({
   tabItemActive: {
     width: '100%',
     height: '102%',
-    // backgroundColor:'red',
     position: 'relative',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    borderTopColor:'red',
+    borderTopWidth:3,
   },
   tabItemInactive: {
     position: 'relative',
-    width: '50%',
+    width: '100%',
     height: '102%',
-    backgroundColor: 'white',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
   IconActive: {
-    fontSize: 20,
-    color: 'green',
+    fontSize: 23,
+    color: 'red',
+    // transform:animatedValue
+
   },
   IconInActive: {
-    fontSize: 20,
+    fontSize: 23,
     color: 'black',
   },
   IconInfo: {

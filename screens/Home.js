@@ -2,9 +2,11 @@ import {
     Text,StyleSheet,TouchableOpacity,View,ScrollView,TextInput,FlatList,ActivityIndicator,Image,Keyboard
   } from 'react-native';
 import database from '@react-native-firebase/database';
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useContext,useRef } from 'react';
 import data from '../data/project2-197c0-default-rtdb-export.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {RefForHome} from '../App'
+import {useNetInfo} from "@react-native-community/netinfo";
 
 
   export default function Home({ navigation }) {  
@@ -17,6 +19,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
       const [searchLawResult,setSearchLawResult] = useState([]);
       const [currentPaper,setCurrentPaper] = useState(1);
       const [totalPaper,setTotalPaper] = useState(2);
+
+      const HomeFlatlist = useContext(RefForHome);
+
+      const [showWanringInternet,setShowWanringInternet] = useState(true);
+
+      const list1 = useRef(null);
+
+      HomeFlatlist.updateHome(list1)
 
       const reference = database().ref('/Law1');
     const Render = ({item})=>{
@@ -41,7 +51,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
     
 
       useEffect( ()=>{
+
         setSearchLawResult(Content && Content.filter( (item)=>{
+
+            if (inputSearchLaw.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\s?)/gim)) {
+
             let inputSearchLawReg = inputSearchLaw
             if(inputSearchLaw.match(/\(/img)){
               inputSearchLawReg = inputSearchLaw.replace(/\(/img,'\\(')
@@ -50,12 +64,32 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
             if(inputSearchLaw.match(/\)/img)){
                 inputSearchLawReg = inputSearchLawReg.replace(/\)/img,'\\)')
               }
+              if(inputSearchLaw.match(/\//img)){
+                inputSearchLawReg = inputSearchLawReg.replace(/\//img,'.')
+              }
+              if(inputSearchLaw.match(/\\/img)){
+                inputSearchLawReg = inputSearchLawReg.replace(/\\/img,'.')
+              }
+              if (inputSearchLaw.match(/\./gim)) {
+                inputSearchLawReg = inputSearchLawReg.replace(/\./gim, '\\.');
+              }
+              if (inputSearchLaw.match(/\+/gim)) {
+                inputSearchLawReg = inputSearchLawReg.replace(/\+/gim, '\\+');
+              }
+              if (inputSearchLaw.match(/\?/gim)) {
+                inputSearchLawReg = inputSearchLawReg.replace(/\?/gim, '\\?');
+              }
+
+      
+
+              return item.match(new RegExp(inputSearchLawReg, 'igm'));
+            }
   
-            return item.match(new RegExp(inputSearchLawReg, 'igm'));
         }))
     }
     ,[inputSearchLaw])
     
+
 
     //   let totalPaper
     useEffect( ()=>{
@@ -66,23 +100,29 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
         //   console.log(Object.keys(snapshot.val()).length)
         //   totalPaper= Object.keys(snapshot.val()).length
         setTotalPaper(Math.floor(Object.keys(snapshot.val()).length/7)+1)
-
         });
 
     }
     ,[])
-    // totalPaper =Math.floor(Content.length/7)+1
-    // console.log(totalPaper);
-    
+
+    const netInfo = useNetInfo();
+    let internetConnected = netInfo.isConnected
+    // console.log(internetConnected);
+
+    useEffect(()=>{
+        setShowWanringInternet(true)
+
+    },[internetConnected])
+
     const loadMoreItem = ()=>{
         console.log('totalPaper',totalPaper);
         console.log('currentPaper',currentPaper);
         if(currentPaper<totalPaper){            // bị lỗi: tuy totalPaper đã dc thêm mới nhưng trong if() vẫn false
             setCurrentPaper(currentPaper+1)
-            console.log('được cộng');
+            // console.log('được cộng');
         }
         setShowContent(Content.slice(0,7*currentPaper));
-        // console.log('currentPaper',currentPaper);
+
     }
 
 
@@ -92,12 +132,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
             <View
               style={{
                 flexDirection: 'row',
-                // backgroundColor: 'black',
                 height: 50,
                 paddingLeft:10,
                 paddingRight:10,
                 display:'flex',
-                // justifyContent:'center',
                 alignItems:'center',
 
             }}>
@@ -116,13 +154,18 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
               }}>
                     Search
                 </Text> */}
-                <Image source={require('../assets/abc.png')}
+                {/* <Image source={require('../assets/abc.png')}
                 style= {{
                         width:30, height:10,color:'red',position: 'absolute',
                 marginLeft:8,
-                // paddingRight:30
             }}>
-              </Image>
+              </Image> */}
+                <View style={{display:'flex',justifyContent:'center',alignItems:'center'}}>
+                    <Ionicons name="book-outline" style= {{
+                       color:internetConnected ?'green':'red',fontSize:25
+                
+            }}></Ionicons>
+            </View>
               <TextInput
                 onChangeText={text => setInputSearchLaw(text)}
                 value={inputSearchLaw}
@@ -134,10 +177,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
                 </TextInput>
               <TouchableOpacity
                 onPress={() => {setInputSearchLaw('');Keyboard.dismiss()}}
-                style={{width: '10%', display: 'flex',alignItems: 'center',justifyContent: 'center',
+                style={{width: '10%', display: 'flex'
                 }}>
                 {inputSearchLaw && (
-             <Ionicons name="close-circle-outline" style={{color: 'black', fontSize: 25, textAlign: 'center'
+             <Ionicons name="close-circle-outline" style={{color: 'black', fontSize: 25,
          }}></Ionicons>
            )}
               </TouchableOpacity>
@@ -166,6 +209,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
   } */}
 
   <FlatList
+  ref={list1}
   keyboardShouldPersistTaps='handled'
   data={Content && (searchLawResult || Content)}
   renderItem={Render}
@@ -176,47 +220,84 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
     
   </FlatList>
 
+  { (!internetConnected && showWanringInternet)  && (
+      <View 
+      style={{
+        position:'absolute',
+      bottom:40, 
+      paddingBottom:10,
+      paddingTop:10,
+      left:30,right:30,
+      display:'flex',
+      justifyContent:'space-around',
+    alignItems:'center',
+    flexDirection:'row',
+    backgroundColor:'black',
+borderRadius:10
+      }}>
+        <View
+                style={{
+                    width:'12%',
+                    alignItems:'right',
+                    justifyContent:'flex-end',
+                    display:'flex',
+                    position:'relative',
+                    // backgroundColor:'red',
+                    flexDirection:'row'
+                }}
+        >
+        <Ionicons name="wifi-outline"
+        style={{
+            color:'red',
+            fontSize:27,
+            alignItems:'right',
+            justifyContent:'center',
+            // backgroundColor:'white',
+        }}
+        ></Ionicons>
+</View>
+        <Text 
+        style={{color:'white',
+        textAlign:'center',
+        justifyContent:'center',
+        width:'60%',
+        // backgroundColor:'green'
+        }}>
+          {'Mất kết nối Internet \n Đang sử dụng chế độ Offline'}
+        </Text>
+        <TouchableOpacity
+        onPress={()=>   setShowWanringInternet(false)
+        }
+        style={{
+            width:'20%',
+            // backgroundColor:'white',
+            height:'100%',
+            alignItems:'center',
+            justifyContent:'center',
+            // backgroundColor:'green'
+            borderLeftWidth:2,
+            borderLeftColor:'white',
 
+        }}
+        >
+            <Text
+                    style={{
+                        textAlign:'center',
+                        justifyContent:'center',
+                        // backgroundColor:'yellow',
+                        width:'100%',
+                        color:'white',
+                        fontWeight:'bold'
 
+                    }}
+            >       
 
-
-
-        {/* <TouchableOpacity onPress={() => navigation.navigate('Luật Cư Trú 2020')}>
-            <View style={styles.item}>
-                <Text style={styles.text}>
-                    Luật Cư trú 2020
-                </Text>
-            </View>
+                Đóng
+            </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Luật Tín ngưỡng, tôn giáo 2016')}>
-            <View style={styles.item}>
-                <Text style={styles.text}>
-                    Luật Tín ngưỡng, tôn giáo 2016
-                </Text>
-            </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Luật Viễn Thông 2023')}>
-            <View style={styles.item}>
-                <Text style={styles.text}>
-                Luật Viễn thông 2023
-                </Text>
-            </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('FireBase')}>
-            <View style={styles.item}>
-                <Text style={styles.text}>
-                FireBase Test
-                </Text>
-            </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('addFirebase')}>
-            <View style={styles.item}>
-                <Text style={styles.text}>
-                addFirebase
-                </Text>
-            </View>
-        </TouchableOpacity> */}
-      
+      </View>
+    )}
+
       </>
     )
   }
@@ -235,32 +316,32 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
         textAlign:'center',
     },
     inputSearchArea:{
-        paddingLeft: 40,
-        paddingRight: 40,
+        paddingLeft: 10,
+        paddingRight: 10,
         fontSize:18,
         color: 'black',
-        width: '90%',
+        width: '85%',
         alignItems: 'center',
         height:50
     },
     placeholder:{
         fontSize:15,
-        paddingLeft: 40,
-        paddingRight: 40,
+        paddingLeft: 10,
+        paddingRight: 10,
         color: 'black',
-        width: '90%',
+        width: '85%',
         alignItems: 'center',
         height:50
 
     },
-    inputXIcon:{
-        height: 20,
-        width: 20,
-        color: 'white',
-        textAlign: 'center',
-        verticalAlign: 'middle',
-        backgroundColor: 'gray',
-        borderRadius: 25,
-    }
+    // inputXIcon:{
+    //     height: 20,
+    //     width: 20,
+    //     color: 'white',
+    //     textAlign: 'center',
+    //     verticalAlign: 'middle',
+    //     backgroundColor: 'gray',
+    //     borderRadius: 25,
+    // }
   });
   
