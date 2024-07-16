@@ -13,6 +13,7 @@ import {useNetInfo} from "@react-native-community/netinfo";
       const [Content,setContent] = useState('');
       // sử dụng để đọc realtime database, data được xuất ra ở dưới dạng object rồi không cần JSON.parse
       // console.log('API',API);
+      
       const [showContent,setShowContent] = useState([]);
 
       const [inputSearchLaw,setInputSearchLaw] = useState('');
