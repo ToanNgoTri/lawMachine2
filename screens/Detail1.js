@@ -170,7 +170,6 @@ export function Detail1({navigation}) {
                     // })
                   });
 
-                  // console.log('searchArray',searchArray);
                 } else {
                   //nếu không có chương
 
@@ -547,7 +546,7 @@ export function Detail1({navigation}) {
               left: 50,
               backgroundColor: 'white',
               display: 'flex',
-              borderRadius: 15,
+              borderRadius: 20,
               transform: [{scale: Scale}],
               overflow: 'hidden',
               // borderWidth:1,
@@ -620,7 +619,6 @@ export function Detail1({navigation}) {
                 if (choosenLaw.length == Object.keys(Content).length) {
                   setCheckedAllFilter(false);
                   setChoosenLaw([]);
-                  // console.log('full');
                 } else {
                   setChoosenLaw(Object.keys(Content));
                   setCheckedAllFilter(true);
@@ -631,7 +629,6 @@ export function Detail1({navigation}) {
                   if (choosenLaw.length == Object.keys(Content).length) {
                     setCheckedAllFilter(false);
                     setChoosenLaw([]);
-                    // console.log('full');
                   } else {
                     setChoosenLaw(Object.keys(Content));
                     setCheckedAllFilter(true);
@@ -740,12 +737,9 @@ export function Detail1({navigation}) {
                             // if(choosenLaw.length > Object.keys(Content).length){
                             //   setCheckedAllFilter(true)
                             // // setChoosenLaw([])
-                            // console.log('full',choosenLaw.length);
                             // }else{
                             //   // setChoosenLaw(Object.keys(Content))
                             //   setCheckedAllFilter(false)
-                            //   console.log('none',choosenLaw.length);
-                            //   console.log(Object.keys(Content).length);
 
                             // }
                           }}>
@@ -802,6 +796,8 @@ export function Detail1({navigation}) {
                   paddingBottom: 10,
                   paddingTop: 10,
                   textAlign: 'center',
+                  color:'white',
+                  fontWeight:'bold'
                 }}>
                 OK
               </Text>

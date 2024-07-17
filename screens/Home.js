@@ -21,7 +21,6 @@ import {useNetInfo} from '@react-native-community/netinfo';
 export default function Home({navigation}) {
   const [Content, setContent] = useState('');
   // sử dụng để đọc realtime database, data được xuất ra ở dưới dạng object rồi không cần JSON.parse
-  // console.log('API',API);
 
   const [showContent, setShowContent] = useState([]);
 
@@ -125,7 +124,6 @@ export default function Home({navigation}) {
     hasBeenRerender.current = true
   }
 
-    // console.log(internetConnected);
     if(hasBeenRerender.current){
       setShowWanringInternet(true);
     }
