@@ -91,29 +91,42 @@ import {useNetInfo} from "@react-native-community/netinfo";
     ,[inputSearchLaw])
     
 
+    const netInfo = useNetInfo();
+    let internetConnected = netInfo.isConnected
 
     //   let totalPaper
     useEffect( ()=>{
-        reference.on('value', snapshot => {
-            // console.log(snapshot.val());
+      setShowWanringInternet(true)
+
+      if(internetConnected){
+      reference.on('value', snapshot => {
           setContent(Object.keys(snapshot.val()))
           setShowContent(Object.keys(snapshot.val()).slice(0,7))
-        //   console.log(Object.keys(snapshot.val()).length)
-        //   totalPaper= Object.keys(snapshot.val()).length
         setTotalPaper(Math.floor(Object.keys(snapshot.val()).length/7)+1)
-        });
+      });
+          }else{
+            setContent(Object.keys(data))
+            setShowContent(Object.keys(data).slice(0,7))
+          setTotalPaper(Math.floor(Object.keys(data).length/7)+1)
+            }
 
     }
-    ,[])
+    ,[internetConnected])
 
-    const netInfo = useNetInfo();
-    let internetConnected = netInfo.isConnected
-    // console.log(internetConnected);
 
-    useEffect(()=>{
-        setShowWanringInternet(true)
+    // useEffect(()=>{
 
-    },[internetConnected])
+    //     if(internetConnected){
+    //       setContent(Object.keys(snapshot.val()))
+    //       setShowContent(Object.keys(snapshot.val()).slice(0,7))
+    //     setTotalPaper(Math.floor(Object.keys(snapshot.val()).length/7)+1)
+    //       }else{
+    //         setContent(Object.keys(data))
+    //         setShowContent(Object.keys(data).slice(0,7))
+    //       setTotalPaper(Math.floor(Object.keys(data).length/7)+1)
+    //         }
+
+    // },[internetConnected])
 
     const loadMoreItem = ()=>{
         console.log('totalPaper',totalPaper);
@@ -335,14 +348,5 @@ borderRadius:10
         height:50
 
     },
-    // inputXIcon:{
-    //     height: 20,
-    //     width: 20,
-    //     color: 'white',
-    //     textAlign: 'center',
-    //     verticalAlign: 'middle',
-    //     backgroundColor: 'gray',
-    //     borderRadius: 25,
-    // }
   });
   

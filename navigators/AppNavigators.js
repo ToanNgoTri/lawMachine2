@@ -24,11 +24,13 @@ import {
 } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useNetInfo} from "@react-native-community/netinfo";
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const AppNavigators = ({navigation}) => {
+const AppNavigators = () => {
   // const [tabName, setTabName] = useState('home');
 
   const animatedValue = useRef(new Animated.Value(1)).current
@@ -153,11 +155,7 @@ const AppNavigators = ({navigation}) => {
         }}
         listeners={{
           tabPress: (props)=>{
-            // const { route, index, focused } = scene;
-            // console.log(navigation);
-            // if(){
               HomeFlatlist.forHome.current.scrollToOffset({ animated: true, offset: 0 });
-            // }
           }
         }}
 
@@ -196,17 +194,26 @@ const AppNavigators = ({navigation}) => {
   );
 };
 
-const StackNavigator = ({navigation}) => {
+const StackNavigator = () => {
   const [Content, setContent] = useState(null);
   const [num, setNum] = useState(false);
 
+  const netInfo = useNetInfo();
+  let internetConnected = netInfo.isConnected
+
   useEffect(() => {
+
+    if(internetConnected){
     const reference = database().ref('/Law1');
     reference.on('value', snapshot => {
       setContent(snapshot.val());
     });
-  }, []);
+      }else{
+        setContent(data);
+      }
+  }, [internetConnected]);
 
+  
   function TopBarNav({route}) {
     <Text>{route.name}</Text>;
   }
@@ -240,7 +247,7 @@ const StackNavigator = ({navigation}) => {
               name={`${key}`}
               component={Detail5}
               // options={{animationEnabled: true}}
-              options={({navigation}) => ({
+              options={() => ({
                 title: '',
                 headerRight: () => (
                   <>

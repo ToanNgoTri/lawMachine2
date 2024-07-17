@@ -74,14 +74,27 @@ export function Detail1({navigation}) {
   let internetConnected = netInfo.isConnected;
 
   useEffect(() => {
-    reference.on('value', snapshot => {
-      setContent(snapshot.val());
-      setChoosenLaw(Object.keys(snapshot.val()));
-    });
+
+    if(internetConnected){
+      reference.on('value', snapshot => {
+        setContent(snapshot.val());
+        setChoosenLaw(Object.keys(snapshot.val()));
+        });
+          }else{
+            setContent(data);
+            setChoosenLaw(Object.keys(data));
+                }
 
     navigation.setParams({
       query: 'someText',
     });
+
+    // if(choosenLaw.length == Object.keys(Content).length){
+      setCheckedAllFilter(true)
+    // }else{
+    //   setCheckedAllFilter(false)
+    // }
+
 
     // navigation.setParams({
     //   scrollToTop: () => {
@@ -89,7 +102,7 @@ export function Detail1({navigation}) {
     //     console.log('m');
     //   }
     // })
-  }, []);
+  }, [internetConnected]);
 
   function Search(input) {
     let searchArray = {};
@@ -232,14 +245,6 @@ export function Detail1({navigation}) {
 
   function highlight(para, word) {
     if (typeof para == 'string') {
-      // let replace1 = `((.*\n)*.*)(${word})((.*\n)*.*)`
-      // let re1 = new RegExp(replace1, "gm");
-      // let s2 = para.replace(re1, "$2");  // khúc đầu
-      // let s4 = para.replace(re1, "$4"); //khúc cần
-      // let s5 = para.replace(re1, "$5");    // khúc sau
-
-      // return <Text>{s2}<Text style={styles.highlight}>{s4}</Text>{s5}</Text>
-
       let inputRexgex = para.match(new RegExp(word, 'igm'));
       return (
         <Text>
@@ -272,6 +277,14 @@ export function Detail1({navigation}) {
 
   useEffect(() => {
     setInputFilter('');
+
+    if(choosenLaw.length == Object.keys(Content).length){
+      setCheckedAllFilter(true)
+    }else{
+      setCheckedAllFilter(false)
+    }
+    console.log('choosenLaw.length',choosenLaw.length);
+    console.log('Content.length',Object.keys(Content).length);
   }, [showFilter]);
 
   const NoneOfResutl = () => {
@@ -285,24 +298,9 @@ export function Detail1({navigation}) {
       </View>
     );
   };
-  // console.log(Object.keys('SearchResult1',SearchResult));
+
   return (
     <>
-      {/* { Boolean(Object.keys(SearchResult).length) &&  (<TouchableOpacity
-          
-          onPress={() => {
-            list.current.scrollTo({y: 0});
-          }}
-          style={styles.tabSearch}
-          >
-          <Ionicons name="arrow-up-outline" style={{
-                  color: 'rgb(240,240,208)',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                  fontSize: 25,
-                }}></Ionicons>
-        </TouchableOpacity>)
-} */}
       <ScrollView keyboardShouldPersistTaps="handled" ref={list}>
         <View style={{backgroundColor: 'green'}}>
           <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
@@ -553,6 +551,8 @@ export function Detail1({navigation}) {
               display: 'flex',
               borderRadius: 10,
               transform: [{scale: Scale}],
+              overflow: 'hidden',
+          
             }}>
             <View
               style={{
@@ -631,9 +631,6 @@ export function Detail1({navigation}) {
                   }
                 }}
                 isChecked={checkedAllFilter}
-                style={{
-                  color: 'gray',
-                }}
               />
 
               <Text
@@ -827,17 +824,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     // backgroundColor:'red'
   },
-  IconBook: {
-    // width: '15%',
-    fontSize: 30,
-    color: 'white',
-    fontWeight: 'bold',
-    alignItems: 'center',
-    justifyContent: 'center',
-    display: 'flex',
-    // top:10,
-    textAlign: 'center',
-  },
   inputArea: {
     width: '85%',
     backgroundColor: 'white',
@@ -920,35 +906,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     textAlign: 'center',
   },
-  lines: {
-    color: 'white',
-  },
-  category: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  checkContainer: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 15,
-    paddingRight: 15,
-    backgroundColor: 'blue',
-    borderRadius: 20,
-    marginRight: 10,
-    marginLeft: 10,
-  },
-  ContainerChecked: {
-    backgroundColor: 'red',
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderRadius: 20,
-    marginRight: 10,
-    marginLeft: 10,
-  },
   blackBackground: {
     backgroundColor: 'white',
     color: 'black',
@@ -963,10 +920,6 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     paddingBottom: 10,
   },
-  checkConent: {
-    fontWeight: 'bold',
-    color: 'yellow',
-  },
   highlight: {
     color: 'red',
     backgroundColor: 'yellow',
@@ -974,38 +927,5 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  inputXIcon: {
-    height: 20,
-    width: 20,
-    color: 'white',
-    textAlign: 'center',
-    verticalAlign: 'middle',
-    backgroundColor: 'gray',
-    borderRadius: 25,
-  },
-  tabSearch: {
-    display: 'flex',
-    position: 'absolute',
-    height: 55,
-    width: 55,
-    right: 25,
-    bottom: 20,
-    justifyContent: 'center',
-    borderRadius: 30,
-    opacity: 0.6,
-    backgroundColor: 'gray',
-    zIndex: 10,
-  },
-  listFilter: {
-    position: 'absolute',
-    top: 80,
-    bottom: 60,
-    right: 50,
-    left: 50,
-    backgroundColor: 'white',
-    display: 'flex',
-    borderRadius: 10,
-    overflow: 'hidden',
   },
 });

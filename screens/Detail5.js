@@ -16,6 +16,7 @@ import {useRoute} from '@react-navigation/native';
 import data from '../data/project2-197c0-default-rtdb-export.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useNetInfo} from "@react-native-community/netinfo";
 
 let TopUnitCount; // là đơn vị lớn nhất vd là 'phần thứ' hoặc chương
 let articleCount = 0;
@@ -64,7 +65,11 @@ export default function Detail() {
 
   const [Content, setContent] = useState('');
 
-  const reference = database().ref('/Law1');
+  const netInfo = useNetInfo();
+  let internetConnected = netInfo.isConnected
+
+
+  // const reference = database().ref('/Law1');
 
   function pushToSearch() {
     setGo(true);
@@ -107,10 +112,21 @@ export default function Detail() {
   }
 
   useEffect(() => {
-    reference.on('value', snapshot => {
-      setContent(snapshot.val()[route.name]);
-      // setContent(data[route.name]);
-    });
+
+    if(internetConnected){
+      const reference = database().ref('/Law1');
+      reference.on('value', snapshot => {
+        setContent(snapshot.val()[route.name]);
+      });
+        }else{
+          setContent(data[route.name]);
+        }
+
+        
+    // reference.on('value', snapshot => {
+    //   setContent(snapshot.val()[route.name]);
+    //   // setContent(data[route.name]);
+    // });
 
     if (route.params) {
       setTimeout(() => {
@@ -123,7 +139,7 @@ export default function Detail() {
       sumChapterArray = [];
       sumChapterArray[0] = 0;
     };
-  }, []);
+  }, [internetConnected]);
 
   function collapse(a) {
     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
@@ -975,10 +991,6 @@ export default function Detail() {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   titleText: {
     fontSize: 28,
     alignItems: 'center',
@@ -997,12 +1009,6 @@ const styles = StyleSheet.create({
     color: 'black',
     alignItems: 'center',
     marginBottom: 1,
-  },
-  chapterText: {
-    textAlign: 'center',
-    color: 'yellow',
-    fontSize: 15,
-    fontWeight: 'bold',
   },
   dieu: {
     fontWeight: 'bold',
@@ -1153,13 +1159,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     justifyContent: 'center',
   },
-  searchCount: {
-    color: 'white',
-    fontSize: 15,
-    textAlign: 'center',
-    marginBottom: 5,
-  },
-
   listArticle: {
     position: 'absolute',
     width: 200,
