@@ -53,10 +53,13 @@ export default function Home({navigation}) {
 
   const reference = database().ref('/Law1');
   const Render = ({item}) => {
+
+    let name =item.replace(/\\/img,'\/')
+    
     return (
       <TouchableOpacity onPress={() => navigation.navigate(`${item}`)}>
         <View style={styles.item}>
-          <Text style={styles.text}>{item}</Text>
+          <Text style={styles.text}>{name}</Text>
         </View>
       </TouchableOpacity>
     );

@@ -39,7 +39,6 @@ export default function Detail() {
 
   const [tittleArray2, setTittleArray2] = useState([]); // nếu có 'phần thứ...' thì đây sẽ là chương
 
-  // const [searchCount, setSearchCount] = useState(0);
   const [positionYArr, setPositionYArr] = useState([]); // tập hợp pos Y Search
   const [positionYArrArtical, setPositionYArrArtical] = useState([]);
   const [showArticle, setShowArticle] = useState(false);
@@ -52,8 +51,13 @@ export default function Detail() {
 
   const route = useRoute();
 
+  let LawName = route.name;
+
+  if(LawName.match(/\\/img,'\/')){
+    LawName = LawName.replace(/\\/img,'\/')
+  }
+
   const animatedForNavi = useRef(new Animated.Value(0)).current;
-  // const animatedForFind = useRef(new Animated.Value(50)).current
 
   const list = useRef(null);
 
@@ -69,13 +73,11 @@ export default function Detail() {
   let internetConnected = netInfo.isConnected
 
 
-  // const reference = database().ref('/Law1');
-
   function pushToSearch() {
     setGo(true);
 
     if (input) {
-      if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!)/gim)) {
+      if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
         let inputSearchLawReg = input;
         if (input.match(/\(/gim)) {
           inputSearchLawReg = input.replace(/\(/gim, '\\(');
@@ -89,9 +91,9 @@ export default function Detail() {
         if (input.match(/\+/gim)) {
           inputSearchLawReg = inputSearchLawReg.replace(/\+/gim, '\\+');
         }
-        if(input.match(/\//img)){
-          inputSearchLawReg = inputSearchLawReg.replace(/\//img,'.')
-        }
+        // if(input.match(/\//img)){
+        //   inputSearchLawReg = inputSearchLawReg.replace(/\//img,'\\/')
+        // }
         if(input.match(/\\/img)){
           inputSearchLawReg = inputSearchLawReg.replace(/\\/img,'.')
         }
@@ -194,9 +196,15 @@ export default function Detail() {
   let searchResultCount = 0;
   // let c = 0;
   function highlight(para, word, i2) {
-    // if (typeof para == 'string' ) {
+
+    if(para[0]){
+    if(para[0].match(/(?<=\w)\\(?=\w)/img)){
+    para[0] = para[0].replace(/(?<=\w)\\(?=\w)/img,'\/')
+    }
+  }
+
     // if (word.match(/\w+/gim) || word.match(/\(/gim)|| word.match(/\)/gim) || word.match(/\./img) || word.match(/\+/img)) {
-    if (word.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;)/gim)) {
+    if (word.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
       let inputRexgex = para[0].match(new RegExp(String(word), 'igmu'));
       // let inputRexgex = para[0].match(new RegExp('hội', 'igmu'));
       if (inputRexgex) {
@@ -333,6 +341,15 @@ export default function Detail() {
         setTittleArray(oldArray => [...oldArray, b]);
       }
     }
+    // console.log('sumChapter',sumChapter);
+    // console.log('sumChapterArray',sumChapterArray);
+
+      let sumChapter = sumChapterArray.reduce((total, currentValue) => {
+    // tổng chapter nếu có phần thứ
+    if (currentValue) {
+      return total + currentValue;
+    }
+  });
 
     for (let b = 0; b <= sumChapter - 1; b++) {
       if (tittleArray2 == []) {
@@ -341,7 +358,6 @@ export default function Detail() {
         setTittleArray2(oldArray => [...oldArray, b + 1]);
       }
     }
-    // console.log(tittleArray);
   }
 
   // useEffect(() => {
@@ -423,15 +439,10 @@ export default function Detail() {
 
   }, [find]);
 
-  useEffect(() => {
-    // setTittleArray([]);
-    // setTittleArray2([]);
-
-  }, [showArticle]);
-
-
   const a = (key, i, key1, i1a, t) => {
     // phần nếu không mục 'phần thứ' trong văn bản
+
+
 
     return Object.keys(key)[0] != '0' ? (
       <View
@@ -445,6 +456,8 @@ export default function Detail() {
           styles.content //////////////////////////////////////////////////////////////////
         }>
         {key[key1].map((key2, i2) => {
+
+
           return (
             <View
               onLayout={event => {
@@ -471,12 +484,12 @@ export default function Detail() {
     );
   };
 
-  let sumChapter = sumChapterArray.reduce((total, currentValue) => {
-    // tổng chapter nếu có phần thứ
-    if (currentValue) {
-      return total + currentValue;
-    }
-  });
+  // let sumChapter = sumChapterArray.reduce((total, currentValue) => {
+  //   // tổng chapter nếu có phần thứ
+  //   if (currentValue) {
+  //     return total + currentValue;
+  //   }
+  // });
 
   const b = (keyA, i, keyB) => {
     // phần nếu có mục 'phần' trong văn bản
@@ -590,7 +603,7 @@ export default function Detail() {
           // style={  find ? {setTimeout( ()=>{ return {'marginBottom': 60}},400)} : {marginBottom: 0}}
 
           showsVerticalScrollIndicator={true}>
-          <Text style={styles.titleText}>{`${route.name}`}</Text>
+          <Text style={styles.titleText}>{`${LawName}`}</Text>
           {Content &&
             Content.map((key, i) => (
               <>
@@ -798,8 +811,6 @@ export default function Detail() {
             let timeOut = setTimeout(() => {
               setShowArticle(false)
               return()=>{
-                 
-
               }
             },  600);
 
@@ -837,8 +848,6 @@ export default function Detail() {
               let timeOut = setTimeout(() => {
                 setShowArticle(false)
                 return()=>{
-                 
-                  
                 }
               },  600);
             }else{
@@ -993,12 +1002,14 @@ const styles = StyleSheet.create({
     fontSize: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 30,
+    paddingTop: 20,
+    paddingBottom: 30,
     textAlign: 'center',
     paddingLeft: 10,
     paddingRight: 10,
-    color: 'gray',
+    color: 'rgb(68,68,68)',
+    // backgroundColor:'rgb(230,230,230)',
+    fontWeight:'bold'
   },
   chapter: {
     height: 60,

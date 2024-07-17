@@ -109,7 +109,7 @@ export function Detail1({navigation}) {
 
     if (input) {
       // if ( (input.match(/\w+/gim)) || input.match(/\(/img) || input.match(/\)/img) || input.match(/\./img) || input.match(/\+/img)) {
-      if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!)/gim)) {
+      if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
         function a(key, key1) {
           // Object.keys(key2).map((key3, i3) => {
           // thama nhap chuowng (array dieu)
@@ -413,9 +413,9 @@ export function Detail1({navigation}) {
                       '\\?',
                     );
                   }
-                  if (input.match(/\//gim)) {
-                    inputSearchLawReg = inputSearchLawReg.replace(/\//gim, '.');
-                  }
+                  // if (input.match(/\//gim)) {
+                  //   inputSearchLawReg = inputSearchLawReg.replace(/\//gim, '.');
+                  // }
                   if (input.match(/\\/gim)) {
                     inputSearchLawReg = inputSearchLawReg.replace(/\\/gim, '.');
                   }
@@ -611,9 +611,17 @@ export function Detail1({navigation}) {
                 width: '100%',
                 paddingLeft: '5%',
                 paddingTop: 10,
-                borderBottomWidth: 2,
-                borderBottomColor: 'rgb(245,245,247)',
                 alignItems: 'center',
+                backgroundColor:'rgb(240,240,240)',
+                shadowColor:'black',
+                shadowOpacity:.5,
+                shadowOffset: {
+                  width: 5,
+                  height: 5,
+                },
+                shadowRadius:4,
+                elevation: 10,
+  
               }}
               onPress={() => {
                 if (choosenLaw.length == Object.keys(Content).length) {
@@ -623,6 +631,7 @@ export function Detail1({navigation}) {
                   setChoosenLaw(Object.keys(Content));
                   setCheckedAllFilter(true);
                 }
+                // console.log(choosenLaw);
               }}>
               <CheckBox
                 onClick={() => {
@@ -659,10 +668,19 @@ export function Detail1({navigation}) {
                 }}>
                 {Content &&
                   Object.keys(Content).map((key, i) => {
-                    let inputSearchLawReg = inputFilter;
+
+                    let nameLaw = key
+                    if(nameLaw){
+                      if(nameLaw.match(/(?<=\w)\\(?=\w)/img)){
+                        nameLaw = key.replace(/(?<=\w)\\(?=\w)/img,'\/')
+                      }
+                    }
+
+
+                                      let inputSearchLawReg = inputFilter;
                     if (
                       inputFilter.match(
-                        /(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\s?)/gim,
+                        /(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/|\s?)/gim,
                       )
                     ) {
                       if (inputFilter.match(/\(/gim)) {
@@ -675,12 +693,12 @@ export function Detail1({navigation}) {
                           '\\)',
                         );
                       }
-                      if (inputFilter.match(/\//gim)) {
-                        inputSearchLawReg = inputSearchLawReg.replace(
-                          /\//gim,
-                          '.',
-                        );
-                      }
+                      // if (inputFilter.match(/\//gim)) {
+                      //   inputSearchLawReg = inputSearchLawReg.replace(
+                      //     /\//gim,
+                      //     '.',
+                      //   );
+                      // }
                       if (inputFilter.match(/\\/gim)) {
                         inputSearchLawReg = inputSearchLawReg.replace(
                           /\\/gim,
@@ -707,7 +725,7 @@ export function Detail1({navigation}) {
                         );
                       }
                     }
-                    if (key.match(new RegExp(inputSearchLawReg, 'igm'))) {
+                    if (nameLaw.match(new RegExp(inputSearchLawReg, 'igm'))) {
                       return (
                         <TouchableOpacity
                           style={{
@@ -766,7 +784,7 @@ export function Detail1({navigation}) {
                           />
 
                           <Text style={{marginLeft: 5, color: 'black'}}>
-                            {key}
+                            {nameLaw}
                           </Text>
                         </TouchableOpacity>
                       );
@@ -797,7 +815,8 @@ export function Detail1({navigation}) {
                   paddingTop: 10,
                   textAlign: 'center',
                   color:'white',
-                  fontWeight:'bold'
+                  fontWeight:'bold',
+                  fontSize:16
                 }}>
                 OK
               </Text>
