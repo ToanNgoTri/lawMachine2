@@ -274,7 +274,7 @@ const StackNavigator = () => {
 const styles = StyleSheet.create({
   tabItemActive: {
     width: '100%',
-    height: '102%',
+    height: '104%',
     position: 'relative',
     display: 'flex',
     alignItems: 'center',

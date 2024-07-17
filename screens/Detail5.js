@@ -781,7 +781,6 @@ export default function Detail() {
 
             Animated.timing(animatedForNavi, {
               toValue: 0,
-              // toValue:100,
               duration:  600,
               useNativeDriver: false,
             }).start();
@@ -821,7 +820,6 @@ export default function Detail() {
             },  600);
             Animated.timing(animatedForNavi, {
               toValue: !find ? 80 : 0,
-              // toValue:100,
               duration:  600,
               useNativeDriver: false,
             }).start();

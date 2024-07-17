@@ -283,8 +283,6 @@ export function Detail1({navigation}) {
     }else{
       setCheckedAllFilter(false)
     }
-    console.log('choosenLaw.length',choosenLaw.length);
-    console.log('Content.length',Object.keys(Content).length);
   }, [showFilter]);
 
   const NoneOfResutl = () => {
@@ -549,10 +547,19 @@ export function Detail1({navigation}) {
               left: 50,
               backgroundColor: 'white',
               display: 'flex',
-              borderRadius: 10,
+              borderRadius: 15,
               transform: [{scale: Scale}],
               overflow: 'hidden',
-          
+              // borderWidth:1,
+              // borderColor:'brown',
+              shadowColor:'black',
+              shadowOpacity:1,
+              shadowOffset: {
+                width: 10,
+                height: 10,
+              },
+              shadowRadius:4,
+              elevation: 20,
             }}>
             <View
               style={{
