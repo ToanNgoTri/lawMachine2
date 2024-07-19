@@ -115,6 +115,10 @@ export default function Home({navigation}) {
 
   const hasBeenRerender = useRef(false);
 
+  const [m, setm] = useState(false);
+
+
+  useEffect(() => {
 
     // if(internetConnected){
   //   setTimeout(()=>{
@@ -125,28 +129,11 @@ export default function Home({navigation}) {
   //   hasBeenRerender.current = true
   // }
 
-  const [m, setm] = useState(false);
-
-
-  useEffect(() => {
-
-  //   if(internetConnected){
-  //   setTimeout(()=>{
-  //     hasBeenRerender.current = true
-
-  //   },2000)
-  // }else if (internetConnected == false){
-  //   hasBeenRerender.current = true
-  // }
 
     
     if(!hasBeenRerender.current && (internetConnected==false) ){
-      // setShowWanringInternet(true);
       setShowWanringInternet(true);
       setm(true)
-      // setTimeout(()=>{
-      //   hasBeenRerender.current = true
-      // },2000)
   
     }
     else if(!hasBeenRerender.current && internetConnected && m){
@@ -158,13 +145,6 @@ export default function Home({navigation}) {
       },3000)
     }
 
-        // if(internetConnected){
-  //   setTimeout(()=>{
-  //     hasBeenRerender.current = true
-
-  //   },2000)
-
-
     if (internetConnected) {
             hasBeenRerender.current = true
 
@@ -174,9 +154,6 @@ export default function Home({navigation}) {
         setTotalPaper(Math.floor(Object.keys(snapshot.val()).length / 7) + 1);
       });
     } else {
-      // setContent(Object.keys(data));
-      // setShowContent(Object.keys(data).slice(0, 7));
-      // setTotalPaper(Math.floor(Object.keys(data).length / 7) + 1);
     }
 
     setTimeout(()=>{
@@ -186,13 +163,6 @@ export default function Home({navigation}) {
         useNativeDriver: true,
       }).start();
     },2000)
-
-    // if (internetConnected ) {
-    //   setTimeout(() => {
-    //     setShowWanringInternet(false);
-    //   }, 4000);
-    // }
-
 
   }, [internetConnected]);
 
