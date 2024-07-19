@@ -116,31 +116,67 @@ export default function Home({navigation}) {
   const hasBeenRerender = useRef(false);
 
 
+    // if(internetConnected){
+  //   setTimeout(()=>{
+  //     hasBeenRerender.current = true
+
+  //   },2000)
+  // }else if (internetConnected == false){
+  //   hasBeenRerender.current = true
+  // }
+
+  const [m, setm] = useState(false);
+
+
   useEffect(() => {
 
-    if(internetConnected){
-    setTimeout(()=>{
-      hasBeenRerender.current = true
+  //   if(internetConnected){
+  //   setTimeout(()=>{
+  //     hasBeenRerender.current = true
 
-    },2000)
-  }else if (internetConnected == false){
-    hasBeenRerender.current = true
-  }
+  //   },2000)
+  // }else if (internetConnected == false){
+  //   hasBeenRerender.current = true
+  // }
 
-    if(hasBeenRerender.current){
+    
+    if(!hasBeenRerender.current && (internetConnected==false) ){
+      // setShowWanringInternet(true);
       setShowWanringInternet(true);
+      setm(true)
+      // setTimeout(()=>{
+      //   hasBeenRerender.current = true
+      // },2000)
+  
+    }
+    else if(!hasBeenRerender.current && internetConnected && m){
+      setShowWanringInternet(true);
+      
+      setTimeout(()=>{
+        hasBeenRerender.current = true
+      setShowWanringInternet(false);
+      },3000)
     }
 
+        // if(internetConnected){
+  //   setTimeout(()=>{
+  //     hasBeenRerender.current = true
+
+  //   },2000)
+
+
     if (internetConnected) {
+            hasBeenRerender.current = true
+
       reference.on('value', snapshot => {
         setContent(Object.keys(snapshot.val()));
         setShowContent(Object.keys(snapshot.val()).slice(0, 7));
         setTotalPaper(Math.floor(Object.keys(snapshot.val()).length / 7) + 1);
       });
     } else {
-      setContent(Object.keys(data));
-      setShowContent(Object.keys(data).slice(0, 7));
-      setTotalPaper(Math.floor(Object.keys(data).length / 7) + 1);
+      // setContent(Object.keys(data));
+      // setShowContent(Object.keys(data).slice(0, 7));
+      // setTotalPaper(Math.floor(Object.keys(data).length / 7) + 1);
     }
 
     setTimeout(()=>{
@@ -151,22 +187,14 @@ export default function Home({navigation}) {
       }).start();
     },2000)
 
-    if (internetConnected ) {
-      setTimeout(() => {
-        setShowWanringInternet(false);
-      }, 4000);
-    }
+    // if (internetConnected ) {
+    //   setTimeout(() => {
+    //     setShowWanringInternet(false);
+    //   }, 4000);
+    // }
 
 
   }, [internetConnected]);
-
-  // useEffect(()=>{
-  //   hasBeenRerender.current = true
-
-
-
-  // },[])
-
 
 
 
@@ -321,10 +349,18 @@ export default function Home({navigation}) {
               width: '60%',
               // backgroundColor:'green'
             }}>
-            {'Mất kết nối Internet \n Đang sử dụng chế độ Offline'}
+            {'Mất kết nối Internet \n Muốn xem chế độ Offline?'}
           </Text>
           <TouchableOpacity
-            onPress={() => setShowWanringInternet(false)}
+            onPress={() => {setShowWanringInternet(false)
+
+              if(!internetConnected){
+              setContent(Object.keys(data));
+              setShowContent(Object.keys(data).slice(0, 7));
+              setTotalPaper(Math.floor(Object.keys(data).length / 7) + 1);
+              }
+            
+            }}
             style={{
               width: '20%',
               // backgroundColor:'white',
