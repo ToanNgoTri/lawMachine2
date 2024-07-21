@@ -18,6 +18,8 @@ import data from '../data/project2-197c0-default-rtdb-export.json';
 import React, {useEffect, useState, useRef, useContext} from 'react';
 
 import {RefForSearch} from '../App';
+import {dataLaw} from '../App';
+
 
 import {useNetInfo} from '@react-native-community/netinfo';
 
@@ -44,6 +46,17 @@ export function Detail1({navigation}) {
 
   const [warning, setWanring] = useState(false);
   const list = useRef(null);
+
+  const dataLawContent = useContext(dataLaw);
+
+
+  useEffect(()=>{
+
+            setContent(dataLawContent.dataLawForApp);
+            setChoosenLaw(Object.keys(dataLawContent.dataLawForApp));
+
+
+  },[dataLawContent.dataLawForApp])
 
   const animated = useRef(new Animated.Value(0)).current;
 
@@ -73,36 +86,36 @@ export function Detail1({navigation}) {
   const netInfo = useNetInfo();
   let internetConnected = netInfo.isConnected;
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    if(internetConnected){
-      reference.on('value', snapshot => {
-        setContent(snapshot.val());
-        setChoosenLaw(Object.keys(snapshot.val()));
-        });
-          }else{
-            setContent(data);
-            setChoosenLaw(Object.keys(data));
-                }
+  //   if(internetConnected){
+  //     reference.on('value', snapshot => {
+  //       setContent(snapshot.val());
+  //       setChoosenLaw(Object.keys(snapshot.val()));
+  //       });
+  //         }else{
+  //           setContent(data);
+  //           setChoosenLaw(Object.keys(data));
+  //               }
 
-    navigation.setParams({
-      query: 'someText',
-    });
+  //   navigation.setParams({
+  //     query: 'someText',
+  //   });
 
-    // if(choosenLaw.length == Object.keys(Content).length){
-      setCheckedAllFilter(true)
-    // }else{
-    //   setCheckedAllFilter(false)
-    // }
+  //   // if(choosenLaw.length == Object.keys(Content).length){
+  //     setCheckedAllFilter(true)
+  //   // }else{
+  //   //   setCheckedAllFilter(false)
+  //   // }
 
 
-    // navigation.setParams({
-    //   scrollToTop: () => {
-    //     onTabPress();
-    //     console.log('m');
-    //   }
-    // })
-  }, [internetConnected]);
+  //   // navigation.setParams({
+  //   //   scrollToTop: () => {
+  //   //     onTabPress();
+  //   //     console.log('m');
+  //   //   }
+  //   // })
+  // }, [internetConnected]);
 
   function Search(input) {
     let searchArray = {};
@@ -693,12 +706,6 @@ export function Detail1({navigation}) {
                           '\\)',
                         );
                       }
-                      // if (inputFilter.match(/\//gim)) {
-                      //   inputSearchLawReg = inputSearchLawReg.replace(
-                      //     /\//gim,
-                      //     '.',
-                      //   );
-                      // }
                       if (inputFilter.match(/\\/gim)) {
                         inputSearchLawReg = inputSearchLawReg.replace(
                           /\\/gim,

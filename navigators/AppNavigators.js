@@ -14,7 +14,6 @@ import {RefForHome} from '../App'
 import data from '../data/project2-197c0-default-rtdb-export.json';
 import {
   Alert,
-  Button,
   Text,
   View,
   Image,

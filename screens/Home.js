@@ -3,7 +3,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  ScrollView,
   TextInput,
   FlatList,
   ActivityIndicator,
@@ -16,6 +15,8 @@ import {useState, useEffect, useContext, useRef,} from 'react';
 import data from '../data/project2-197c0-default-rtdb-export.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {RefForHome} from '../App';
+import {dataLaw} from '../App';
+
 import {useNetInfo} from '@react-native-community/netinfo';
 
 export default function Home({navigation}) {
@@ -30,6 +31,11 @@ export default function Home({navigation}) {
   const [totalPaper, setTotalPaper] = useState(2);
 
   const HomeFlatlist = useContext(RefForHome);
+
+
+  const dataLawContent = useContext(dataLaw);
+
+
 
   const [showWanringInternet, setShowWanringInternet] = useState(false);
 
@@ -152,6 +158,8 @@ export default function Home({navigation}) {
         setContent(Object.keys(snapshot.val()));
         setShowContent(Object.keys(snapshot.val()).slice(0, 7));
         setTotalPaper(Math.floor(Object.keys(snapshot.val()).length / 7) + 1);
+        dataLawContent.updateData(snapshot.val())
+
       });
     } else {
     }
@@ -164,8 +172,15 @@ export default function Home({navigation}) {
       }).start();
     },2000)
 
+
   }, [internetConnected]);
 
+  // useEffect(()=>{
+  //   reference.on('value', snapshot => {
+  //   dataLawContent.updateData(snapshot.val())
+  //   })
+
+  // },[Content])
 
 
   const loadMoreItem = () => {
@@ -328,6 +343,8 @@ export default function Home({navigation}) {
               setContent(Object.keys(data));
               setShowContent(Object.keys(data).slice(0, 7));
               setTotalPaper(Math.floor(Object.keys(data).length / 7) + 1);
+              dataLawContent.updateData(data)
+
               }
             
             }}

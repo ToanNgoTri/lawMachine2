@@ -11,7 +11,7 @@ import {createContext,useState} from 'react';
 
 const RefForSearch = createContext(); // lấy ref.current của Tab Search (Detail1) để ScrollToTop khi click vào bottom tab
 const RefForHome = createContext(); // lấy ref.current của Tab Home (Home) để ScrollToTop khi click vào bottom tab
-
+const dataLaw = createContext(); // lấy ref.current của Tab Home (Home) để ScrollToTop khi click vào bottom tab
 
 function App() {
 
@@ -25,11 +25,18 @@ function App() {
     setforHome(data)
   } 
 
+  const [dataLawForApp,setDataLawForApp] = useState([]);
+  const updateData = (data) =>{
+    setDataLawForApp(data)
+  } 
+
   return(
     <RefForHome.Provider value={{forHome,updateHome}}>
 
 <RefForSearch.Provider value={{forSearch,updateSearch}}>
+  <dataLaw.Provider value={{dataLawForApp,updateData}}>
 <StackNavigator/>
+</dataLaw.Provider>
 </RefForSearch.Provider> 
 </RefForHome.Provider> 
 
@@ -40,3 +47,4 @@ function App() {
 export default App;
 export {RefForSearch}
 export {RefForHome}
+export {dataLaw}
