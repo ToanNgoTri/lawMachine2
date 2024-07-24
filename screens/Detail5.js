@@ -198,8 +198,8 @@ export default function Detail() {
   function highlight(para, word, i2) {
 
     if(para[0]){
-    if(para[0].match(/(?<=\w)\\(?=\w)/img)){
-    para[0] = para[0].replace(/(?<=\w)\\(?=\w)/img,'\/')
+    if(para[0].match(/(?<=\w*)\\(?=\w*)/img)){
+    para[0] = para[0].replace(/(?<=\w*)\\(?=\w*)/img,'\/')
     }
   }
 
@@ -1034,21 +1034,16 @@ const styles = StyleSheet.create({
   lines: {
     display: 'flex',
     position: 'relative',
-    textAlign: 'justify',
+    textAlign:'justify',
     paddingLeft: 10,
     paddingRight: 10,
+    paddingBottom:'0',
     fontSize: 14,
-    // height:'auto',
-    // position:'relative',
-    // justifyContent: 'center',
-    // alignItems:'center',
-    // textAlign:'center',
     color: 'black',
-    // margin:5,
-    // backgroundColor:'yellow',
     lineHeight: 22,
     overflow: 'hidden',
-  },
+
+},
   highlight: {
     color: 'black',
     backgroundColor: 'yellow',
