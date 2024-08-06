@@ -8,7 +8,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import StackNavigator from './navigators/AppNavigators';
 import {createContext,useState} from 'react';
-
+import { Provider } from 'react-redux';
+import {store} from './redux/store'
 const RefForSearch = createContext(); // lấy ref.current của Tab Search (Detail1) để ScrollToTop khi click vào bottom tab
 const RefForHome = createContext(); // lấy ref.current của Tab Home (Home) để ScrollToTop khi click vào bottom tab
 const dataLaw = createContext(); // lấy ref.current của Tab Home (Home) để ScrollToTop khi click vào bottom tab
@@ -31,6 +32,7 @@ function App() {
   } 
 
   return(
+    <Provider store={store}>
     <RefForHome.Provider value={{forHome,updateHome}}>
 
 <RefForSearch.Provider value={{forSearch,updateSearch}}>
@@ -39,7 +41,7 @@ function App() {
 </dataLaw.Provider>
 </RefForSearch.Provider> 
 </RefForHome.Provider> 
-
+</Provider>
  )
 }
 

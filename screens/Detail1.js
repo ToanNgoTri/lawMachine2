@@ -70,7 +70,7 @@ export function Detail1({navigation}) {
     outputRange: [0, 1],
   });
 
-  const reference = database().ref('/Law1');
+  // const reference = database().ref('/Law1');
   // const route = useRoute();
   const SearchScrollview = useContext(RefForSearch);
 

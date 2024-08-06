@@ -16,6 +16,7 @@ import data from '../data/project2-197c0-default-rtdb-export.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {RefForHome} from '../App';
 import {dataLaw} from '../App';
+import { useSelector, useDispatch } from 'react-redux';
 
 import {useNetInfo} from '@react-native-community/netinfo';
 
@@ -41,6 +42,7 @@ export default function Home({navigation}) {
 
   const list1 = useRef(null);
 
+  const dispatch = useDispatch()
 
 
   const animated = useRef(new Animated.Value(0)).current;
@@ -159,6 +161,7 @@ export default function Home({navigation}) {
         setShowContent(Object.keys(snapshot.val()).slice(0, 7));
         setTotalPaper(Math.floor(Object.keys(snapshot.val()).length / 7) + 1);
         dataLawContent.updateData(snapshot.val())
+        dispatch({type:'run'})
 
       });
     } else {
@@ -175,17 +178,17 @@ export default function Home({navigation}) {
 
   }, [internetConnected]);
 
-  // useEffect(()=>{
-  //   reference.on('value', snapshot => {
-  //   dataLawContent.updateData(snapshot.val())
-  //   })
+  const {dataRedux,loading} = useSelector(state => state);
 
-  // },[Content])
+  useEffect(()=>{
+
+  },[])
+  // console.log('loading',loading);
 
 
   const loadMoreItem = () => {
-    console.log('totalPaper', totalPaper);
-    console.log('currentPaper', currentPaper);
+    // console.log('totalPaper', totalPaper);
+    // console.log('currentPaper', currentPaper);
     if (currentPaper < totalPaper) {
       // bị lỗi: tuy totalPaper đã dc thêm mới nhưng trong if() vẫn false
       setCurrentPaper(currentPaper + 1);
@@ -196,6 +199,24 @@ export default function Home({navigation}) {
 
   return (
     <>
+                    { loading && (
+        <View style={{position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        opacity: 0.7,
+        backgroundColor: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex:10
+        }}>
+        <ActivityIndicator size='large' color="#cc3333" >
+
+        </ActivityIndicator>
+        </View>
+        )}
+
       <View
         style={{
           flexDirection: 'row',

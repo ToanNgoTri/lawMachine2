@@ -8,15 +8,18 @@ import {
   Keyboard,
   Alert,
   Animated,
-  
+  ActivityIndicator
 } from 'react-native';
 import database from '@react-native-firebase/database';
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef,useContext} from 'react';
 import {useRoute} from '@react-navigation/native';
 import data from '../data/project2-197c0-default-rtdb-export.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNetInfo} from "@react-native-community/netinfo";
+// import { useSelector, useDispatch } from 'react-redux';
+
+import {dataLaw} from '../App';
 
 let TopUnitCount; // là đơn vị lớn nhất vd là 'phần thứ' hoặc chương
 let articleCount = 0;
@@ -112,14 +115,30 @@ export default function Detail() {
       Alert.alert('Thông báo', 'Vui lòng nhập từ khóa hợp lệ');
     }
   }
+  // const dispatch = useDispatch()
+
+  // const {data,loading} = useSelector(state => state);
+  // console.log('data',data);
+  // console.log('loading',loading);
+
+  // useEffect(() => {
+  //   dispatch({type:'run'})
+  
+  // }, [])
+  
+  const dataLawContent = useContext(dataLaw);
 
   useEffect(() => {
 
     if(internetConnected){
-      const reference = database().ref('/Law1');
-      reference.on('value', snapshot => {
-        setContent(snapshot.val()[route.name]);
-      });
+      // const reference = database().ref('/Law1');
+      // reference.on('value', snapshot => {
+        // setContent(snapshot.val()[route.name]);
+        if(data){
+          // setContent(data[route.name]);
+setContent(dataLawContent.dataLawForApp[route.name])
+        }
+      // });
         }else{
           setContent(data[route.name]);
         }
@@ -590,6 +609,24 @@ export default function Detail() {
 
   return (
     <>
+                        {/* { loading && (
+        <View style={{position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        opacity: 0.7,
+        backgroundColor: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex:10
+        }}>
+        <ActivityIndicator size='large' color="#cc3333" >
+
+        </ActivityIndicator>
+        </View>
+        )} */}
+
       <Animated.View style={{marginBottom: MagginBottom}}>
         <ScrollView
           onScroll={event => {

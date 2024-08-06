@@ -30,7 +30,7 @@
 //     let list = []
 //     Query.forEach( (doc) => {
 //       list.push({
-//         Điều:doc.data().Article,
+//         Điều:doc.data().Article,     // để lấy tên document thì có thể thay .data() bằng .id
 //         Khoản:doc.data().Clause,
 //         Điểm:doc.data().Point,
 //       })
@@ -60,6 +60,8 @@
 //   //     console.log(list);
 //   //   })
 //   // },[])
+
+
 
 
 //   // đây là thêm
