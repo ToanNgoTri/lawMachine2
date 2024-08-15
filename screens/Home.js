@@ -159,7 +159,7 @@ export default function Home({navigation}) {
       },3000)
     }
 
-    if (internetConnected  && !hasBeenRerender.current) {
+    if (internetConnected ) {
             hasBeenRerender.current = true
 
       reference.on('value', snapshot => {
@@ -168,12 +168,12 @@ export default function Home({navigation}) {
         setTotalPaper(Math.floor(Object.keys(snapshot.val()).length / 7) + 1);
         dataLawContent.updateData(snapshot.val())
         dispatch({type:'run'})
-        console.log('đã kn');
-        // store.dispatch(handle())
+        // console.log('đã kn');
+      //   // store.dispatch(handle())
       });
     } else if(internetConnected==false) {
       
-       dispatch(noLoading())
+      //  dispatch(noLoading())
 
     }
 
@@ -188,7 +188,6 @@ export default function Home({navigation}) {
 
   }, [internetConnected]);
 
-  // console.log('internetConnected',internetConnected);
 
   const {loading} = useSelector(state => state['read']);
   // console.log("store.getState()['read']['loading']",store.getState()['read']['loading']);

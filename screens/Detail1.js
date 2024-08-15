@@ -83,8 +83,7 @@ loading2.current = false
   SearchScrollview.updateSearch(list);
 
 
-    const dispatch = useDispatch()
-
+    // const dispatch = useDispatch()
   // const loading1 = useSelector(state => state['search']['loading1']);
   // console.log("loading1",loading1);
 

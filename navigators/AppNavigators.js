@@ -7,11 +7,10 @@ import {dataLaw} from '../App';
 
 import Home from '../screens/Home';
 import {Detail1} from '../screens/Detail1';
-import Detail4 from '../screens/Detail4';
+// import Detail4 from '../screens/Detail4';
 import Detail5 from '../screens/Detail5';
 import {RefForSearch} from '../App'
 import {RefForHome} from '../App'
-import data from '../data/project2-197c0-default-rtdb-export.json';
 import {
   Alert,
   Text,
@@ -24,16 +23,17 @@ import {
 } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useNetInfo} from "@react-native-community/netinfo";
+// import {useNetInfo} from "@react-native-community/netinfo";
 
 
 const Stack = createNativeStackNavigator();
+
 const Tab = createBottomTabNavigator();
 
 const AppNavigators = () => {
   // const [tabName, setTabName] = useState('home');
 
-  const animatedValue = useRef(new Animated.Value(1)).current
+  // const animatedValue = useRef(new Animated.Value(1)).current
 
   const SearchScrollview = useContext(RefForSearch)
   const HomeFlatlist = useContext(RefForHome)
@@ -209,8 +209,8 @@ const StackNavigator = () => {
   const [Content, setContent] = useState(null);
   const dataLawContent = useContext(dataLaw);
 
-  const netInfo = useNetInfo();
-  let internetConnected = netInfo.isConnected
+  // const netInfo = useNetInfo();
+  // let internetConnected = netInfo.isConnected
 
   useEffect(() => {
 
@@ -248,7 +248,7 @@ const StackNavigator = () => {
       // }
       >
         <Stack.Screen
-          name="home"
+          name="HomeStack"
           component={AppNavigators}
           options={{animationEnabled: false, header: () => null}}
           

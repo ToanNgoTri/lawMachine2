@@ -158,7 +158,7 @@ export function* mySaga(action){
 
     yield put(handle(a))
 
-    yield put(noLoading(a))
+    yield put(noLoading())
     noLoading
   }catch(e){
 
