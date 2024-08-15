@@ -13,6 +13,7 @@ import {store} from './redux/store'
 const RefForSearch = createContext(); // lấy ref.current của Tab Search (Detail1) để ScrollToTop khi click vào bottom tab
 const RefForHome = createContext(); // lấy ref.current của Tab Home (Home) để ScrollToTop khi click vào bottom tab
 const dataLaw = createContext(); // lấy ref.current của Tab Home (Home) để ScrollToTop khi click vào bottom tab
+const RefLoading = createContext(); // lấy ref.current của Tab Home (Home) để ScrollToTop khi click vào bottom tab
 
 function App() {
 
@@ -31,13 +32,22 @@ function App() {
     setDataLawForApp(data)
   } 
 
+  const [loading,setLoading] = useState(false);
+  const updateLoading = (data) =>{
+    setLoading(data)
+  } 
+
+  
+
   return(
     <Provider store={store}>
     <RefForHome.Provider value={{forHome,updateHome}}>
 
 <RefForSearch.Provider value={{forSearch,updateSearch}}>
   <dataLaw.Provider value={{dataLawForApp,updateData}}>
+    <RefLoading.Provider value={{loading,updateLoading}}>
 <StackNavigator/>
+</RefLoading.Provider>
 </dataLaw.Provider>
 </RefForSearch.Provider> 
 </RefForHome.Provider> 
@@ -50,3 +60,4 @@ export default App;
 export {RefForSearch}
 export {RefForHome}
 export {dataLaw}
+export {RefLoading}

@@ -8,7 +8,7 @@ import {
   Keyboard,
   Alert,
   Animated,
-  ActivityIndicator
+  Dimensions
 } from 'react-native';
 import database from '@react-native-firebase/database';
 import React, {useState, useEffect, useRef,useContext} from 'react';
@@ -76,6 +76,25 @@ export default function Detail() {
   let internetConnected = netInfo.isConnected
 
 
+
+
+
+
+  const { width, height } = Dimensions.get("window");
+  let heightDevice=height;
+  let widthDevice=width;
+  Dimensions.addEventListener("change", ({ window: { width, height } }) => {
+    // console.log(`Width: ${width}, Height: ${height}`);
+    widthDevice=width;
+    heightDevice=height
+    
+  });  
+
+
+
+
+
+
   function pushToSearch() {
     setGo(true);
 
@@ -128,6 +147,14 @@ export default function Detail() {
   
   const dataLawContent = useContext(dataLaw);
 
+
+
+
+
+
+
+
+  
   useEffect(() => {
 
     if(internetConnected){
@@ -136,13 +163,13 @@ export default function Detail() {
         // setContent(snapshot.val()[route.name]);
         if(data){
           // setContent(data[route.name]);
-setContent(dataLawContent.dataLawForApp[route.name])
         }
-      // });
-        }else{
-          setContent(data[route.name]);
-        }
-
+        // });
+      }else{
+        // setContent(data[route.name]);
+      }
+      
+      setContent(dataLawContent.dataLawForApp[route.name])
         
     // reference.on('value', snapshot => {
     //   setContent(snapshot.val()[route.name]);
@@ -429,7 +456,7 @@ setContent(dataLawContent.dataLawForApp[route.name])
 
   let transX = animatedForNavi.interpolate({
     inputRange: [-100, 0],
-    outputRange: [0, 200],
+    outputRange: [0, widthDevice/100*60],
   });
 
   let Opacity = animatedForNavi.interpolate({
@@ -956,7 +983,7 @@ setContent(dataLawContent.dataLawForApp[route.name])
             </Animated.View>
 
           <Animated.View
-            style={{...styles.listArticle, transform: [{translateX: transX}]}}>
+            style={{...styles.listArticle,width:widthDevice/100*60, transform: [{translateX: transX}]}}>
             <View
               style={{
                 flexDirection: 'row',
@@ -1202,7 +1229,7 @@ const styles = StyleSheet.create({
   },
   listArticle: {
     position: 'absolute',
-    width: 200,
+    width:'55%',
     top: 0,
     bottom: 0,
     backgroundColor: 'white',

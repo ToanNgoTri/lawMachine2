@@ -9,6 +9,7 @@ import {
   Image,
   Keyboard,
   Animated,
+  Dimensions
 } from 'react-native';
 import database from '@react-native-firebase/database';
 import {useState, useEffect, useContext, useRef,} from 'react';
@@ -16,14 +17,18 @@ import data from '../data/project2-197c0-default-rtdb-export.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {RefForHome} from '../App';
 import {dataLaw} from '../App';
+import {RefLoading} from '../App'
 import { useSelector, useDispatch } from 'react-redux';
 
 import {useNetInfo} from '@react-native-community/netinfo';
-
+import {loader,handle,noLoading} from '../redux/fetchData'
+import {  store} from "../redux/store";
 export default function Home({navigation}) {
   const [Content, setContent] = useState('');
   // sử dụng để đọc realtime database, data được xuất ra ở dưới dạng object rồi không cần JSON.parse
 
+  
+  
   const [showContent, setShowContent] = useState([]);
 
   const [inputSearchLaw, setInputSearchLaw] = useState('');
@@ -36,11 +41,13 @@ export default function Home({navigation}) {
 
   const dataLawContent = useContext(dataLaw);
 
+  const Loading1 = useContext(RefLoading);
 
 
   const [showWanringInternet, setShowWanringInternet] = useState(false);
 
   const list1 = useRef(null);
+
 
   const dispatch = useDispatch()
 
@@ -120,10 +127,9 @@ export default function Home({navigation}) {
 
   const netInfo = useNetInfo();
   let internetConnected = netInfo.isConnected;
+  const hasBeenRerender = useRef(false);      // nếu true có nghĩa là warning sẽ không xuất hiện thêm lần nào nữa
 
-  const hasBeenRerender = useRef(false);
-
-  const [m, setm] = useState(false);
+  const [alreadyInternetWarning, setAlreadyInternetWarning] = useState(false);      // dùng để biết đã từng có internet chưa
 
 
   useEffect(() => {
@@ -141,19 +147,19 @@ export default function Home({navigation}) {
     
     if(!hasBeenRerender.current && (internetConnected==false) ){
       setShowWanringInternet(true);
-      setm(true)
+      setAlreadyInternetWarning(true)
   
     }
-    else if(!hasBeenRerender.current && internetConnected && m){
+    else if(!hasBeenRerender.current && internetConnected && alreadyInternetWarning){
       setShowWanringInternet(true);
-      
+      // dispatch({type:'run'})
       setTimeout(()=>{
         hasBeenRerender.current = true
       setShowWanringInternet(false);
       },3000)
     }
 
-    if (internetConnected) {
+    if (internetConnected  && !hasBeenRerender.current) {
             hasBeenRerender.current = true
 
       reference.on('value', snapshot => {
@@ -162,9 +168,13 @@ export default function Home({navigation}) {
         setTotalPaper(Math.floor(Object.keys(snapshot.val()).length / 7) + 1);
         dataLawContent.updateData(snapshot.val())
         dispatch({type:'run'})
-
+        console.log('đã kn');
+        // store.dispatch(handle())
       });
-    } else {
+    } else if(internetConnected==false) {
+      
+       dispatch(noLoading())
+
     }
 
     setTimeout(()=>{
@@ -178,12 +188,14 @@ export default function Home({navigation}) {
 
   }, [internetConnected]);
 
-  const {dataRedux,loading} = useSelector(state => state);
+  // console.log('internetConnected',internetConnected);
 
-  useEffect(()=>{
-
-  },[])
+  const {loading} = useSelector(state => state['read']);
+  // console.log("store.getState()['read']['loading']",store.getState()['read']['loading']);
+  // let loading2 = store.getState()['read']['loading']
   // console.log('loading',loading);
+  // console.log('loading2',loading2);
+  Loading1.updateLoading(loading)
 
 
   const loadMoreItem = () => {
@@ -199,7 +211,7 @@ export default function Home({navigation}) {
 
   return (
     <>
-                    { loading && (
+                    { (loading) && (
         <View style={{position: 'absolute',
         left: 0,
         right: 0,
@@ -225,6 +237,9 @@ export default function Home({navigation}) {
           paddingRight: 10,
           display: 'flex',
           alignItems: 'center',
+          // backgroundColor:'yellow',
+          justifyContent:'space-between'
+
         }}>
         {/* <Text 
                 style={{
@@ -272,11 +287,21 @@ export default function Home({navigation}) {
             setInputSearchLaw('');
             Keyboard.dismiss();
           }}
-          style={{width: '10%', display: 'flex'}}>
+          style={{width: '10%', 
+          display: 'flex',
+          // backgroundColor:'red',
+          }}>
           {inputSearchLaw && (
             <Ionicons
               name="close-circle-outline"
-              style={{color: 'black', fontSize: 25}}></Ionicons>
+              style={{color: 'black', 
+              fontSize: 25,
+              justifyContent:'center',
+              textAlign:'right',
+              // backgroundColor:'black';
+              paddingRight:10
+
+            }}></Ionicons>
           )}
         </TouchableOpacity>
       </View>
@@ -410,7 +435,9 @@ export default function Home({navigation}) {
               backgroundColor: 'black',
               borderRadius: 10,
               opacity:Opacity,
-              transform:[{translateY:TranslateY}]
+              transform:[{translateY:TranslateY}],
+              zIndex:100
+
             }}>
             <View
               style={{

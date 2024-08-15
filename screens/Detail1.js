@@ -7,21 +7,25 @@ import {
   TextInput,
   Keyboard,
   Animated,
+  ActivityIndicator
 } from 'react-native';
 
 import CheckBox from 'react-native-check-box';
 import database from '@react-native-firebase/database';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
-import data from '../data/project2-197c0-default-rtdb-export.json';
+import { useSelector, useDispatch } from 'react-redux';
+import data from '../data/project2-197c0-default-rtdb-export.json';       ////////////////////////////////////////////// xài tạm
 
 import React, {useEffect, useState, useRef, useContext} from 'react';
 
 import {RefForSearch} from '../App';
 import {dataLaw} from '../App';
+import {RefLoading} from '../App'
+import {loader1,handle1} from '../redux/fetchData'
 
+// import {  store} from "../redux/store";
 
-import {useNetInfo} from '@react-native-community/netinfo';
+// import {useNetInfo} from '@react-native-community/netinfo';
 
 // lúc ấn X để xóa hay nhập input hay bị đơ
 export function Detail1({navigation}) {
@@ -44,9 +48,14 @@ export function Detail1({navigation}) {
 
   const [choosenLaw, setChoosenLaw] = useState([]);
 
+  // const [loading, setLoading] = useState(false);
+  const Loading2 = useContext(RefLoading);
+
+
   const [warning, setWanring] = useState(false);
   const list = useRef(null);
-
+  const loading2 = useRef();
+loading2.current = false
   const dataLawContent = useContext(dataLaw);
 
 
@@ -54,7 +63,6 @@ export function Detail1({navigation}) {
 
             setContent(dataLawContent.dataLawForApp);
             setChoosenLaw(Object.keys(dataLawContent.dataLawForApp));
-
 
   },[dataLawContent.dataLawForApp])
 
@@ -70,52 +78,17 @@ export function Detail1({navigation}) {
     outputRange: [0, 1],
   });
 
-  // const reference = database().ref('/Law1');
-  // const route = useRoute();
   const SearchScrollview = useContext(RefForSearch);
 
   SearchScrollview.updateSearch(list);
 
-  // const onTabPress = () => {
-  //   list.current.scrollTo({
-  //     y: 0,
-  //     animated: true,
-  //   });
-  // };
 
-  const netInfo = useNetInfo();
-  let internetConnected = netInfo.isConnected;
+    const dispatch = useDispatch()
 
-  // useEffect(() => {
-
-  //   if(internetConnected){
-  //     reference.on('value', snapshot => {
-  //       setContent(snapshot.val());
-  //       setChoosenLaw(Object.keys(snapshot.val()));
-  //       });
-  //         }else{
-  //           setContent(data);
-  //           setChoosenLaw(Object.keys(data));
-  //               }
-
-  //   navigation.setParams({
-  //     query: 'someText',
-  //   });
-
-  //   // if(choosenLaw.length == Object.keys(Content).length){
-  //     setCheckedAllFilter(true)
-  //   // }else{
-  //   //   setCheckedAllFilter(false)
-  //   // }
+  // const loading1 = useSelector(state => state['search']['loading1']);
+  // console.log("loading1",loading1);
 
 
-  //   // navigation.setParams({
-  //   //   scrollToTop: () => {
-  //   //     onTabPress();
-  //   //     console.log('m');
-  //   //   }
-  //   // })
-  // }, [internetConnected]);
 
   function Search(input) {
     let searchArray = {};
@@ -123,10 +96,8 @@ export function Detail1({navigation}) {
     if (input) {
       // if ( (input.match(/\w+/gim)) || input.match(/\(/img) || input.match(/\)/img) || input.match(/\./img) || input.match(/\+/img)) {
       if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
-        function a(key, key1) {
-          // Object.keys(key2).map((key3, i3) => {
-          // thama nhap chuowng (array dieu)
 
+        function a(key, key1) {
           Object.values(key1)[0].map((key2, i1) => {
             // chọn từng điều
 
@@ -169,41 +140,9 @@ export function Detail1({navigation}) {
                   Object.values(key1)[0].map((key2, i) => {
                     a(key, key2);
 
-                    // Object.values(key2)[0].map((key3, i3) => {
-                    //   // chọn từng điều
-
-                    //     let replace = `(.*)${input}(.*)`;
-                    //     let re = new RegExp(replace, 'gmi');
-                    //     if(Object.keys(key3)[0].match(re)){
-                    //       searchArray[key].push({[Object.keys(key3)[0]]: Object.values(key3)[0]});
-                    //     }else if (Object.values(key3)[0].match(re)) {
-                    //       searchArray[key].push({[Object.keys(key3)[0]]: Object.values(key3)[0]});
-                    //     }
-                    //   // }
-                    // })
                   });
 
                 } else {
-                  //nếu không có chương
-
-                  // Object.keys(key1).map((key2, i2) => {
-                  //   // thama nhap chuowng (array dieu)
-
-                  //   key1[key2].map((key3, i3) => {
-                  //     // chọn từng điều
-
-                  //     Object.keys(key3).map((key4, i4) => {
-                  //       let replace = `(.*)${input}(.*)`;
-                  //       let re = new RegExp(replace, 'gmi');
-                  //       if(key4.match(re)){
-                  //         searchArray[key].push({[key4]: key3[key4]});
-                  //       }else if (key3[key4].match(re)) {
-                  //         searchArray[key].push({[key4]: key3[key4]});
-                  //       }
-                  //     });
-                  //   });
-                  // });
-
                   a(key, key1);
                 }
               } else {
@@ -213,6 +152,8 @@ export function Detail1({navigation}) {
             });
           }
         });
+
+
 
         let searchResult = {};
 
@@ -234,6 +175,115 @@ export function Detail1({navigation}) {
       setWanring(true);
     }
   }
+
+
+//    function Search(input)  {
+
+//     let searchArray = {};
+// console.log(0);
+//    return new Promise( (resolve) =>{
+//     if (input) {
+//       // if ( (input.match(/\w+/gim)) || input.match(/\(/img) || input.match(/\)/img) || input.match(/\./img) || input.match(/\+/img)) {
+//       if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
+//         function a(key, key1) {
+//           // Object.keys(key2).map((key3, i3) => {
+//           // thama nhap chuowng (array dieu)
+
+//           Object.values(key1)[0].map((key2, i1) => {
+//             // chọn từng điều
+
+//             // Object.keys(key2).map((key5, i5) => {
+//             let replace = `(.*)${input}(.*)`;
+//             let re = new RegExp(replace, 'gmi');
+//             if (Object.keys(key2)[0].match(re)) {
+//               searchArray[key].push({
+//                 [Object.keys(key2)[0]]: Object.values(key2)[0],
+//               });
+//             } else if (Object.values(key2)[0] != '') {
+//               if (Object.values(key2)[0].match(re)) {
+//                 searchArray[key].push({
+//                   [Object.keys(key2)[0]]: Object.values(key2)[0],
+//                 });
+//               }
+//             }
+//             // }
+//           });
+//         }
+
+//         Object.keys(Content).map((key, i) => {
+//           //key là tên của luật
+//           // tham nhap luat (array chuong)
+
+//           searchArray[key] = [];
+//           if (choosenLaw.includes(key)) {
+//             Content[key].map((key1, i1) => {
+//               // ra Object Chuong hoặc (array phần thứ...)
+//               if (Object.keys(key1)[0].match(/phần thứ .*/gim)) {
+//                 // nếu có 'phần thứ
+
+//                 if (
+//                   Object.keys(Object.values(key1)[0][0])[0].match(
+//                     /^Chương .*/gim,
+//                   )
+//                 ) {
+//                   //nếu có chương
+
+//                   Object.values(key1)[0].map((key2, i) => {
+//                     a(key, key2);
+
+//                   });
+
+//                 } else {
+//                   a(key, key1);
+//                 }
+//               } else {
+//                 // nếu không có phần thứ...
+//                 a(key, key1);
+//               }
+//             });
+//           }
+
+//         });
+
+
+
+//         let searchResult = {};
+
+//         Object.keys(searchArray).map((key, i) => {
+//           searchArray[key].map((key1, i) => {
+//             searchResult[key] = searchArray[key];
+//           });
+//         });
+
+//         // setSearchResult(searchResult);
+//         // console.log(searchResult);
+//         resolve(searchResult)
+
+//         // console.log('searchResult',searchResult);
+//         searchResult = [];
+//         // setArticleArray([]);
+//         // setNameArray([]);
+//       } else {
+//         // setWanring(true);
+//       }
+//     } else {
+//       // setWanring(true);
+//     }
+//   })
+//   }
+//   async function run(inp){
+//     // setLoading(true)
+//     dispatch(loader1())
+//     console.log(1);
+//     loading2.current = true
+//     console.log('loading2.current',loading2.current);
+//    const abc = await Search(inp)
+//    setSearchResult(abc)
+//     console.log(2);
+//     dispatch(handle1())
+
+//   }
+
 
   function collapse(a) {
     if (a == undefined) {
@@ -287,6 +337,8 @@ export function Detail1({navigation}) {
     setWanring(false);
   }, [input]);
 
+  
+
   useEffect(() => {
     setInputFilter('');
 
@@ -311,24 +363,43 @@ export function Detail1({navigation}) {
 
   return (
     <>
+            { (Loading2.loading) && (
+        <View style={{position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        opacity: 0.7,
+        backgroundColor: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex:10
+        }}>
+        <ActivityIndicator size='large' color="#cc3333" >
+
+        </ActivityIndicator>
+        </View>
+        )}
+
       <ScrollView keyboardShouldPersistTaps="handled" ref={list}>
         <View style={{backgroundColor: 'green'}}>
+
           <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
 
           <View style={styles.inputContainer}>
-            {/* <View
-            style={{width:"15%",backgroundColor:'yellow',alignItems:'center'}}
-            > */}
+            <View
+            style={styles.containerBtb}
+            >
             <TouchableOpacity
               style={{
                 ...styles.inputBtb,
-                right: -5,
+                // right: -5,
                 backgroundColor: 'white',
-                width: '12%',
+                // width: 50,
               }}
               onPress={() => {
                 setShowFilter(true);
-
+                Keyboard.dismiss()
                 Animated.timing(animated, {
                   toValue: !showFilter ? 100 : 0,
                   // toValue:100,
@@ -340,12 +411,13 @@ export function Detail1({navigation}) {
                 name="funnel-outline"
                 style={{...styles.inputBtbText, color: 'black'}}></Ionicons>
             </TouchableOpacity>
-            {/* </View> */}
+            </View>
 
             <View
               style={{
                 flexDirection: 'column',
                 width: '60%',
+                // backgroundColor:'red'
               }}>
               <View
                 style={{
@@ -357,7 +429,9 @@ export function Detail1({navigation}) {
                 }}>
                 <TextInput
                   style={styles.inputArea}
-                  onChangeText={text => setInput(text)}
+                  onChangeText={text => {setInput(text)
+                    // ;dispatch(type1(text))
+                  }}
                   value={input}
                   placeholder="Nhập từ khóa..."></TextInput>
                 <TouchableOpacity
@@ -365,9 +439,11 @@ export function Detail1({navigation}) {
                   style={{
                     width: '15%',
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-end',
                     justifyContent: 'center',
                     left: -3,
+                    // backgroundColor:'yellow'
+
                   }}>
                   {input && (
                     <Ionicons
@@ -375,9 +451,12 @@ export function Detail1({navigation}) {
                       style={{
                         color: 'black',
                         fontSize: 20,
-                        textAlign: 'center',
-                        width: 20,
-                        height: 20,
+                        paddingRight:8
+                        // textAlign: 'center',
+                        // width: 20,
+                        // height: 20,
+                        
+                        // textAlign:'right'
                       }}></Ionicons>
                   )}
                 </TouchableOpacity>
@@ -392,11 +471,14 @@ export function Detail1({navigation}) {
                 {warning ? 'Vui lòng nhập từ khóa hợp lệ' : ' '}
               </Text>
             </View>
-            <TouchableOpacity
-              style={styles.inputBtb}
-              onPress={() => {
-                Keyboard.dismiss();
+            <View
+            style={styles.containerBtb}
+            >
 
+            <TouchableOpacity
+              style={{...styles.inputBtb,borderRadius:100,height:40,top:5}}
+              onPress={  () =>  {
+                Keyboard.dismiss();
                 let inputSearchLawReg = input;
                 if (input) {
                   if (input.match(/\(/gim)) {
@@ -433,17 +515,24 @@ export function Detail1({navigation}) {
                     inputSearchLawReg = inputSearchLawReg.replace(/\\/gim, '.');
                   }
                 }
+                Keyboard.dismiss()
                 setValueInput(inputSearchLawReg);
                 setValueInputForNav(input);
+                Search(inputSearchLawReg)
 
-                Search(inputSearchLawReg);
+            //  setSearchResult(await  Search(inputSearchLawReg))
 
-                // console.log(inputSearchLawReg);
+                // run(inputSearchLawReg);
+                // dispatch(handle1())
+                // dispatch({type:'search'})
+
+                
               }}>
               <Ionicons
                 name="search-outline"
                 style={styles.inputBtbText}></Ionicons>
             </TouchableOpacity>
+            </View>
           </View>
         </View>
         <View style={{marginTop: 1}}>
@@ -850,7 +939,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     // alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent:'space-evenly',
     // backgroundColor:'red'
   },
   inputArea: {
@@ -860,11 +949,17 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     borderRadius: 15,
   },
+  containerBtb:{
+    width:"15%",
+    // backgroundColor:'yellow',
+    alignItems:'center'
+  
+  },
   inputBtb: {
-    width: '15%',
+    width: '80%',
     height: 30,
     backgroundColor: 'black',
-    borderRadius: 14,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     // right: 5,

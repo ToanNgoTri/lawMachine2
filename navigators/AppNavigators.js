@@ -1,9 +1,9 @@
-// import React, { lazy } from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import database from '@react-native-firebase/database';
 import {useState, useEffect,useContext,useRef} from 'react';
+import {dataLaw} from '../App';
 
 import Home from '../screens/Home';
 import {Detail1} from '../screens/Detail1';
@@ -16,10 +16,11 @@ import {
   Alert,
   Text,
   View,
-  Image,
   StyleSheet,
   TouchableOpacity,
-  Animated
+  Animated,
+  Dimensions
+
 } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -47,12 +48,23 @@ const AppNavigators = () => {
   //   }).start();
   // },[animatedValue])
 
+  const { width, height } = Dimensions.get("window");
+  let heightTab=height/2;
+  let widthTab=width/2;
+  Dimensions.addEventListener("change", ({ window: { width, height } }) => {
+    // console.log(`Width: ${width}, Height: ${height}`);
+    widthTab=width/2;
+    heightTab=height/2
+    
+  });  
+
+
   return (
     <Tab.Navigator
-      // screenOptions={({ route }) => (
-      //   console.log(route.name)
-
-      // )}
+      screenOptions={({ route }) => ({
+        lazy:false                                          // khi app chạy thì sẽ sẽ chạy hết tất cả các tab đồng loạt chứ không phải nhấn vô mới load
+  })
+}
       
       // screenOptions={
         
@@ -106,7 +118,7 @@ const AppNavigators = () => {
       //     );
       //   },
       // })}
-      lazy={false}
+      // lazy={false}                                   ///////////////////// mới bỏ có sao hông
       >
         
       <Tab.Screen
@@ -135,7 +147,7 @@ const AppNavigators = () => {
         //     borderTopWidth:0,
 
         // }}
-        style={focused ? styles.tabItemActive : styles.tabItemInactive}
+        style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
 
         >
                 <Ionicons
@@ -167,7 +179,7 @@ const AppNavigators = () => {
           tabBarIcon: ({focused, color, size}) => {
             return (
               <View
-                style={focused ? styles.tabItemActive : styles.tabItemInactive}>
+                style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}>
                 <Ionicons
                   name="search-outline"
                   style={
@@ -195,22 +207,25 @@ const AppNavigators = () => {
 
 const StackNavigator = () => {
   const [Content, setContent] = useState(null);
-  const [num, setNum] = useState(false);
+  const dataLawContent = useContext(dataLaw);
 
   const netInfo = useNetInfo();
   let internetConnected = netInfo.isConnected
 
   useEffect(() => {
 
-    if(internetConnected){
-    const reference = database().ref('/Law1');
-    reference.on('value', snapshot => {
-      setContent(snapshot.val());
-    });
-      }else{
-        setContent(data);
-      }
-  }, [internetConnected]);
+    // if(internetConnected){
+    // const reference = database().ref('/Law1');
+    // reference.on('value', snapshot => {
+    //   setContent(snapshot.val());
+    // });
+    //   }else{
+        // setContent(data);
+        setContent(dataLawContent.dataLawForApp)
+
+      // }
+
+  }, [dataLawContent.dataLawForApp]);
 
   
   function TopBarNav({route}) {
@@ -233,7 +248,7 @@ const StackNavigator = () => {
       // }
       >
         <Stack.Screen
-          name="Home"
+          name="home"
           component={AppNavigators}
           options={{animationEnabled: false, header: () => null}}
           
@@ -272,22 +287,27 @@ const StackNavigator = () => {
 
 const styles = StyleSheet.create({
   tabItemActive: {
+    // backgroundColor:'red',
     width: '100%',
+    // right:0,
+    // left:100,
     height: '104%',
     position: 'relative',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     borderTopColor:'red',
-    borderTopWidth:3,
+    borderTopWidth:4,
+    overflow:'hidden',
   },
   tabItemInactive: {
     position: 'relative',
-    width: '100%',
+    // width: '100%',
     height: '102%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    
   },
   IconActive: {
     fontSize: 23,
