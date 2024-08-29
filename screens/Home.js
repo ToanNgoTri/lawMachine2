@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import database from '@react-native-firebase/database';
 import {useState, useEffect, useContext, useRef,} from 'react';
-import data from '../data/project2-197c0-default-rtdb-export.json';
+import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {RefForHome} from '../App';
 import {dataLaw} from '../App';
@@ -131,6 +131,13 @@ export default function Home({navigation}) {
 
   const [alreadyInternetWarning, setAlreadyInternetWarning] = useState(false);      // dùng để biết đã từng có internet chưa
 
+  const {loading,data} = useSelector(state => state['read']);
+  // console.log("store.getState()['read']['loading']",store.getState()['read']['loading']);
+  // let loading2 = store.getState()['read']['loading']
+  // console.log('loading',loading);
+  // console.log('loading2',loading2);
+  Loading1.updateLoading(loading)
+
 
   useEffect(() => {
 
@@ -159,22 +166,21 @@ export default function Home({navigation}) {
       },3000)
     }
 
-    if (internetConnected ) {
+    if (internetConnected &&!hasBeenRerender.current) {
             hasBeenRerender.current = true
+            dispatch({type:'run'})
 
-      reference.on('value', snapshot => {
-        setContent(Object.keys(snapshot.val()));
-        setShowContent(Object.keys(snapshot.val()).slice(0, 7));
-        setTotalPaper(Math.floor(Object.keys(snapshot.val()).length / 7) + 1);
-        dataLawContent.updateData(snapshot.val())
-        dispatch({type:'run'})
+      // reference.on('value', snapshot => {
+        // setContent(Object.keys(snapshot.val()));
+        // setShowContent(Object.keys(snapshot.val()).slice(0, 7));
+        // setTotalPaper(Math.floor(Object.keys(snapshot.val()).length / 7) + 1);
+        // dataLawContent.updateData(snapshot.val())
+        // dispatch({type:'run'})
         // console.log('đã kn');
-      //   // store.dispatch(handle())
-      });
-    } else if(internetConnected==false) {
+      // });
       
-      //  dispatch(noLoading())
-
+    } else if(internetConnected==false) {      
+       dispatch(noLoading())
     }
 
     setTimeout(()=>{
@@ -184,17 +190,19 @@ export default function Home({navigation}) {
         useNativeDriver: true,
       }).start();
     },2000)
-
-
   }, [internetConnected]);
 
 
-  const {loading} = useSelector(state => state['read']);
-  // console.log("store.getState()['read']['loading']",store.getState()['read']['loading']);
-  // let loading2 = store.getState()['read']['loading']
-  // console.log('loading',loading);
-  // console.log('loading2',loading2);
-  Loading1.updateLoading(loading)
+
+  useEffect(() => {
+    if(data){
+    setContent(Object.keys(data));
+    setShowContent(Object.keys(data).slice(0, 7));
+    setTotalPaper(Math.floor(Object.keys(data).length / 7) + 1);
+    dataLawContent.updateData(data)
+    }
+  }, [data])
+  
 
 
   const loadMoreItem = () => {
@@ -385,10 +393,10 @@ export default function Home({navigation}) {
             onPress={() => {setShowWanringInternet(false)
 
               if(!internetConnected){
-              setContent(Object.keys(data));
-              setShowContent(Object.keys(data).slice(0, 7));
-              setTotalPaper(Math.floor(Object.keys(data).length / 7) + 1);
-              dataLawContent.updateData(data)
+              setContent(Object.keys(dataOrg));
+              setShowContent(Object.keys(dataOrg).slice(0, 7));
+              setTotalPaper(Math.floor(Object.keys(dataOrg).length / 7) + 1);
+              dataLawContent.updateData(dataOrg)
 
               }
             

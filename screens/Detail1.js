@@ -23,11 +23,7 @@ import {dataLaw} from '../App';
 import {RefLoading} from '../App'
 import {loader1,handle1} from '../redux/fetchData'
 
-// import {  store} from "../redux/store";
 
-// import {useNetInfo} from '@react-native-community/netinfo';
-
-// lúc ấn X để xóa hay nhập input hay bị đơ
 export function Detail1({navigation}) {
   const [Content, setContent] = useState({});
   const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
@@ -81,11 +77,6 @@ loading2.current = false
   const SearchScrollview = useContext(RefForSearch);
 
   SearchScrollview.updateSearch(list);
-
-
-    // const dispatch = useDispatch()
-  // const loading1 = useSelector(state => state['search']['loading1']);
-  // console.log("loading1",loading1);
 
 
 
