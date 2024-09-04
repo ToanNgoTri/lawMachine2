@@ -230,7 +230,7 @@ export default function Home({navigation}) {
         alignItems: 'center',
         zIndex:10
         }}>
-        <ActivityIndicator size='large' color="#cc3333" >
+        <ActivityIndicator size='large' color="white" >
 
         </ActivityIndicator>
         </View>

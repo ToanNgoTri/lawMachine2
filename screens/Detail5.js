@@ -18,6 +18,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNetInfo} from "@react-native-community/netinfo";
 // import { useSelector, useDispatch } from 'react-redux';
+import { Shadow } from 'react-native-shadow-2';
 
 import {dataLaw} from '../App';
 
@@ -451,7 +452,7 @@ export default function Detail() {
 
   let transY = animatedForNavi.interpolate({
     inputRange: [-100,0, 80, 90, 100],
-    outputRange: [0,0, -60, 0, 0],
+    outputRange: [5,5, -53, 0, 0],
   });
 
   let transX = animatedForNavi.interpolate({
@@ -467,7 +468,7 @@ export default function Detail() {
 
   let MagginBottom = animatedForNavi.interpolate({
     inputRange: [-100,0, 80, 90, 100],
-    outputRange: [50,50, 110, 0, 0],
+    outputRange: [45,45, 100, 0, 0],
   });
 
   useEffect(() => {
@@ -514,7 +515,7 @@ export default function Detail() {
                   });
                 });
               }}
-              style={go ? {width: '100%'} : {width: '99%'}}>
+              style={go ? {width: '100%',marginBottom:20} : {width: '99%',marginBottom:20}}>
               <Text key={`${i2}c`} style={styles.dieu}>
                 {highlight(Object.keys(key2), valueInput, i2)}
               </Text>
@@ -586,7 +587,7 @@ export default function Detail() {
                         fontWeight: 'bold',
                         padding: 4,
                         textAlign: 'center',
-                        backgroundColor: 'black',
+                        backgroundColor:'#66CCFF',
                         marginBottom: 1,
                       }}>
                       {Object.keys(keyC)[0].toUpperCase()}
@@ -750,10 +751,11 @@ export default function Detail() {
         )}
 
       {
-        // <Animated.View style={styles.findArea}>
+        
         <Animated.View
           style={{...styles.findArea, transform: [{translateY: transY}]}}>
-          <View style={styles.searchView}>
+        <Shadow distance={13} startColor={'#A0A0A0'} sides={'top'} style={styles.searchView}>
+          {/* <View style={styles.searchView}> */}
             <View style={styles.inputArea}>
               <TextInput
                 style={{width: '65%', color: 'white'}}
@@ -805,11 +807,12 @@ export default function Detail() {
                   fontSize: 18,
                 }}></Ionicons>
             </TouchableOpacity>
-          </View>
+          {/* </View> */}
+        </Shadow>
         </Animated.View>
       }
-
       <View style={styles.functionTab}>
+        
         <TouchableOpacity
           style={styles.tab}
           onPress={() => {
@@ -883,7 +886,8 @@ export default function Detail() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={find ? styles.ActiveTab : styles.tab}
+          // style={find ? styles.ActiveTab : styles.tab}
+          style={styles.tab}
           onPress={() => {
             setFind(!find);
             let timeOut = setTimeout(() => {
@@ -905,7 +909,9 @@ export default function Detail() {
             style={find ? styles.ActiveInner : styles.innerTab}></Ionicons>
         </TouchableOpacity>
         <TouchableOpacity
-          style={showArticle && !find ? styles.ActiveTab : styles.tab}
+          // style={showArticle && !find ? styles.ActiveTab : styles.tab}
+          style={styles.tab}
+
           onPress={() => {
 
             if(showArticle){
@@ -938,7 +944,6 @@ export default function Detail() {
             }></Ionicons>
         </TouchableOpacity>
       </View>
-
         <>
       {showArticle && (
         <>
@@ -1076,9 +1081,9 @@ const styles = StyleSheet.create({
     fontWeight:'bold'
   },
   chapter: {
-    height: 60,
+    // height: 60,
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    backgroundColor: '#F9CC76',
     color: 'black',
     alignItems: 'center',
     marginBottom: 1,
@@ -1133,39 +1138,48 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    // top:'60%',
-    // left: '80%',
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-around',
     bottom: 0,
-    backgroundColor: 'black',
-    height: 52,
+    backgroundColor: 'white',
+    height: 45,
     paddingTop: 2,
     zIndex: 10,
+    borderTopWidth:2,
+    borderTopColor:'black',
+    alignItems:'center'
+
+    // shadowColor:'black',
+    // shadowOpacity:1,
+    // shadowOffset: {
+    //   width: 0,
+    //   height: -10,
+    // },
+    // elevation: 20,
+
   },
   tab: {
     backgroundColor: 'white',
     borderRadius: 30,
-    width: 50,
-    height: 50,
-    // marginBottom:10,
+    // width: 50,
+    // height: 50,
     textAlign: 'center',
     justifyContent: 'center',
     display: 'flex',
     alignItems: 'center',
   },
-  ActiveTab: {
-    backgroundColor: 'yellow',
-    borderRadius: 30,
-    width: 50,
-    height: 50,
-    // marginBottom:10,
-    textAlign: 'center',
-    justifyContent: 'center',
-    display: 'flex',
-    alignItems: 'center',
-  },
+  // ActiveTab: {
+  //   backgroundColor: 'black',
+  //   borderRadius: 30,
+  //   width: 50,
+  //   height: 50,
+  //   // marginBottom:10,
+  //   textAlign: 'center',
+  //   justifyContent: 'center',
+  //   display: 'flex',
+  //   alignItems: 'center',
+  // },
   innerTab: {
     color: 'black',
     textAlign: 'center',
@@ -1173,27 +1187,37 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   ActiveInner: {
-    color: 'black',
+    color: 'green',
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 18,
   },
   findArea: {
     display: 'flex',
-    backgroundColor: 'red',
+    // backgroundColor: '#AAAAAA',
     flexDirection: 'column',
-    // bottom:50,
     bottom: -10,
     position: 'absolute',
     right: 0,
     left: 0,
+    // borderTopLeftRadius:10,
+    // borderTopRightRadius:10,
+    backgroundColor:'#A0A0A0',
+    // overflow:'hidden'
+    borderTopWidth:2,
+    borderTopColor:'black'
+
   },
   searchView: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    marginTop: 6,
+    marginTop: 3,
     marginBottom: 6,
+    backgroundColor:'#A0A0A0',
+    width:'100%',
+    overflow:'hidden'
+    
   },
   tabSearch: {
     display: 'flex',
@@ -1201,8 +1225,9 @@ const styles = StyleSheet.create({
     height: 55,
     // marginTop:20,
     borderRadius: 30,
-    backgroundColor: 'gray',
+    backgroundColor: 'yellow',
     justifyContent: 'center',
+
   },
   inputArea: {
     width: '75%',
@@ -1217,7 +1242,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   searchBtb: {
-    backgroundColor: 'brown',
+    backgroundColor: '#111111',
     color: 'white',
     borderRadius: 30,
     width: '18%',

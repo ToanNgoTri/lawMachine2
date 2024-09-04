@@ -365,14 +365,14 @@ loading2.current = false
         alignItems: 'center',
         zIndex:10
         }}>
-        <ActivityIndicator size='large' color="#cc3333" >
+        <ActivityIndicator size='large' color="white" >
 
         </ActivityIndicator>
         </View>
         )}
 
       <ScrollView keyboardShouldPersistTaps="handled" ref={list}>
-        <View style={{backgroundColor: 'green'}}>
+        <View style={{backgroundColor: 'green',}}>
 
           <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
 
@@ -400,6 +400,29 @@ loading2.current = false
               <Ionicons
                 name="funnel-outline"
                 style={{...styles.inputBtbText, color: 'black'}}></Ionicons>
+                <View style={{
+                  position:'absolute',
+                  height:25,
+                  width:25,
+                  backgroundColor:'red',
+                  borderRadius:20,
+                  right:-10,
+                  bottom:-10,
+                  justifyContent:'center',
+                  alignItems:'center'
+
+                }}>
+                  <Text style={{
+                    color:'white',
+                    textAlign:'center',
+                    fontSize:10,
+                    fontWeight:'bold',
+                    justifyContent:'center',
+                    alignItems:'center'
+}}>
+                    {checkedAllFilter ? 'All' :choosenLaw.length}
+                  </Text>
+                </View>
             </TouchableOpacity>
             </View>
 
@@ -972,7 +995,7 @@ const styles = StyleSheet.create({
   chapter: {
     height: 60,
     justifyContent: 'center',
-    backgroundColor: 'orange',
+    backgroundColor: '#F9CC76',
     color: 'black',
     alignItems: 'center',
     marginBottom: 1,
@@ -1002,10 +1025,10 @@ const styles = StyleSheet.create({
   },
   articleContainer: {
     fontWeight: 'bold',
-    paddingBottom: 10,
-    paddingTop: 10,
+    paddingBottom: 6,
+    paddingTop: 6,
     color: 'white',
-    backgroundColor: 'black',
+    backgroundColor: '#66CCFF',
     justifyContent: 'center',
     // alignItems:'center',
     display: 'flex',
@@ -1019,6 +1042,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     paddingLeft: 10,
     textAlign: 'center',
+    fontWeight:'bold'
   },
   blackBackground: {
     backgroundColor: 'white',
