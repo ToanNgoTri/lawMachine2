@@ -2,15 +2,15 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import database from '@react-native-firebase/database';
-import {useState, useEffect,useContext,useRef} from 'react';
+import {useState, useEffect,useContext} from 'react';
 import {dataLaw} from '../App';
-
 import Home from '../screens/Home';
 import {Detail1} from '../screens/Detail1';
 // import Detail4 from '../screens/Detail4';
 import Detail5 from '../screens/Detail5';
 import {RefForSearch} from '../App'
 import {RefForHome} from '../App'
+import {ModalStatus} from "../App";
 import {
   Alert,
   Text,
@@ -62,7 +62,13 @@ const AppNavigators = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        lazy:false                                          // khi app chạy thì sẽ sẽ chạy hết tất cả các tab đồng loạt chứ không phải nhấn vô mới load
+        lazy:false,
+        tabBarStyle: {postion: "absolute",
+          // backgroundColor:'blue',
+
+
+        }
+                                                  // khi app chạy thì sẽ sẽ chạy hết tất cả các tab đồng loạt chứ không phải nhấn vô mới load
   })
 }
       
@@ -122,7 +128,6 @@ const AppNavigators = () => {
       >
         
       <Tab.Screen
-      
         name="Home"
         component={Home}
         options={{
@@ -169,7 +174,7 @@ const AppNavigators = () => {
               HomeFlatlist.forHome.current.scrollToOffset({ animated: true, offset: 0 });
           }
         }}
-
+an
       />
       <Tab.Screen
         name="Search"
@@ -207,23 +212,17 @@ const AppNavigators = () => {
 
 const StackNavigator = () => {
   const [Content, setContent] = useState(null);
+  const [LawInfo, setLawInfo] = useState(null);
   const dataLawContent = useContext(dataLaw);
-
+  const ModalVisibleStatus = useContext(ModalStatus)
+  
   // const netInfo = useNetInfo();
   // let internetConnected = netInfo.isConnected
 
   useEffect(() => {
 
-    // if(internetConnected){
-    // const reference = database().ref('/Law1');
-    // reference.on('value', snapshot => {
-    //   setContent(snapshot.val());
-    // });
-    //   }else{
-        // setContent(data);
-        setContent(dataLawContent.dataLawForApp)
-
-      // }
+    setContent(dataLawContent.dataLawForApp['LawContent'])
+    setLawInfo(dataLawContent.dataLawForApp['LawInfo'])
 
   }, [dataLawContent.dataLawForApp]);
 
@@ -261,7 +260,9 @@ const StackNavigator = () => {
               name={`${key}`}
               component={Detail5}
               // options={{animationEnabled: true}}
-              options={() => ({
+              options={({ route}) => ({
+                animation:'slide_from_right',
+                animationTypeForReplace:'push',
                 title: '',
                 headerRight: () => (
                   <>
@@ -269,10 +270,10 @@ const StackNavigator = () => {
                       style={styles.iconInfoContainer}
                       onPress={() => {
                         // navigation.navigate('Search')
-                        Alert.alert('Waring', 'Giai đoạn 2 đang cập nhật...');
+                        ModalVisibleStatus.updateModalStatus(true)
                       }}>
                       <Ionicons
-                        name="alert-outline"
+                        name="information-circle-outline"
                         style={styles.IconInfo}></Ionicons>
                     </TouchableOpacity>
                   </>
@@ -320,9 +321,9 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   IconInfo: {
-    fontSize: 25,
+    fontSize: 30,
     display: 'flex',
-    color: 'white',
+    color: 'black',
   },
   iconInfoContainer: {
     width: 50,
@@ -330,7 +331,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'black',
+    // backgroundColor: 'black',
     borderRadius: 25,
   },
 });

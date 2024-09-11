@@ -38,7 +38,7 @@ export const search = createSlice({
   name: 'search',     
   initialState: {
     data1:dataOrg,
-    loading1: false,
+    loading1: true,
     input1:'thuyền',
     result:null
   },
@@ -152,7 +152,7 @@ export const search = createSlice({
 export function* mySaga(action){
   try{
     yield put(loader())
-    const b = yield call( async ()=> await database().ref('/Law1').once('value') )
+    const b = yield call( async ()=> await database().ref('/').once('value') )
     const a =   b.val()      
  
 

@@ -8,19 +8,19 @@ import {
   Keyboard,
   Alert,
   Animated,
-  Dimensions
+  Dimensions,
+  Modal,
 } from 'react-native';
-import database from '@react-native-firebase/database';
-import React, {useState, useEffect, useRef,useContext} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import {useRoute} from '@react-navigation/native';
 import data from '../data/project2-197c0-default-rtdb-export.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useNetInfo} from "@react-native-community/netinfo";
-// import { useSelector, useDispatch } from 'react-redux';
-import { Shadow } from 'react-native-shadow-2';
+import {useNetInfo} from '@react-native-community/netinfo';
+import {Shadow} from 'react-native-shadow-2';
 
 import {dataLaw} from '../App';
+import {ModalStatus} from '../App';
 
 let TopUnitCount; // là đơn vị lớn nhất vd là 'phần thứ' hoặc chương
 let articleCount = 0;
@@ -53,13 +53,9 @@ export default function Detail() {
 
   const [currentSearchPoint, setCurrentSearchPoint] = useState(1); // thứ tự kết quả search đang trỏ tới
 
+  // const [modalVisible, setModalVisible] = useState(false);
+
   const route = useRoute();
-
-  let LawName = route.name;
-
-  if(LawName.match(/\\/img,'\/')){
-    LawName = LawName.replace(/\\/img,'\/')
-  }
 
   const animatedForNavi = useRef(new Animated.Value(0)).current;
 
@@ -74,27 +70,16 @@ export default function Detail() {
   const [Content, setContent] = useState('');
 
   const netInfo = useNetInfo();
-  let internetConnected = netInfo.isConnected
+  let internetConnected = netInfo.isConnected;
 
-
-
-
-
-
-  const { width, height } = Dimensions.get("window");
-  let heightDevice=height;
-  let widthDevice=width;
-  Dimensions.addEventListener("change", ({ window: { width, height } }) => {
+  const {width, height} = Dimensions.get('window');
+  let heightDevice = height;
+  let widthDevice = width;
+  Dimensions.addEventListener('change', ({window: {width, height}}) => {
     // console.log(`Width: ${width}, Height: ${height}`);
-    widthDevice=width;
-    heightDevice=height
-    
-  });  
-
-
-
-
-
+    widthDevice = width;
+    heightDevice = height;
+  });
 
   function pushToSearch() {
     setGo(true);
@@ -117,11 +102,9 @@ export default function Detail() {
         // if(input.match(/\//img)){
         //   inputSearchLawReg = inputSearchLawReg.replace(/\//img,'\\/')
         // }
-        if(input.match(/\\/img)){
-          inputSearchLawReg = inputSearchLawReg.replace(/\\/img,'.')
+        if (input.match(/\\/gim)) {
+          inputSearchLawReg = inputSearchLawReg.replace(/\\/gim, '.');
         }
-
-
 
         setValueInput(inputSearchLawReg);
       } else {
@@ -143,35 +126,30 @@ export default function Detail() {
 
   // useEffect(() => {
   //   dispatch({type:'run'})
-  
+
   // }, [])
-  
+
   const dataLawContent = useContext(dataLaw);
+  const ModalVisibleStatus = useContext(ModalStatus);
 
+  let LawName =
+    dataLawContent.dataLawForApp['LawInfo'][route.name]['lawNameDisplay'];
 
-
-
-
-
-
-
-  
   useEffect(() => {
-
-    if(internetConnected){
+    if (internetConnected) {
       // const reference = database().ref('/Law1');
       // reference.on('value', snapshot => {
-        // setContent(snapshot.val()[route.name]);
-        if(data){
-          // setContent(data[route.name]);
-        }
-        // });
-      }else{
+      // setContent(snapshot.val()[route.name]);
+      if (data) {
         // setContent(data[route.name]);
       }
-      
-      setContent(dataLawContent.dataLawForApp[route.name])
-        
+      // });
+    } else {
+      // setContent(data[route.name]);
+    }
+
+    setContent(dataLawContent.dataLawForApp['LawContent'][route.name]);
+
     // reference.on('value', snapshot => {
     //   setContent(snapshot.val()[route.name]);
     //   // setContent(data[route.name]);
@@ -210,7 +188,6 @@ export default function Detail() {
         }
       }
 
-
       let tittleArray2Copy = tittleArray2;
       for (let m = 0; m < eachSectionWithChapter[a].length; m++) {
         if (!contain) {
@@ -239,16 +216,14 @@ export default function Detail() {
     // setTittle(null);
   }
 
-
   let searchResultCount = 0;
   // let c = 0;
   function highlight(para, word, i2) {
-
-    if(para[0]){
-    if(para[0].match(/(?<=\w*)\\(?=\w*)/img)){
-    para[0] = para[0].replace(/(?<=\w*)\\(?=\w*)/img,'\/')
+    if (para[0]) {
+      if (para[0].match(/(?<=\w*)\\(?=\w*)/gim)) {
+        para[0] = para[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/');
+      }
     }
-  }
 
     // if (word.match(/\w+/gim) || word.match(/\(/gim)|| word.match(/\)/gim) || word.match(/\./img) || word.match(/\+/img)) {
     if (word.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
@@ -391,12 +366,12 @@ export default function Detail() {
     // console.log('sumChapter',sumChapter);
     // console.log('sumChapterArray',sumChapterArray);
 
-      let sumChapter = sumChapterArray.reduce((total, currentValue) => {
-    // tổng chapter nếu có phần thứ
-    if (currentValue) {
-      return total + currentValue;
-    }
-  });
+    let sumChapter = sumChapterArray.reduce((total, currentValue) => {
+      // tổng chapter nếu có phần thứ
+      if (currentValue) {
+        return total + currentValue;
+      }
+    });
 
     for (let b = 0; b <= sumChapter - 1; b++) {
       if (tittleArray2 == []) {
@@ -451,24 +426,23 @@ export default function Detail() {
   });
 
   let transY = animatedForNavi.interpolate({
-    inputRange: [-100,0, 80, 90, 100],
-    outputRange: [5,5, -53, 0, 0],
+    inputRange: [-100, 0, 80, 90, 100],
+    outputRange: [5, 5, -53, 0, 0],
   });
 
   let transX = animatedForNavi.interpolate({
     inputRange: [-100, 0],
-    outputRange: [0, widthDevice/100*60],
+    outputRange: [0, (widthDevice / 100) * 60],
   });
 
   let Opacity = animatedForNavi.interpolate({
     inputRange: [-100, 0],
-    outputRange: [.7, 0],
+    outputRange: [0.7, 0],
   });
 
-
   let MagginBottom = animatedForNavi.interpolate({
-    inputRange: [-100,0, 80, 90, 100],
-    outputRange: [45,45, 100, 0, 0],
+    inputRange: [-100, 0, 80, 90, 100],
+    outputRange: [45, 45, 100, 0, 0],
   });
 
   useEffect(() => {
@@ -482,14 +456,11 @@ export default function Detail() {
     //   useNativeDriver: false,
     // }).start();
     // setShowArticle(false)
-    Keyboard.dismiss()
-
+    Keyboard.dismiss();
   }, [find]);
 
   const a = (key, i, key1, i1a, t) => {
     // phần nếu không mục 'phần thứ' trong văn bản
-
-
 
     return Object.keys(key)[0] != '0' ? (
       <View
@@ -503,8 +474,6 @@ export default function Detail() {
           styles.content //////////////////////////////////////////////////////////////////
         }>
         {key[key1].map((key2, i2) => {
-
-
           return (
             <View
               onLayout={event => {
@@ -515,7 +484,11 @@ export default function Detail() {
                   });
                 });
               }}
-              style={go ? {width: '100%',marginBottom:20} : {width: '99%',marginBottom:20}}>
+              style={
+                go
+                  ? {width: '100%', marginBottom: 20}
+                  : {width: '99%', marginBottom: 20}
+              }>
               <Text key={`${i2}c`} style={styles.dieu}>
                 {highlight(Object.keys(key2), valueInput, i2)}
               </Text>
@@ -587,7 +560,7 @@ export default function Detail() {
                         fontWeight: 'bold',
                         padding: 4,
                         textAlign: 'center',
-                        backgroundColor:'#66CCFF',
+                        backgroundColor: '#66CCFF',
                         marginBottom: 1,
                       }}>
                       {Object.keys(keyC)[0].toUpperCase()}
@@ -635,9 +608,11 @@ export default function Detail() {
     );
   };
 
+  // console.log("dataLawContent.dataLawForApp['LawInfo']",dataLawContent.dataLawForApp['LawInfo'][route.name]['lawRelated'])
+
   return (
     <>
-                        {/* { loading && (
+      {/* { loading && (
         <View style={{position: 'absolute',
         left: 0,
         right: 0,
@@ -654,6 +629,169 @@ export default function Detail() {
         </ActivityIndicator>
         </View>
         )} */}
+
+      <Modal
+        presentationStyle="pageSheet"
+        animationType="slide"
+        visible={ModalVisibleStatus.modalStatus}
+        style={{}}
+        >
+
+        <ScrollView
+          style={{
+            backgroundColor: '#EEEFE4',
+          }}>
+            <View style={{justifyContent:'center',alignItems:'center'}}>
+          <View
+            style={{
+              padding: 20,
+              paddingTop: 50,
+              paddingBottom: 20,
+              // backgroundColor: 'blue',
+            }}>
+            <Text
+              style={{
+                textAlign: 'center',
+                fontSize: 23,
+                fontWeight: 'bold',
+                color: 'black',
+              }}>
+              THÔNG TIN CHI TIẾT
+            </Text>
+          </View>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              paddingTop: 10,
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+              // backgroundColor: 'green',
+              paddingLeft: 10,
+              paddingRight: 10,
+            }}>
+            <View style={styles.ModalInfoContainer}>
+              <Text style={styles.ModalInfoTitle}>Tên Luật:</Text>
+              <Text style={styles.ModalInfoContent}>
+                {
+                  dataLawContent.dataLawForApp['LawInfo'][route.name][
+                    'lawDescription'
+                  ]
+                }
+              </Text>
+            </View>
+            <View style={styles.ModalInfoContainer}>
+              <Text style={styles.ModalInfoTitle}>Ngày ký:</Text>
+              <Text style={styles.ModalInfoContent}>
+                {
+                  dataLawContent.dataLawForApp['LawInfo'][route.name][
+                    'lawDaySign'
+                  ]
+                }
+              </Text>
+            </View>
+            <View style={styles.ModalInfoContainer}>
+              <Text style={styles.ModalInfoTitle}>Ngày có hiệu lực:</Text>
+              <Text style={styles.ModalInfoContent}>
+                {
+                  dataLawContent.dataLawForApp['LawInfo'][route.name][
+                    'lawDayActive'
+                  ]
+                }
+              </Text>
+            </View>
+            <View style={styles.ModalInfoContainer}>
+              <Text style={styles.ModalInfoTitle}>Số văn bản:</Text>
+              <Text style={styles.ModalInfoContent}>
+                {
+                  dataLawContent.dataLawForApp['LawInfo'][route.name][
+                    'lawNumber'
+                  ]
+                }
+              </Text>
+            </View>
+            <View style={styles.ModalInfoContainer}>
+              <Text style={styles.ModalInfoTitle}>Họ Tên người ký:</Text>
+              <Text style={styles.ModalInfoContent}>
+                {
+                  dataLawContent.dataLawForApp['LawInfo'][route.name][
+                    'nameSign'
+                  ]
+                }
+              </Text>
+            </View>
+            <View style={styles.ModalInfoContainer}>
+              <Text style={styles.ModalInfoTitle}>Chức vụ người ký:</Text>
+              <Text style={styles.ModalInfoContent}>
+                {
+                  dataLawContent.dataLawForApp['LawInfo'][route.name][
+                    'roleSign'
+                  ]
+                }{' '}
+              </Text>
+            </View>
+            <View style={styles.ModalInfoContainer}>
+              <Text style={styles.ModalInfoTitle}>Cơ quan ban hành:</Text>
+              <Text style={styles.ModalInfoContent}>
+                {
+                  dataLawContent.dataLawForApp['LawInfo'][route.name][
+                    'unitPublish'
+                  ]
+                }
+              </Text>
+            </View>
+            <View style={{...styles.ModalInfoContainer}}>
+              <Text style={styles.ModalInfoTitle}>Văn bản liên quan:</Text>
+              <View style={{flex: 1, paddingTop: 10}}>
+                {dataLawContent.dataLawForApp['LawInfo'][route.name][
+                  'lawRelated'
+                ].map((key, i) => {
+                  nameLaw= key.replace(/\//gim,'\\')
+                  return (
+                  <View>
+                    <Text style={styles.ModalInfoContentLawRelated}>{
+
+                    //   nameLaw.match(/QH/gim)?
+                    // Object.keys(dataLawContent.dataLawForApp['LawInfo']).includes(nameLaw)?dataLawContent.dataLawForApp['LawInfo'][nameLaw]['lawNameDisplay']:key
+                    // :key
+                    
+                    key
+                    }</Text>
+                  </View>
+                )})}
+              </View>
+            </View>
+          </View>
+
+          <TouchableOpacity
+          onPress={() => {
+            ModalVisibleStatus.updateModalStatus(false);
+          }}
+          style={{
+            padding: 10,
+            backgroundColor: 'green',
+            width:'50%',
+            alignItems:'center',
+            marginTop:40,
+            borderRadius:30,
+            borderWidth:2,
+            marginBottom:50,
+
+          }}>
+          <Text
+            style={{
+              textAlign: 'center',
+              fontWeight: 'bold',
+              fontSize: 18,
+              color: 'white',
+              
+            }}>
+            Đóng
+          </Text>
+        </TouchableOpacity>
+        </View>
+        </ScrollView>
+      </Modal>
 
       <Animated.View style={{marginBottom: MagginBottom}}>
         <ScrollView
@@ -751,11 +889,14 @@ export default function Detail() {
         )}
 
       {
-        
         <Animated.View
           style={{...styles.findArea, transform: [{translateY: transY}]}}>
-        <Shadow distance={13} startColor={'#A0A0A0'} sides={'top'} style={styles.searchView}>
-          {/* <View style={styles.searchView}> */}
+          <Shadow
+            distance={17}
+            startColor={'#A0A0A0'}
+            sides={'top'}
+            style={{...styles.searchView, width: widthDevice}}>
+            {/* <View style={styles.searchView}> */}
             <View style={styles.inputArea}>
               <TextInput
                 style={{width: '65%', color: 'white'}}
@@ -807,26 +948,20 @@ export default function Detail() {
                   fontSize: 18,
                 }}></Ionicons>
             </TouchableOpacity>
-          {/* </View> */}
-        </Shadow>
+            {/* </View> */}
+          </Shadow>
         </Animated.View>
       }
       <View style={styles.functionTab}>
-        
         <TouchableOpacity
           style={styles.tab}
           onPress={() => {
             setFind(false);
 
             let timeOut = setTimeout(() => {
-              setShowArticle(false)
-              return()=>{
-                 
-
-              }
-            },  600);
-
-              
+              setShowArticle(false);
+              return () => {};
+            }, 600);
 
             setTittleArray([]);
             Shrink();
@@ -834,7 +969,7 @@ export default function Detail() {
             Animated.timing(animatedForNavi, {
               toValue: 0,
               // toValue:100,
-              duration:  600,
+              duration: 600,
               useNativeDriver: false,
             }).start();
 
@@ -852,19 +987,15 @@ export default function Detail() {
             setTittleArray2([]);
             setFind(false);
             let timeOut = setTimeout(() => {
-              setShowArticle(false)
-              return()=>{
-                 
-
-              }
-            },  600);
+              setShowArticle(false);
+              return () => {};
+            }, 600);
 
             Animated.timing(animatedForNavi, {
               toValue: 0,
-              duration:  600,
+              duration: 600,
               useNativeDriver: false,
             }).start();
-
           }}>
           {/* <Text style={styles.innerTab}>E</Text> */}
           <Ionicons
@@ -876,11 +1007,9 @@ export default function Detail() {
           onPress={() => {
             list.current.scrollTo({y: 0});
             let timeOut = setTimeout(() => {
-              setShowArticle(false)
-              return()=>{
-              }
-            },  600);
-
+              setShowArticle(false);
+              return () => {};
+            }, 600);
           }}>
           <Ionicons name="arrow-up-outline" style={styles.innerTab}></Ionicons>
         </TouchableOpacity>
@@ -891,15 +1020,12 @@ export default function Detail() {
           onPress={() => {
             setFind(!find);
             let timeOut = setTimeout(() => {
-              setShowArticle(false)
-              return()=>{
-                 
-
-              }
-            },  600);
+              setShowArticle(false);
+              return () => {};
+            }, 600);
             Animated.timing(animatedForNavi, {
               toValue: !find ? 80 : 0,
-              duration:  600,
+              duration: 600,
               useNativeDriver: false,
             }).start();
           }}>
@@ -911,32 +1037,26 @@ export default function Detail() {
         <TouchableOpacity
           // style={showArticle && !find ? styles.ActiveTab : styles.tab}
           style={styles.tab}
-
           onPress={() => {
-
-            if(showArticle){
+            if (showArticle) {
               let timeOut = setTimeout(() => {
-                setShowArticle(false)
-                return()=>{
-                }
-              },  600);
-            }else{
-            setShowArticle(true);
-
-          }
+                setShowArticle(false);
+                return () => {};
+              }, 600);
+            } else {
+              setShowArticle(true);
+            }
             setFind(false);
-            Keyboard.dismiss()
+            Keyboard.dismiss();
             Animated.timing(animatedForNavi, {
               toValue: !showArticle ? -100 : 0,
-              duration:  600,
+              duration: 600,
               useNativeDriver: false,
             }).start();
 
             setTittleArray([]);
             setTittleArray2([]);
-        
           }}>
-
           <Ionicons
             name="menu-outline"
             style={
@@ -944,124 +1064,117 @@ export default function Detail() {
             }></Ionicons>
         </TouchableOpacity>
       </View>
-        <>
-      {showArticle && (
-        <>
-        <Animated.View 
-        style={{
-          backgroundColor: 'rgb(245,245,247)',
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-          display: 'flex',
-          position: 'absolute',
-          opacity:Opacity,
-          
-        }}
->
-          <TouchableOpacity //overlay
-                    style={{
-                      left: 0,
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      display: 'flex',
-                      position: 'absolute',
-                    }}
-            
-            onPress={() => {
-              // Keyboard.dismiss()
-            let timeOut = setTimeout(() => {
-              setShowArticle(false)
-              return()=>{
-              }
-
-            },  600);
-              Animated.timing(animatedForNavi, {
-                toValue: !showArticle ? -100 : 0,
-                duration:  600,
-                useNativeDriver: false,
-              }).start();
-  
-            }}></TouchableOpacity>
+      <>
+        {showArticle && (
+          <>
+            <Animated.View
+              style={{
+                backgroundColor: 'rgb(245,245,247)',
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                display: 'flex',
+                position: 'absolute',
+                opacity: Opacity,
+              }}>
+              <TouchableOpacity //overlay
+                style={{
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  position: 'absolute',
+                }}
+                onPress={() => {
+                  // Keyboard.dismiss()
+                  let timeOut = setTimeout(() => {
+                    setShowArticle(false);
+                    return () => {};
+                  }, 600);
+                  Animated.timing(animatedForNavi, {
+                    toValue: !showArticle ? -100 : 0,
+                    duration: 600,
+                    useNativeDriver: false,
+                  }).start();
+                }}></TouchableOpacity>
             </Animated.View>
 
-          <Animated.View
-            style={{...styles.listArticle,width:widthDevice/100*60, transform: [{translateX: transX}]}}>
-            <View
+            <Animated.View
               style={{
-                flexDirection: 'row',
-                backgroundColor: 'black',
-                height: 50,
+                ...styles.listArticle,
+                width: (widthDevice / 100) * 60,
+                transform: [{translateX: transX}],
               }}>
-              <TextInput
-                onChangeText={text => setInputSearchArtical(text)}
-                value={inputSearchArtical}
+              <View
                 style={{
-                  paddingLeft: 10,
-                  paddingRight: 10,
-                  color: 'white',
-                  width: '85%',
-                  alignItems: 'center',
-                }}
-                placeholder=" Input to Search ..."
-                placeholderTextColor={'gray'}></TextInput>
-              <TouchableOpacity
-                onPress={() => setInputSearchArtical('')}
-                style={{
-                  width: '15%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  flexDirection: 'row',
+                  backgroundColor: 'black',
+                  height: 50,
                 }}>
-                {inputSearchArtical && (
-                  <Text
-                    style={{
-                      height: 20,
-                      width: 20,
-                      color: 'white',
-                      textAlign: 'center',
-                      verticalAlign: 'middle',
-                      backgroundColor: 'gray',
-                      borderRadius: 25,
-                    }}>
-                    X
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
-            <ScrollView
-            keyboardShouldPersistTaps='handled' 
-            >
-              <View style={{height: 7}}>
-                {
-                  // đây là hàng ảo để thêm margin
-                }
-              </View>
-              {(SearchArticalResult || positionYArrArtical).map((key, i) => (
+                <TextInput
+                  onChangeText={text => setInputSearchArtical(text)}
+                  value={inputSearchArtical}
+                  style={{
+                    paddingLeft: 10,
+                    paddingRight: 10,
+                    color: 'white',
+                    width: '85%',
+                    alignItems: 'center',
+                  }}
+                  placeholder=" Input to Search ..."
+                  placeholderTextColor={'gray'}></TextInput>
                 <TouchableOpacity
-                  style={styles.listItem}
-                  onPress={() => {
-                    setShowArticle(false);
-                    list.current.scrollTo({y: Object.values(key) - 57}); 
-                    Animated.timing(animatedForNavi, {
-                      toValue: !showArticle ? -100 : 0,
-                      duration:  600,
-                      useNativeDriver: false,
-                    }).start();
-        
-
+                  onPress={() => setInputSearchArtical('')}
+                  style={{
+                    width: '15%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}>
-                  <Text style={styles.listItemText}>{Object.keys(key)}</Text>
+                  {inputSearchArtical && (
+                    <Text
+                      style={{
+                        height: 20,
+                        width: 20,
+                        color: 'white',
+                        textAlign: 'center',
+                        verticalAlign: 'middle',
+                        backgroundColor: 'gray',
+                        borderRadius: 25,
+                      }}>
+                      X
+                    </Text>
+                  )}
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </Animated.View>
+              </View>
+              <ScrollView keyboardShouldPersistTaps="handled">
+                <View style={{height: 7}}>
+                  {
+                    // đây là hàng ảo để thêm margin
+                  }
+                </View>
+                {(SearchArticalResult || positionYArrArtical).map((key, i) => (
+                  <TouchableOpacity
+                    style={styles.listItem}
+                    onPress={() => {
+                      setShowArticle(false);
+                      list.current.scrollTo({y: Object.values(key) - 57});
+                      Animated.timing(animatedForNavi, {
+                        toValue: !showArticle ? -100 : 0,
+                        duration: 600,
+                        useNativeDriver: false,
+                      }).start();
+                    }}>
+                    <Text style={styles.listItemText}>{Object.keys(key)}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </Animated.View>
           </>
-          )}
-
-        </>
+        )}
+      </>
     </>
   );
 }
@@ -1078,7 +1191,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     color: 'rgb(68,68,68)',
     // backgroundColor:'rgb(230,230,230)',
-    fontWeight:'bold'
+    fontWeight: 'bold',
   },
   chapter: {
     // height: 60,
@@ -1103,16 +1216,15 @@ const styles = StyleSheet.create({
   lines: {
     display: 'flex',
     position: 'relative',
-    textAlign:'justify',
+    textAlign: 'justify',
     paddingLeft: 10,
     paddingRight: 10,
-    paddingBottom:'0',
+    paddingBottom: '0',
     fontSize: 14,
     color: 'black',
     lineHeight: 22,
     overflow: 'hidden',
-
-},
+  },
   highlight: {
     color: 'black',
     backgroundColor: 'yellow',
@@ -1146,9 +1258,9 @@ const styles = StyleSheet.create({
     height: 45,
     paddingTop: 2,
     zIndex: 10,
-    borderTopWidth:2,
-    borderTopColor:'black',
-    alignItems:'center'
+    borderTopWidth: 2,
+    borderTopColor: 'black',
+    alignItems: 'center',
 
     // shadowColor:'black',
     // shadowOpacity:1,
@@ -1157,13 +1269,12 @@ const styles = StyleSheet.create({
     //   height: -10,
     // },
     // elevation: 20,
-
   },
   tab: {
-    backgroundColor: 'white',
+    // backgroundColor: 'red',
     borderRadius: 30,
-    // width: 50,
-    // height: 50,
+    width: '15%',
+    height: 40,
     textAlign: 'center',
     justifyContent: 'center',
     display: 'flex',
@@ -1171,7 +1282,7 @@ const styles = StyleSheet.create({
   },
   // ActiveTab: {
   //   backgroundColor: 'black',
-  //   borderRadius: 30,
+  //   borderRadius: 40,
   //   width: 50,
   //   height: 50,
   //   // marginBottom:10,
@@ -1202,11 +1313,10 @@ const styles = StyleSheet.create({
     left: 0,
     // borderTopLeftRadius:10,
     // borderTopRightRadius:10,
-    backgroundColor:'#A0A0A0',
+    backgroundColor: '#A0A0A0',
     // overflow:'hidden'
-    borderTopWidth:2,
-    borderTopColor:'black'
-
+    borderTopWidth: 2,
+    borderTopColor: 'black',
   },
   searchView: {
     flexDirection: 'row',
@@ -1214,10 +1324,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginTop: 3,
     marginBottom: 6,
-    backgroundColor:'#A0A0A0',
-    width:'100%',
-    overflow:'hidden'
-    
+    backgroundColor: '#A0A0A0',
+    // width:'100%',
+    overflow: 'hidden',
   },
   tabSearch: {
     display: 'flex',
@@ -1227,7 +1336,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: 'yellow',
     justifyContent: 'center',
-
   },
   inputArea: {
     width: '75%',
@@ -1254,13 +1362,13 @@ const styles = StyleSheet.create({
   },
   listArticle: {
     position: 'absolute',
-    width:'55%',
+    width: '55%',
     top: 0,
     bottom: 0,
     backgroundColor: 'white',
     display: 'flex',
     right: 0,
-    marginBottom:50
+    marginBottom: 50,
     // transform:[{translateX:200}]
     // right:'100%'
     // paddingTop: 10,
@@ -1281,5 +1389,35 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
     marginRight: 5,
     marginLeft: 5,
+  },
+  ModalInfoContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    paddingLeft: 20,
+    paddingRight: 5,
+  },
+  ModalInfoTitle: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    flex: 1,
+    fontWeight: 'bold',
+    // backgroundColor:'red',
+    fontSize: 16,
+    color: 'black',
+  },
+  ModalInfoContent: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    flex: 1,
+    color: 'black',
+    fontSize:14,
+    // backgroundColor:'yellow'
+  },
+  ModalInfoContentLawRelated: {
+    paddingBottom: 10,
+    flex: 1,
+    color: 'black',
+    fontSize:14,
+    // backgroundColor:'blue'
   },
 });

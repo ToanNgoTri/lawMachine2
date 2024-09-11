@@ -11,7 +11,6 @@ import {
   Animated,
   Dimensions
 } from 'react-native';
-import database from '@react-native-firebase/database';
 import {useState, useEffect, useContext, useRef,} from 'react';
 import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -22,7 +21,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import {useNetInfo} from '@react-native-community/netinfo';
 import {loader,handle,noLoading} from '../redux/fetchData'
-import {  store} from "../redux/store";
+
 export default function Home({navigation}) {
   const [Content, setContent] = useState('');
   // sử dụng để đọc realtime database, data được xuất ra ở dưới dạng object rồi không cần JSON.parse
@@ -55,26 +54,38 @@ export default function Home({navigation}) {
   const animated = useRef(new Animated.Value(0)).current;
 
   let Opacity = animated.interpolate({
-    inputRange: [0,25,50,100],
-    outputRange: [1,0,0, 0],
+    inputRange: [-100,0,25,50,100],
+    outputRange: [0,1,0,0, 0],
   });
 
   let TranslateY = animated.interpolate({
-    inputRange: [0, 100],
-    outputRange: [0, 100],
+    inputRange: [-100,0, 100],
+    outputRange: [0,0, 100],
   });
+
+
+  const {width, height} = Dimensions.get('window');
+  let heightDevice = height;
+  let widthDevice = width;
+  Dimensions.addEventListener('change', ({window: {width, height}}) => {
+    // console.log(`Width: ${width}, Height: ${height}`);
+    widthDevice = width;
+    heightDevice = height;
+  });
+
 
   HomeFlatlist.updateHome(list1);
 
-  const reference = database().ref('/Law1');
+
+
+  // console.log("dataLawContent.dataLawForApp['LawInfo']",dataLawContent.dataLawForApp);
+
   const Render = ({item}) => {
 
-    let name =item.replace(/\\/img,'\/')
-    
     return (
       <TouchableOpacity onPress={() => navigation.navigate(`${item}`)}>
         <View style={styles.item}>
-          <Text style={styles.text}>{name}</Text>
+          <Text style={styles.text}>{dataLawContent.dataLawForApp && dataLawContent.dataLawForApp['LawInfo'][item]['lawNameDisplay']}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -119,7 +130,9 @@ export default function Home({navigation}) {
               inputSearchLawReg = inputSearchLawReg.replace(/\?/gim, '\\?');
             }
 
-            return item.match(new RegExp(inputSearchLawReg, 'igm'));
+            return (data['LawInfo'][item]['lawNameDisplay'].match(new RegExp(inputSearchLawReg, 'igm')) 
+            || data['LawInfo'][item]['lawDescription'].match(new RegExp(inputSearchLawReg, 'igm'))
+            || data['LawInfo'][item]['lawNumber'].match(new RegExp(inputSearchLawReg, 'igm')));
           }
         }),
     );
@@ -132,26 +145,12 @@ export default function Home({navigation}) {
   const [alreadyInternetWarning, setAlreadyInternetWarning] = useState(false);      // dùng để biết đã từng có internet chưa
 
   const {loading,data} = useSelector(state => state['read']);
-  // console.log("store.getState()['read']['loading']",store.getState()['read']['loading']);
-  // let loading2 = store.getState()['read']['loading']
-  // console.log('loading',loading);
-  // console.log('loading2',loading2);
+
   Loading1.updateLoading(loading)
 
 
   useEffect(() => {
 
-    // if(internetConnected){
-  //   setTimeout(()=>{
-  //     hasBeenRerender.current = true
-
-  //   },2000)
-  // }else if (internetConnected == false){
-  //   hasBeenRerender.current = true
-  // }
-
-
-    
     if(!hasBeenRerender.current && (internetConnected==false) ){
       setShowWanringInternet(true);
       setAlreadyInternetWarning(true)
@@ -170,14 +169,6 @@ export default function Home({navigation}) {
             hasBeenRerender.current = true
             dispatch({type:'run'})
 
-      // reference.on('value', snapshot => {
-        // setContent(Object.keys(snapshot.val()));
-        // setShowContent(Object.keys(snapshot.val()).slice(0, 7));
-        // setTotalPaper(Math.floor(Object.keys(snapshot.val()).length / 7) + 1);
-        // dataLawContent.updateData(snapshot.val())
-        // dispatch({type:'run'})
-        // console.log('đã kn');
-      // });
       
     } else if(internetConnected==false) {      
        dispatch(noLoading())
@@ -193,25 +184,26 @@ export default function Home({navigation}) {
   }, [internetConnected]);
 
 
+// console.log(dataOrg['LawContent']);
 
   useEffect(() => {
+    
     if(data){
-    setContent(Object.keys(data));
-    setShowContent(Object.keys(data).slice(0, 7));
-    setTotalPaper(Math.floor(Object.keys(data).length / 7) + 1);
+    setContent(Object.keys(data['LawContent']));
+    setShowContent(Object.keys(data['LawContent']).slice(0, 7));
+    setTotalPaper(Math.floor(Object.keys(data['LawContent']).length / 7) + 1);
     dataLawContent.updateData(data)
+    console.log(123);
+    
     }
   }, [data])
   
 
 
   const loadMoreItem = () => {
-    // console.log('totalPaper', totalPaper);
-    // console.log('currentPaper', currentPaper);
     if (currentPaper < totalPaper) {
       // bị lỗi: tuy totalPaper đã dc thêm mới nhưng trong if() vẫn false
       setCurrentPaper(currentPaper + 1);
-      // console.log('được cộng');
     }
     setShowContent(Content.slice(0, 7 * currentPaper));
   };
@@ -228,7 +220,7 @@ export default function Home({navigation}) {
         backgroundColor: 'black',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex:10
+        zIndex:100
         }}>
         <ActivityIndicator size='large' color="white" >
 
@@ -244,31 +236,10 @@ export default function Home({navigation}) {
           paddingRight: 10,
           display: 'flex',
           alignItems: 'center',
-          // backgroundColor:'yellow',
+          // backgroundColor:'#EEEFE4',
           justifyContent:'space-between'
 
         }}>
-        {/* <Text 
-                style={{
-                    display:'flex',
-                color:'black',
-                fontWeight:'bold',
-                alignItems:'center',
-                textAlign:'center',
-                fontSize:20,
-                justifyContent:'center'
-                // paddingLeft:30,
-                // paddingRight:30
-
-              }}>
-                    Search
-                </Text> */}
-        {/* <Image source={require('../assets/abc.png')}
-                style= {{
-                        width:30, height:10,color:'red',position: 'absolute',
-                marginLeft:8,
-            }}>
-              </Image> */}
         <View
           style={{
             display: 'flex',
@@ -286,8 +257,9 @@ export default function Home({navigation}) {
           onChangeText={text => setInputSearchLaw(text)}
           value={inputSearchLaw}
           style={inputSearchLaw ? styles.inputSearchArea : styles.placeholder}
-          placeholder="Search Law ..."
+          placeholder="Nhập tên gọi, Số văn bản, Trích yếu . . ."
           placeholderTextColor={'gray'}
+          
           keyboardAppearance=""></TextInput>
         <TouchableOpacity
           onPress={() => {
@@ -336,6 +308,8 @@ export default function Home({navigation}) {
 
       <FlatList
         ref={list1}
+        style={{          backgroundColor:'#EEEFE4',
+        }}
         keyboardShouldPersistTaps="handled"
         data={Content && (searchLawResult || Content)}
         renderItem={Render}
@@ -393,9 +367,9 @@ export default function Home({navigation}) {
             onPress={() => {setShowWanringInternet(false)
 
               if(!internetConnected){
-              setContent(Object.keys(dataOrg));
-              setShowContent(Object.keys(dataOrg).slice(0, 7));
-              setTotalPaper(Math.floor(Object.keys(dataOrg).length / 7) + 1);
+              setContent(Object.keys(dataOrg['LawContent']));
+              setShowContent(Object.keys(dataOrg['LawContent']).slice(0, 7));
+              setTotalPaper(Math.floor(Object.keys(dataOrg['LawContent']).length / 7) + 1);
               dataLawContent.updateData(dataOrg)
 
               }
