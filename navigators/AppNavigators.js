@@ -6,6 +6,7 @@ import {useState, useEffect,useContext} from 'react';
 import {dataLaw} from '../App';
 import Home from '../screens/Home';
 import {Detail1} from '../screens/Detail1';
+import {Detail2} from '../screens/Detail2';
 // import Detail4 from '../screens/Detail4';
 import Detail5 from '../screens/Detail5';
 import {RefForSearch} from '../App'
@@ -176,7 +177,36 @@ const AppNavigators = () => {
         }}
 an
       />
-      <Tab.Screen
+          <Tab.Screen
+        name="SearchLaw"
+        component={Detail2}
+        options={{
+          header: () => null,
+          tabBarIcon: ({focused, color, size}) => {
+            return (
+              <View
+                style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}>
+                <Ionicons
+                  name="albums-outline"
+                  style={
+                    focused ? styles.IconActive : styles.IconInActive
+                  }></Ionicons>
+              </View>
+            );
+          },
+          tabBarLabel: () => {
+            return null;
+          },
+        }}
+        listeners={{
+          tabPress: (props)=>{
+            // const { route, index, focused } = scene;
+            // console.log(navigation);
+            SearchScrollview.forSearch.current.scrollTo({y: 0});
+          }
+        }}
+      />
+  <Tab.Screen
         name="Search"
         component={Detail1}
         options={{

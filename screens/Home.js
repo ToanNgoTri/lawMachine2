@@ -83,9 +83,20 @@ export default function Home({navigation}) {
   const Render = ({item}) => {
 
     return (
-      <TouchableOpacity onPress={() => navigation.navigate(`${item}`)}>
+      <TouchableOpacity
+      style={{
+        paddingBottom:20,
+        paddingTop:20,
+        justifyContent:'center',
+        backgroundColor: 'green',
+        marginBottom: 6,
+
+      }}
+      onPress={() => navigation.navigate(`${item}`)}>
         <View style={styles.item}>
-          <Text style={styles.text}>{dataLawContent.dataLawForApp && dataLawContent.dataLawForApp['LawInfo'][item]['lawNameDisplay']}</Text>
+        <Text style={styles.itemDisplay}>{dataLawContent.dataLawForApp && dataLawContent.dataLawForApp['LawInfo'][item]['lawNameDisplay']}</Text>
+        {!dataLawContent.dataLawForApp['LawInfo'][item]['lawNameDisplay'].match(/^(luật|bộ luật)/img) 
+        && <Text style={styles.itemDescription}>{dataLawContent.dataLawForApp && dataLawContent.dataLawForApp['LawInfo'][item]['lawDescription']}</Text>}
         </View>
       </TouchableOpacity>
     );
@@ -193,11 +204,10 @@ export default function Home({navigation}) {
     setShowContent(Object.keys(data['LawContent']).slice(0, 7));
     setTotalPaper(Math.floor(Object.keys(data['LawContent']).length / 7) + 1);
     dataLawContent.updateData(data)
-    console.log(123);
     
-    }
-  }, [data])
-  
+  }
+}, [data])
+
 
 
   const loadMoreItem = () => {
@@ -257,7 +267,7 @@ export default function Home({navigation}) {
           onChangeText={text => setInputSearchLaw(text)}
           value={inputSearchLaw}
           style={inputSearchLaw ? styles.inputSearchArea : styles.placeholder}
-          placeholder="Nhập tên gọi, Số văn bản, Trích yếu . . ."
+          placeholder="Nhập tên, Số văn bản, Trích yếu . . ."
           placeholderTextColor={'gray'}
           
           keyboardAppearance=""></TextInput>
@@ -484,18 +494,26 @@ export default function Home({navigation}) {
 
 const styles = StyleSheet.create({
   item: {
-    height: 100,
-    backgroundColor: 'green',
+    minHeight:100,
+    // height: 120,
+    // backgroundColor: 'green',
     display: 'flex',
     justifyContent: 'center',
-    marginBottom: 6,
     paddingLeft:20,
-    paddingRight:20
+    paddingRight:20,
+    flexDirection:'column'
   },
-  text: {
+  itemDisplay: {
     fontWeight: 'bold',
     color: 'white',
     textAlign: 'center',
+    fontSize:17
+  },
+  itemDescription:{
+    color:'#EEEEEE',
+    textAlign: 'center',
+    fontSize:15
+
   },
   inputSearchArea: {
     paddingLeft: 10,

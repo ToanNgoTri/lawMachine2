@@ -81,6 +81,32 @@ export const search = createSlice({
 }
 })
 
+export const searchLaw = createSlice({
+  name: 'searchLaw',     
+  initialState: {
+    loading2: false,
+    input2:'',
+    content:null,
+    info:null,
+  },
+  reducers: {
+
+
+    loader2: (state,action) => {
+      state.loading2= true;
+
+    },
+
+    handle2: (state,action) => {
+      console.log('action',action);
+      
+      state.content=action.payload.a;
+      state.info=action.payload.b;
+      state.loading2= false;
+
+    },
+}
+})
 
 
     async function search1 (input1,data1) {
@@ -167,19 +193,78 @@ export function* mySaga(action){
 
 export function* mySaga1(state,action){
   try{
-    // yield put(setData1())
-
-    // yield put(type1())
     yield put(loader1())
 
     const b = yield call(search1,'tốt nhất',dataOrg)
     let a = b
-
-    
-
     yield put(handle1(a))
   }catch(e){
+  }
+}
 
+export function* mySaga2(state,action){
+  try{
+    yield put(loader2())
+    console.log('state',state.input);
+
+  let inputSearchLawReg = state.input.replace(/\(/gim, '\\(');
+
+
+      inputSearchLawReg = inputSearchLawReg.replace(
+          /\)/gim,
+          '\\)',
+        );
+
+
+        inputSearchLawReg = inputSearchLawReg.replace(
+          /\./gim,
+          '\\.',
+        );
+
+
+        inputSearchLawReg = inputSearchLawReg.replace(
+          /\+/gim,
+          '\\+',
+        );
+
+
+        inputSearchLawReg = inputSearchLawReg.replace(
+          /\?/gim,
+          '\\?',
+        );
+
+        if (inputSearchLawReg.match(/\//gim)) {
+        inputSearchLawReg = inputSearchLawReg.replace(/\//gim, '\\');
+      }
+
+      inputSearchLawReg = inputSearchLawReg.replace(
+          /\\/gim,
+          '\\',
+        );
+        console.log('inputSearchLawReg',inputSearchLawReg);
+
+        let lawNumberDemo = inputSearchLawReg.match(/\d+\\?\d*\\\w+Đ?-\w*Đ?\w+/img);
+        console.log('lawNumberDemo',lawNumberDemo);
+        let lawNumber
+        if(lawNumberDemo){
+         lawNumber = lawNumberDemo[0].replace(/ /gim, "");
+          
+        }else{
+          lawNumber = false 
+
+        }
+      
+        console.log('lawNumber',lawNumber);
+
+    const content = yield call( async ()=> await database().ref(`/LawContent/${lawNumber}`).once('value') )
+    const a =   content.val()
+
+    const info = yield call( async ()=> await database().ref(`/LawInfo/${lawNumber}`).once('value') )
+    const b =   info.val()
+
+
+    yield put(handle2({a,b}))
+  }catch(e){
   }
 }
 
@@ -196,6 +281,12 @@ export function* saga1(){
 
 }
 
+export function* saga2(){
+  yield takeEvery('searchLaw',mySaga2)
+
+}
+
   
 export const {loader,handle,noLoading} = read.actions;
 export const {loader1,handle1} = search.actions;
+export const {loader2,handle2} = searchLaw.actions;

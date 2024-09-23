@@ -27,7 +27,6 @@ export function Detail1({navigation}) {
   // const [Content, setContent] = useState({});
   // const [LawInfo, setLawInfo] = useState(null);
 
-
   const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
   const [input, setInput] = useState(undefined);
   const [valueInput, setValueInput] = useState('');
@@ -46,8 +45,7 @@ export function Detail1({navigation}) {
 
   const dataLawContent = useContext(dataLaw);
 
-    const [choosenLaw, setChoosenLaw] = useState([]);
-  
+  const [choosenLaw, setChoosenLaw] = useState([]);
 
   // const [loading, setLoading] = useState(false);
   const Loading2 = useContext(RefLoading);
@@ -57,10 +55,9 @@ export function Detail1({navigation}) {
   // const loading2 = useRef();
   // loading2.current = false;
 
-  const {loading,data} = useSelector(state => state['read']);
+  const {loading, data} = useSelector(state => state['read']);
 
   useEffect(() => {
-
     // const listener = navigation.addListener('focus', () => {
 
     // setContent(dataLawContent.dataLawForApp['LawContent']);
@@ -71,13 +68,9 @@ export function Detail1({navigation}) {
         ? Object.keys(dataLawContent.dataLawForApp['LawContent'])
         : [],
     );
-  // })
+    // })
     // console.log('choosenLaw',choosenLaw);
-
   }, [dataLawContent.dataLawForApp]);
-
-  
-
 
   const animated = useRef(new Animated.Value(0)).current;
 
@@ -99,61 +92,81 @@ export function Detail1({navigation}) {
     let searchArray = {};
 
     if (input) {
-      // if ( (input.match(/\w+/gim)) || input.match(/\(/img) || input.match(/\)/img) || input.match(/\./img) || input.match(/\+/img)) {
       if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
+
         function a(key, key1) {
+          // key ở đây là tên luật, key1 là Object 1 chương
+
           Object.values(key1)[0].map((key2, i1) => {
             // chọn từng điều
 
-            // Object.keys(key2).map((key5, i5) => {
             let replace = `(.*)${input}(.*)`;
             let re = new RegExp(replace, 'gmi');
+            let article = Object.keys(key2)[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/')
+            let point = Object.values(key2)[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/')
+
             if (Object.keys(key2)[0].match(re)) {
               searchArray[key].push({
-                [Object.keys(key2)[0]]: Object.values(key2)[0],
+                [article]: point,
               });
-            } else if (Object.values(key2)[0] != '') {
-              if (Object.values(key2)[0].match(re)) {
+            } else if (point != '') {
+              if (point.match(re)) {
                 searchArray[key].push({
-                  [Object.keys(key2)[0]]: Object.values(key2)[0],
+                  [article]: point,
                 });
               }
             }
-            // }
           });
+
+          
         }
 
-        Object.keys(dataLawContent.dataLawForApp['LawContent']).map((key, i) => {
-          //key là tên của luật
-          // tham nhap luat (array chuong)
+        Object.keys(dataLawContent.dataLawForApp['LawContent']).map(
+          (key, i) => {
+            // key là tên luật
+            //key là tên của luật
+            // tham nhap luat (array chuong)
 
-          searchArray[key] = [];
-          if (choosenLaw.includes(key)) {
-            dataLawContent.dataLawForApp['LawContent'][key].map((key1, i1) => {
-              // ra Object Chuong hoặc (array phần thứ...)
-              if (Object.keys(key1)[0].match(/phần thứ .*/gim)) {
-                // nếu có 'phần thứ
+            searchArray[key] = [];
+            if (choosenLaw.includes(key)) {
+              dataLawContent.dataLawForApp['LawContent'][key].map(
+                (key1, i1) => {
+                  // ra Object Chuong hoặc (array phần thứ...)
+                  if (Object.keys(key1)[0].match(/^phần thứ .*/gim)) {
+                    // nếu có 'phần thứ
+                    // console.log('phần thứ');
+                    // console.log('Object.keys(key1)[0]',Object.keys(key1)[0]);
+                    if (
+                      Object.keys(Object.values(key1)[0][0])[0].match(
+                        /^Chương .*/gim,
+                      )
+                    ) {
+                      //nếu có chương trong phần thứ
 
-                if (
-                  Object.keys(Object.values(key1)[0][0])[0].match(
-                    /^Chương .*/gim,
-                  )
-                ) {
-                  //nếu có chương
-
-                  Object.values(key1)[0].map((key2, i) => {
-                    a(key, key2);
-                  });
-                } else {
-                  a(key, key1);
-                }
-              } else {
-                // nếu không có phần thứ...
-                a(key, key1);
-              }
-            });
-          }
-        });
+                      Object.values(key1)[0].map((key2, i) => {
+                        a(key, key2);
+                      });
+                    } else {
+                      //nếu không có chương trong phần thứ
+                      a(key, key1);
+                    }
+                  } else if (Object.keys(key1)[0].match(/^chương .*/gim)) {
+                    a(key, key1);
+                  } else {
+                    //nếu chỉ có điều
+                    if(i1==0){ //  đảm bảo chỉ chạy 1 lần
+                      a(key, {
+                        'chương Giả định':
+                          dataLawContent.dataLawForApp['LawContent'][key],
+                      });
+  
+                    }
+                  }
+                },
+              );
+            }
+          },
+        );
 
         let searchResult = {};
 
@@ -336,7 +349,10 @@ export function Detail1({navigation}) {
   useEffect(() => {
     setInputFilter('');
 
-    if (choosenLaw.length == Object.keys(dataLawContent.dataLawForApp['LawContent'] || {}).length) {
+    if (
+      choosenLaw.length ==
+      Object.keys(dataLawContent.dataLawForApp['LawContent'] || {}).length
+    ) {
       setCheckedAllFilter(true);
     } else {
       setCheckedAllFilter(false);
@@ -355,7 +371,7 @@ export function Detail1({navigation}) {
     );
   };
 
-  
+
   return (
     <>
       {Loading2.loading && (
@@ -376,7 +392,10 @@ export function Detail1({navigation}) {
         </View>
       )}
 
-      <ScrollView keyboardShouldPersistTaps="handled" ref={list} style={{backgroundColor:'#EEEFE4'}}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        ref={list}
+        style={{backgroundColor: '#EEEFE4'}}>
         <View style={{backgroundColor: 'green'}}>
           <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
 
@@ -450,6 +469,7 @@ export function Detail1({navigation}) {
                     // ;dispatch(type1(text))
                   }}
                   value={input}
+                  selectTextOnFocus={true}
                   placeholder="Nhập từ khóa..."></TextInput>
                 <TouchableOpacity
                   onPress={() => setInput('')}
@@ -499,43 +519,43 @@ export function Detail1({navigation}) {
                   Keyboard.dismiss();
                   let inputSearchLawReg = input;
                   if (input) {
-                    if (input.match(/\(/gim)) {
-                      inputSearchLawReg = input.replace(/\(/gim, '\\(');
-                    }
-                    if (input.match(/\)/gim)) {
-                      inputSearchLawReg = inputSearchLawReg.replace(
+
+                    inputSearchLawReg = input.replace(/\(/gim, '\\(');
+
+
+                    inputSearchLawReg = inputSearchLawReg.replace(
                         /\)/gim,
                         '\\)',
                       );
-                    }
-                    if (input.match(/\./gim)) {
+
+
                       inputSearchLawReg = inputSearchLawReg.replace(
                         /\./gim,
                         '\\.',
                       );
-                    }
-                    if (input.match(/\+/gim)) {
+
+
                       inputSearchLawReg = inputSearchLawReg.replace(
                         /\+/gim,
                         '\\+',
                       );
-                    }
-                    if (input.match(/\?/gim)) {
+
+
                       inputSearchLawReg = inputSearchLawReg.replace(
                         /\?/gim,
                         '\\?',
                       );
-                    }
-                    // if (input.match(/\//gim)) {
+
+                      // if (input.match(/\//gim)) {
                     //   inputSearchLawReg = inputSearchLawReg.replace(/\//gim, '.');
                     // }
-                    if (input.match(/\\/gim)) {
-                      inputSearchLawReg = inputSearchLawReg.replace(
+
+                    inputSearchLawReg = inputSearchLawReg.replace(
                         /\\/gim,
                         '.',
                       );
+
                     }
-                  }
                   Keyboard.dismiss();
                   setValueInput(inputSearchLawReg);
                   setValueInputForNav(input);
@@ -560,7 +580,8 @@ export function Detail1({navigation}) {
             <NoneOfResutl />
           ) : (
             Object.keys(SearchResult).map((key, i) => {
-              let nameLaw = dataLawContent.dataLawForApp['LawInfo'][key]['lawNameDisplay'];
+              let nameLaw =
+                dataLawContent.dataLawForApp['LawInfo'][key]['lawNameDisplay'];
               if (nameLaw) {
                 if (nameLaw.match(/(?<=\w)\\(?=\w)/gim)) {
                   nameLaw = key.replace(/(?<=\w)\\(?=\w)/gim, '/');
@@ -571,17 +592,27 @@ export function Detail1({navigation}) {
                 <>
                   <TouchableOpacity
                     key={i}
-                    style={styles.chapter}
+                    style={{
+                      paddingBottom:10,
+                      paddingTop:10,
+                      justifyContent:'center',
+                      backgroundColor: '#F9CC76',
+                      marginBottom:1
+                                  }}
                     onPress={() => {
                       setName(i);
                     }}>
+                      <View
+                                          style={styles.chapter}
+>
+
                     <Text style={styles.chapterText} key={`${i}a`}>
                       {nameLaw} có {0 || SearchResult[key].length} điều, khoản
                       trùng khớp
                     </Text>
                     <TouchableOpacity
                       onPress={() =>
-                        navigation.navigate(`${key}`, {input: valueInputForNav})
+                        navigation.navigate(`${key}`, {input: valueInputForNav,findShow:true})
                       }
                       style={styles.chapterArrow}>
                       <Ionicons
@@ -593,6 +624,7 @@ export function Detail1({navigation}) {
                           fontSize: 17,
                         }}></Ionicons>
                     </TouchableOpacity>
+                        </View>
                   </TouchableOpacity>
                   {SearchResult[key].map((key1, i1) => (
                     <View
@@ -753,22 +785,33 @@ export function Detail1({navigation}) {
                 elevation: 10,
               }}
               onPress={() => {
-                if (choosenLaw.length == Object.keys(dataLawContent.dataLawForApp['LawContent']).length) {
+                if (
+                  choosenLaw.length ==
+                  Object.keys(dataLawContent.dataLawForApp['LawContent']).length
+                ) {
                   setCheckedAllFilter(false);
                   setChoosenLaw([]);
                 } else {
-                  setChoosenLaw(Object.keys(dataLawContent.dataLawForApp['LawContent']));
+                  setChoosenLaw(
+                    Object.keys(dataLawContent.dataLawForApp['LawContent']),
+                  );
                   setCheckedAllFilter(true);
                 }
                 // console.log(choosenLaw);
               }}>
               <CheckBox
                 onClick={() => {
-                  if (choosenLaw.length == Object.keys(dataLawContent.dataLawForApp['LawContent']).length) {
+                  if (
+                    choosenLaw.length ==
+                    Object.keys(dataLawContent.dataLawForApp['LawContent'])
+                      .length
+                  ) {
                     setCheckedAllFilter(false);
                     setChoosenLaw([]);
                   } else {
-                    setChoosenLaw(Object.keys(dataLawContent.dataLawForApp['LawContent']));
+                    setChoosenLaw(
+                      Object.keys(dataLawContent.dataLawForApp['LawContent']),
+                    );
                     setCheckedAllFilter(true);
                   }
                 }}
@@ -796,125 +839,146 @@ export function Detail1({navigation}) {
                   // flexDirection:'row'
                 }}>
                 {dataLawContent.dataLawForApp['LawContent'] &&
-                  Object.keys(dataLawContent.dataLawForApp['LawContent']).map((key, i) => {
-                    let nameLaw = dataLawContent.dataLawForApp['LawInfo'][key]['lawNameDisplay'];
-                    let lawDescription = dataLawContent.dataLawForApp['LawInfo'][key]['lawDescription'];
-                    if (nameLaw) {
-                      if (nameLaw.match(/(?<=\w)\\(?=\w)/gim)) {
-                        nameLaw = key.replace(/(?<=\w)\\(?=\w)/gim, '/');
-                      }
-                    }
-
-                    let inputSearchLawReg = inputFilter;
-                    if (
-                      inputFilter.match(
-                        /(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/|\s?)/gim,
-                      )
-                    ) {
-                      if (inputFilter.match(/\(/gim)) {
-                        inputSearchLawReg = inputFilter.replace(/\(/gim, '\\(');
+                  Object.keys(dataLawContent.dataLawForApp['LawContent']).map(
+                    (key, i) => {
+                      let nameLaw =
+                        dataLawContent.dataLawForApp['LawInfo'][key][
+                          'lawNameDisplay'
+                        ];
+                      let lawDescription =
+                        dataLawContent.dataLawForApp['LawInfo'][key][
+                          'lawDescription'
+                        ];
+                      if (nameLaw) {
+                        if (nameLaw.match(/(?<=\w)\\(?=\w)/gim)) {
+                          nameLaw = key.replace(/(?<=\w)\\(?=\w)/gim, '/');
+                        }
                       }
 
-                      if (inputFilter.match(/\)/gim)) {
-                        inputSearchLawReg = inputSearchLawReg.replace(
-                          /\)/gim,
-                          '\\)',
-                        );
-                      }
-                      if (inputFilter.match(/\\/gim)) {
-                        inputSearchLawReg = inputSearchLawReg.replace(
-                          /\\/gim,
-                          '.',
-                        );
-                      }
-                      if (inputFilter.match(/\./gim)) {
-                        inputSearchLawReg = inputSearchLawReg.replace(
-                          /\./gim,
-                          '\\.',
-                        );
-                      }
-                      if (inputFilter.match(/\+/gim)) {
-                        inputSearchLawReg = inputSearchLawReg.replace(
-                          /\+/gim,
-                          '\\+',
-                        );
-                      }
+                      let inputSearchLawReg = inputFilter;
+                      if (
+                        inputFilter.match(
+                          /(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/|\s?)/gim,
+                        )
+                      ) {
 
-                      if (inputFilter.match(/\?/gim)) {
-                        inputSearchLawReg = inputSearchLawReg.replace(
-                          /\?/gim,
-                          '\\?',
-                        );
-                      }
-                    }
-                    if (
-                      nameLaw.match(new RegExp(inputSearchLawReg, 'igm')) ||
-                      lawDescription.match(new RegExp(inputSearchLawReg, 'igm'))
-                    ) {
-                      return (
-                        <TouchableOpacity
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            paddingBottom: 10,
-                            width: '90%',
-                            alignItems: 'center',
-                          }}
-                          onPress={() => {
-                            if (key == undefined) {
-                            } else if (choosenLaw.includes(key)) {
-                              setChoosenLaw(
-                                choosenLaw.filter(a1 => a1 !== key),
-                                setCheckedAllFilter(false),
-                              );
-                            } else {
-                              setChoosenLaw([...choosenLaw, key]);
-                              if (
-                                choosenLaw.length ==
-                                Object.keys(dataLawContent.dataLawForApp['LawContent']).length - 1
-                              ) {
-                                setCheckedAllFilter(true);
-                              }
-                            }
+                        inputSearchLawReg = inputFilter.replace(
+                            /\(/gim,
+                            '\\(',
+                          );
 
-                            // if(choosenLaw.length > Object.keys(Content).length){
-                            //   setCheckedAllFilter(true)
-                            // // setChoosenLaw([])
-                            // }else{
-                            //   // setChoosenLaw(Object.keys(Content))
-                            //   setCheckedAllFilter(false)
+                          
 
-                            // }
-                          }}>
-                          <CheckBox
-                            onClick={() => {
+                          inputSearchLawReg = inputSearchLawReg.replace(
+                            /\)/gim,
+                            '\\)',
+                          );
+
+
+                          inputSearchLawReg = inputSearchLawReg.replace(
+                            /\\/gim,
+                            '.',
+                          );
+
+
+                          inputSearchLawReg = inputSearchLawReg.replace(
+                            /\./gim,
+                            '\\.',
+                          );
+
+
+                          inputSearchLawReg = inputSearchLawReg.replace(
+                            /\+/gim,
+                            '\\+',
+                          );
+
+                          
+
+                          inputSearchLawReg = inputSearchLawReg.replace(
+                            /\?/gim,
+                            '\\?',
+                          );
+
+                        }
+                      if (
+                        nameLaw.match(new RegExp(inputSearchLawReg, 'igm')) ||
+                        lawDescription.match(
+                          new RegExp(inputSearchLawReg, 'igm'),
+                        )
+                      ) {
+                        return (
+                          <TouchableOpacity
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'row',
+                              paddingBottom: 10,
+                              width: '90%',
+                              alignItems: 'center',
+                            }}
+                            onPress={() => {
                               if (key == undefined) {
                               } else if (choosenLaw.includes(key)) {
                                 setChoosenLaw(
                                   choosenLaw.filter(a1 => a1 !== key),
+                                  setCheckedAllFilter(false),
                                 );
-                                setCheckedAllFilter(false);
                               } else {
                                 setChoosenLaw([...choosenLaw, key]);
                                 if (
                                   choosenLaw.length ==
-                                  Object.keys(dataLawContent.dataLawForApp['LawContent']).length - 1
+                                  Object.keys(
+                                    dataLawContent.dataLawForApp['LawContent'],
+                                  ).length -
+                                    1
                                 ) {
                                   setCheckedAllFilter(true);
                                 }
                               }
-                            }}
-                            isChecked={choosenLaw.includes(key)}
-                            style={{}}
-                          />
 
-                          <Text style={{marginLeft: 5, color: 'black'}}>
-                            {nameLaw}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    }
-                  })}
+                              // if(choosenLaw.length > Object.keys(Content).length){
+                              //   setCheckedAllFilter(true)
+                              // // setChoosenLaw([])
+                              // }else{
+                              //   // setChoosenLaw(Object.keys(Content))
+                              //   setCheckedAllFilter(false)
+
+                              // }
+                            }}>
+                            <CheckBox
+                              onClick={() => {
+                                if (key == undefined) {
+                                } else if (choosenLaw.includes(key)) {
+                                  setChoosenLaw(
+                                    choosenLaw.filter(a1 => a1 !== key),
+                                  );
+                                  setCheckedAllFilter(false);
+                                } else {
+                                  setChoosenLaw([...choosenLaw, key]);
+                                  if (
+                                    choosenLaw.length ==
+                                    Object.keys(
+                                      dataLawContent.dataLawForApp[
+                                        'LawContent'
+                                      ],
+                                    ).length -
+                                      1
+                                  ) {
+                                    setCheckedAllFilter(true);
+                                  }
+                                }
+                              }}
+                              isChecked={choosenLaw.includes(key)}
+                              style={{}}
+                            />
+
+                            <Text style={{marginLeft: 5, color: 'black'}}>
+                              {nameLaw}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      }
+                    },
+                  )}
               </View>
             </ScrollView>
             <TouchableOpacity
@@ -1008,23 +1072,21 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   chapter: {
-    height: 60,
-    justifyContent: 'center',
+    minHeight:50,
+    justifyContent: 'space-around',
     backgroundColor: '#F9CC76',
     color: 'black',
     alignItems: 'center',
-    marginBottom: 1,
     display: 'flex',
     flexDirection: 'row',
-    paddingLeft: 50,
-    paddingRight: 50,
   },
   chapterText: {
     textAlign: 'center',
     color: 'black',
     fontSize: 16,
     fontWeight: 'bold',
-    // backgroundColor:'red'
+    // backgroundColor:'red',
+    width:'75%'
   },
   chapterArrow: {
     backgroundColor: 'black',
@@ -1037,6 +1099,7 @@ const styles = StyleSheet.create({
     height: 30,
     textAlign: 'center',
     justifyContent: 'center',
+    
   },
   articleContainer: {
     fontWeight: 'bold',
