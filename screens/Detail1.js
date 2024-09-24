@@ -9,6 +9,7 @@ import {
   Animated,
   ActivityIndicator,
 } from 'react-native';
+import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 
 import CheckBox from 'react-native-check-box';
 import database from '@react-native-firebase/database';
@@ -19,8 +20,6 @@ import data from '../data/project2-197c0-default-rtdb-export.json'; ////////////
 import React, {useEffect, useState, useRef, useContext} from 'react';
 
 import {RefForSearch} from '../App';
-import {dataLaw} from '../App';
-import {RefLoading} from '../App';
 import {loader1, handle1} from '../redux/fetchData';
 
 export function Detail1({navigation}) {
@@ -43,34 +42,42 @@ export function Detail1({navigation}) {
   const [article, setArticle] = useState(); // dùng để collapse (thu thập key của các 'điều')
   const [articleArray, setArticleArray] = useState([]); // arrray của các 'điều' đã expand
 
-  const dataLawContent = useContext(dataLaw);
 
   const [choosenLaw, setChoosenLaw] = useState([]);
 
-  // const [loading, setLoading] = useState(false);
-  const Loading2 = useContext(RefLoading);
+  // const [Loading, setLoading] = useState(false);
 
   const [warning, setWanring] = useState(false);
   const list = useRef(null);
-  // const loading2 = useRef();
-  // loading2.current = false;
 
-  const {loading, data} = useSelector(state => state['read']);
+  const dispatch = useDispatch();
+
+  const {loading1, result} = useSelector(state => state['searchContent']);
+// console.log('result',result);
 
   useEffect(() => {
     // const listener = navigation.addListener('focus', () => {
 
-    // setContent(dataLawContent.dataLawForApp['LawContent']);
-    // setLawInfo(dataLawContent.dataLawForApp['LawInfo']);
+    // setContent(dataOrg['LawContent']);
+    // setLawInfo(dataOrg['LawInfo']);
 
     setChoosenLaw(
-      Object.keys(dataLawContent.dataLawForApp).length
-        ? Object.keys(dataLawContent.dataLawForApp['LawContent'])
+      Object.keys(dataOrg).length
+        ? Object.keys(dataOrg['LawContent'])
         : [],
     );
     // })
     // console.log('choosenLaw',choosenLaw);
-  }, [dataLawContent.dataLawForApp]);
+  }, [dataOrg]);
+  
+  useEffect(() => {
+    if(result){
+      setSearchResult(result)
+
+    }
+    
+  }, [result])
+  
 
   const animated = useRef(new Animated.Value(0)).current;
 
@@ -88,106 +95,106 @@ export function Detail1({navigation}) {
 
   SearchScrollview.updateSearch(list);
 
-  function Search(input) {
-    let searchArray = {};
+  // function Search(input) {
+  //   let searchArray = {};
 
-    if (input) {
-      if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
+  //   if (input) {
+  //     if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
 
-        function a(key, key1) {
-          // key ở đây là tên luật, key1 là Object 1 chương
+  //       function a(key, key1) {
+  //         // key ở đây là tên luật, key1 là Object 1 chương
 
-          Object.values(key1)[0].map((key2, i1) => {
-            // chọn từng điều
+  //         Object.values(key1)[0].map((key2, i1) => {
+  //           // chọn từng điều
 
-            let replace = `(.*)${input}(.*)`;
-            let re = new RegExp(replace, 'gmi');
-            let article = Object.keys(key2)[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/')
-            let point = Object.values(key2)[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/')
+  //           let replace = `(.*)${input}(.*)`;
+  //           let re = new RegExp(replace, 'gmi');
+  //           let article = Object.keys(key2)[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/')
+  //           let point = Object.values(key2)[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/')
 
-            if (Object.keys(key2)[0].match(re)) {
-              searchArray[key].push({
-                [article]: point,
-              });
-            } else if (point != '') {
-              if (point.match(re)) {
-                searchArray[key].push({
-                  [article]: point,
-                });
-              }
-            }
-          });
+  //           if (Object.keys(key2)[0].match(re)) {
+  //             searchArray[key].push({
+  //               [article]: point,
+  //             });
+  //           } else if (point != '') {
+  //             if (point.match(re)) {
+  //               searchArray[key].push({
+  //                 [article]: point,
+  //               });
+  //             }
+  //           }
+  //         });
 
           
-        }
+  //       }
 
-        Object.keys(dataLawContent.dataLawForApp['LawContent']).map(
-          (key, i) => {
-            // key là tên luật
-            //key là tên của luật
-            // tham nhap luat (array chuong)
+  //       Object.keys(dataOrg['LawContent']).map(
+  //         (key, i) => {
+  //           // key là tên luật
+  //           //key là tên của luật
+  //           // tham nhap luat (array chuong)
 
-            searchArray[key] = [];
-            if (choosenLaw.includes(key)) {
-              dataLawContent.dataLawForApp['LawContent'][key].map(
-                (key1, i1) => {
-                  // ra Object Chuong hoặc (array phần thứ...)
-                  if (Object.keys(key1)[0].match(/^phần thứ .*/gim)) {
-                    // nếu có 'phần thứ
-                    // console.log('phần thứ');
-                    // console.log('Object.keys(key1)[0]',Object.keys(key1)[0]);
-                    if (
-                      Object.keys(Object.values(key1)[0][0])[0].match(
-                        /^Chương .*/gim,
-                      )
-                    ) {
-                      //nếu có chương trong phần thứ
+  //           searchArray[key] = [];
+  //           if (choosenLaw.includes(key)) {
+  //             dataOrg['LawContent'][key].map(
+  //               (key1, i1) => {
+  //                 // ra Object Chuong hoặc (array phần thứ...)
+  //                 if (Object.keys(key1)[0].match(/^phần thứ .*/gim)) {
+  //                   // nếu có 'phần thứ
+  //                   // console.log('phần thứ');
+  //                   // console.log('Object.keys(key1)[0]',Object.keys(key1)[0]);
+  //                   if (
+  //                     Object.keys(Object.values(key1)[0][0])[0].match(
+  //                       /^Chương .*/gim,
+  //                     )
+  //                   ) {
+  //                     //nếu có chương trong phần thứ
 
-                      Object.values(key1)[0].map((key2, i) => {
-                        a(key, key2);
-                      });
-                    } else {
-                      //nếu không có chương trong phần thứ
-                      a(key, key1);
-                    }
-                  } else if (Object.keys(key1)[0].match(/^chương .*/gim)) {
-                    a(key, key1);
-                  } else {
-                    //nếu chỉ có điều
-                    if(i1==0){ //  đảm bảo chỉ chạy 1 lần
-                      a(key, {
-                        'chương Giả định':
-                          dataLawContent.dataLawForApp['LawContent'][key],
-                      });
+  //                     Object.values(key1)[0].map((key2, i) => {
+  //                       a(key, key2);
+  //                     });
+  //                   } else {
+  //                     //nếu không có chương trong phần thứ
+  //                     a(key, key1);
+  //                   }
+  //                 } else if (Object.keys(key1)[0].match(/^chương .*/gim)) {
+  //                   a(key, key1);
+  //                 } else {
+  //                   //nếu chỉ có điều
+  //                   if(i1==0){ //  đảm bảo chỉ chạy 1 lần
+  //                     a(key, {
+  //                       'chương Giả định':
+  //                         dataOrg['LawContent'][key],
+  //                     });
   
-                    }
-                  }
-                },
-              );
-            }
-          },
-        );
+  //                   }
+  //                 }
+  //               },
+  //             );
+  //           }
+  //         },
+  //       );
 
-        let searchResult = {};
+  //       let searchResult = {};
 
-        Object.keys(searchArray).map((key, i) => {
-          searchArray[key].map((key1, i) => {
-            searchResult[key] = searchArray[key];
-          });
-        });
+  //       Object.keys(searchArray).map((key, i) => {
+  //         searchArray[key].map((key1, i) => {
+  //           searchResult[key] = searchArray[key];
+  //         });
+  //       });
 
-        setSearchResult(searchResult);
-        // console.log('searchResult',searchResult);
-        searchResult = [];
-        setArticleArray([]);
-        setNameArray([]);
-      } else {
-        setWanring(true);
-      }
-    } else {
-      setWanring(true);
-    }
-  }
+  //       setSearchResult(searchResult);
+  //       // console.log('searchResult',searchResult);
+  //       searchResult = [];
+  //       setArticleArray([]);
+  //       setNameArray([]);
+  //     } else {
+  //       setWanring(true);
+  //     }
+  //   } else {
+  //     setWanring(true);
+  //   }
+  // }
 
   //    function Search(input)  {
 
@@ -351,7 +358,7 @@ export function Detail1({navigation}) {
 
     if (
       choosenLaw.length ==
-      Object.keys(dataLawContent.dataLawForApp['LawContent'] || {}).length
+      Object.keys(dataOrg['LawContent'] || {}).length
     ) {
       setCheckedAllFilter(true);
     } else {
@@ -374,7 +381,7 @@ export function Detail1({navigation}) {
 
   return (
     <>
-      {Loading2.loading && (
+          {loading1 && (
         <View
           style={{
             position: 'absolute',
@@ -388,6 +395,15 @@ export function Detail1({navigation}) {
             alignItems: 'center',
             zIndex: 10,
           }}>
+            <Text
+            style={{
+              color:'white',
+              marginBottom:15,
+              fontWeight:'bold'
+            }}
+            >
+              Xin vui lòng đợi trong giây lát ...
+            </Text>
           <ActivityIndicator size="large" color="white"></ActivityIndicator>
         </View>
       )}
@@ -397,7 +413,7 @@ export function Detail1({navigation}) {
         ref={list}
         style={{backgroundColor: '#EEEFE4'}}>
         <View style={{backgroundColor: 'green'}}>
-          <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
+          <Text style={styles.titleText}>{`Tìm kiếm nội dung`}</Text>
 
           <View style={styles.inputContainer}>
             <View style={styles.containerBtb}>
@@ -442,8 +458,11 @@ export function Detail1({navigation}) {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    {checkedAllFilter ? 'All' : choosenLaw.length}
+                    {/* {checkedAllFilter ? 'All' : choosenLaw.length} */}
+                    {choosenLaw.length}
+
                   </Text>
+                  
                 </View>
               </TouchableOpacity>
             </View>
@@ -559,13 +578,14 @@ export function Detail1({navigation}) {
                   Keyboard.dismiss();
                   setValueInput(inputSearchLawReg);
                   setValueInputForNav(input);
-                  Search(inputSearchLawReg);
 
-                  //  setSearchResult(await  Search(inputSearchLawReg))
+                  // Search(inputSearchLawReg);
 
+                  
                   // run(inputSearchLawReg);
                   // dispatch(handle1())
-                  // dispatch({type:'search'})
+                  
+                  dispatch({type:'searchContent',input:inputSearchLawReg})
                 }}>
                 <Ionicons
                   name="search-outline"
@@ -581,7 +601,7 @@ export function Detail1({navigation}) {
           ) : (
             Object.keys(SearchResult).map((key, i) => {
               let nameLaw =
-                dataLawContent.dataLawForApp['LawInfo'][key]['lawNameDisplay'];
+                dataOrg['LawInfo'][key]['lawNameDisplay'];
               if (nameLaw) {
                 if (nameLaw.match(/(?<=\w)\\(?=\w)/gim)) {
                   nameLaw = key.replace(/(?<=\w)\\(?=\w)/gim, '/');
@@ -765,7 +785,7 @@ export function Detail1({navigation}) {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={{
                 display: 'flex',
                 flexDirection: 'row',
@@ -787,13 +807,13 @@ export function Detail1({navigation}) {
               onPress={() => {
                 if (
                   choosenLaw.length ==
-                  Object.keys(dataLawContent.dataLawForApp['LawContent']).length
+                  Object.keys(dataOrg['LawContent']).length
                 ) {
                   setCheckedAllFilter(false);
                   setChoosenLaw([]);
                 } else {
                   setChoosenLaw(
-                    Object.keys(dataLawContent.dataLawForApp['LawContent']),
+                    Object.keys(dataOrg['LawContent']),
                   );
                   setCheckedAllFilter(true);
                 }
@@ -803,14 +823,14 @@ export function Detail1({navigation}) {
                 onClick={() => {
                   if (
                     choosenLaw.length ==
-                    Object.keys(dataLawContent.dataLawForApp['LawContent'])
+                    Object.keys(dataOrg['LawContent'])
                       .length
                   ) {
                     setCheckedAllFilter(false);
                     setChoosenLaw([]);
                   } else {
                     setChoosenLaw(
-                      Object.keys(dataLawContent.dataLawForApp['LawContent']),
+                      Object.keys(dataOrg['LawContent']),
                     );
                     setCheckedAllFilter(true);
                   }
@@ -827,7 +847,7 @@ export function Detail1({navigation}) {
                 }}>
                 Tất cả
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <ScrollView keyboardShouldPersistTaps="handled">
               <View
@@ -838,15 +858,15 @@ export function Detail1({navigation}) {
                   display: 'flex',
                   // flexDirection:'row'
                 }}>
-                {dataLawContent.dataLawForApp['LawContent'] &&
-                  Object.keys(dataLawContent.dataLawForApp['LawContent']).map(
+                {dataOrg['LawContent'] &&
+                  Object.keys(dataOrg['LawContent']).map(
                     (key, i) => {
                       let nameLaw =
-                        dataLawContent.dataLawForApp['LawInfo'][key][
+                        dataOrg['LawInfo'][key][
                           'lawNameDisplay'
                         ];
                       let lawDescription =
-                        dataLawContent.dataLawForApp['LawInfo'][key][
+                        dataOrg['LawInfo'][key][
                           'lawDescription'
                         ];
                       if (nameLaw) {
@@ -915,36 +935,28 @@ export function Detail1({navigation}) {
                               width: '90%',
                               alignItems: 'center',
                             }}
-                            onPress={() => {
-                              if (key == undefined) {
-                              } else if (choosenLaw.includes(key)) {
-                                setChoosenLaw(
-                                  choosenLaw.filter(a1 => a1 !== key),
-                                  setCheckedAllFilter(false),
-                                );
-                              } else {
-                                setChoosenLaw([...choosenLaw, key]);
-                                if (
-                                  choosenLaw.length ==
-                                  Object.keys(
-                                    dataLawContent.dataLawForApp['LawContent'],
-                                  ).length -
-                                    1
-                                ) {
-                                  setCheckedAllFilter(true);
-                                }
-                              }
-
-                              // if(choosenLaw.length > Object.keys(Content).length){
-                              //   setCheckedAllFilter(true)
-                              // // setChoosenLaw([])
-                              // }else{
-                              //   // setChoosenLaw(Object.keys(Content))
-                              //   setCheckedAllFilter(false)
-
-                              // }
-                            }}>
-                            <CheckBox
+                            // onPress={() => {
+                            //   if (key == undefined) {
+                            //   } else if (choosenLaw.includes(key)) {
+                            //     setChoosenLaw(
+                            //       choosenLaw.filter(a1 => a1 !== key),
+                            //       setCheckedAllFilter(false),
+                            //     );
+                            //   } else {
+                            //     setChoosenLaw([...choosenLaw, key]);
+                            //     if (
+                            //       choosenLaw.length ==
+                            //       Object.keys(
+                            //         dataOrg['LawContent'],
+                            //       ).length -
+                            //         1
+                            //     ) {
+                            //       setCheckedAllFilter(true);
+                            //     }
+                            //   }
+                            // }}
+                            >
+                            {/* <CheckBox
                               onClick={() => {
                                 if (key == undefined) {
                                 } else if (choosenLaw.includes(key)) {
@@ -957,7 +969,7 @@ export function Detail1({navigation}) {
                                   if (
                                     choosenLaw.length ==
                                     Object.keys(
-                                      dataLawContent.dataLawForApp[
+                                      dataOrg[
                                         'LawContent'
                                       ],
                                     ).length -
@@ -969,7 +981,7 @@ export function Detail1({navigation}) {
                               }}
                               isChecked={choosenLaw.includes(key)}
                               style={{}}
-                            />
+                            /> */}
 
                             <Text style={{marginLeft: 5, color: 'black'}}>
                               {nameLaw}

@@ -3,7 +3,6 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import database from '@react-native-firebase/database';
 import {useState, useEffect,useContext} from 'react';
-import {dataLaw} from '../App';
 import Home from '../screens/Home';
 import {Detail1} from '../screens/Detail1';
 import {Detail2} from '../screens/Detail2';
@@ -22,9 +21,11 @@ import {
   Dimensions
 
 } from 'react-native';
+import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 // import {useNetInfo} from "@react-native-community/netinfo";
+import {useSelector, useDispatch} from 'react-redux';
 
 
 const Stack = createNativeStackNavigator();
@@ -153,7 +154,7 @@ const AppNavigators = () => {
         //     borderTopWidth:0,
 
         // }}
-        style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
+        // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
 
         >
                 <Ionicons
@@ -185,7 +186,8 @@ an
           tabBarIcon: ({focused, color, size}) => {
             return (
               <View
-                style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}>
+                // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
+                >
                 <Ionicons
                   name="albums-outline"
                   style={
@@ -214,7 +216,8 @@ an
           tabBarIcon: ({focused, color, size}) => {
             return (
               <View
-                style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}>
+                // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
+                >
                 <Ionicons
                   name="search-outline"
                   style={
@@ -241,21 +244,27 @@ an
 };
 
 const StackNavigator = () => {
-  const [Content, setContent] = useState(null);
-  const [LawInfo, setLawInfo] = useState(null);
-  const dataLawContent = useContext(dataLaw);
+  const [Content, setContent] = useState(dataOrg['LawInfo']);
   const ModalVisibleStatus = useContext(ModalStatus)
   
-  // const netInfo = useNetInfo();
-  // let internetConnected = netInfo.isConnected
+  const {loading3,info3} = useSelector(state => state['navigator']);
 
-  useEffect(() => {
+useEffect(() => {
 
-    setContent(dataLawContent.dataLawForApp['LawContent'])
-    setLawInfo(dataLawContent.dataLawForApp['LawInfo'])
+  database() 
+  .ref(`/LawInfo`)
+  .once('value')
+  .then(snapshot => {
+    // setInfo(snapshot.val());
+    setContent(snapshot.val())  /////////////////////////////////////////////////////////////////  nên sửa
+  });
 
-  }, [dataLawContent.dataLawForApp]);
+  // if(info3){
+  //   setContent(info3)
 
+  // }
+
+}, [info3])
   
   function TopBarNav({route}) {
     <Text>{route.name}</Text>;

@@ -10,17 +10,20 @@ import {
   Animated,
   Dimensions,
   Modal,
+  ActivityIndicator,
+  PermissionsAndroid
 } from 'react-native';
+// import RNFS from 'react-native-fs';
+import { Dirs, FileSystem } from 'react-native-file-access';
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import {useRoute} from '@react-navigation/native';
-import data from '../data/project2-197c0-default-rtdb-export.json';
+import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useNetInfo} from '@react-native-community/netinfo';
 import {Shadow} from 'react-native-shadow-2';
-
-import {dataLaw} from '../App';
+import database from '@react-native-firebase/database';
 import {ModalStatus} from '../App';
+import {useSelector, useDispatch} from 'react-redux';
 
 let TopUnitCount; // là đơn vị lớn nhất vd là 'phần thứ' hoặc chương
 let articleCount = 0;
@@ -38,6 +41,21 @@ let eachSectionWithChapter = [];
 // chỗ chapter nếu bung được thì bung hết
 
 export default function Detail() {
+
+
+
+  // RNFS.writeFile(`${RNFS.DocumentDirectoryPath}/te.json`,'ád', 'utf8')
+  // .then(contents => {
+  //   console.log('contents',contents);
+  //   console.log('File created successfully!');
+  // })
+
+
+  
+
+
+
+
   // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
   const [tittleArray, setTittleArray] = useState([]); // đây là 'phần thứ...' hoặc chương (nói chung là section cao nhất)
 
@@ -53,9 +71,88 @@ export default function Detail() {
 
   const [currentSearchPoint, setCurrentSearchPoint] = useState(1); // thứ tự kết quả search đang trỏ tới
 
-  // const [modalVisible, setModalVisible] = useState(false);
+  const dispatch = useDispatch();
 
   const route = useRoute();
+
+
+
+
+  if(Object.keys(dataOrg['LawInfo']).includes(route.name)){
+    console.log(true);
+    
+  }else{
+    console.log(false);
+    
+  }
+  
+  // async function  y () {
+  //   const FileInfoString = await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8');
+  //   console.log('FileContentString',JSON.parse(FileInfoString));
+
+  // }
+
+  // y()
+
+  async function  StoreInternal () {
+
+    async function k() {
+      if(await FileSystem.exists(Dirs.CacheDir+'/Info.txt','utf8')){
+        const FileInfoString = await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8');
+        console.log('FileContentString',JSON.parse(FileInfoString));
+        return JSON.parse(FileInfoString)
+    
+      }
+
+}
+
+
+if(k()){
+  // const addContent = await FileSystem.writeFile(Dirs.CacheDir+'/Content.txt',JSON.stringify([Content]),'utf8');
+  // console.log('addContent1',addContent);
+
+  // const addInfo = await FileSystem.writeFile(Dirs.CacheDir+'/Info.txt',JSON.stringify(k().push(Info)),'utf8');
+  // console.log('addInfo1',addInfo);
+
+
+  const addContent = await FileSystem.writeFile(Dirs.CacheDir+'/Content.txt',JSON.stringify(Content),'utf8');
+  console.log('addContent2',addContent);
+
+  const addInfo = await FileSystem.writeFile(Dirs.CacheDir+'/Info.txt',JSON.stringify([Info]),'utf8');
+  console.log('addInfo2',addInfo);
+
+}else{
+  const addContent = await FileSystem.writeFile(Dirs.CacheDir+'/Content.txt',JSON.stringify([Content]),'utf8');
+  console.log('addContent2',addContent);
+
+  const addInfo = await FileSystem.writeFile(Dirs.CacheDir+'/Info.txt',JSON.stringify([Info]),'utf8');
+  console.log('addInfo2',addInfo);
+
+}
+
+    
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const animatedForNavi = useRef(new Animated.Value(0)).current;
 
@@ -68,9 +165,7 @@ export default function Detail() {
   const [go, setGo] = useState(route.params ? true : false);
 
   const [Content, setContent] = useState('');
-
-  const netInfo = useNetInfo();
-  let internetConnected = netInfo.isConnected;
+  const [Info, setInfo] = useState('');
 
   const {width, height} = Dimensions.get('window');
   let heightDevice = height;
@@ -81,6 +176,9 @@ export default function Detail() {
     heightDevice = height;
   });
 
+
+  
+
   function pushToSearch() {
     setGo(true);
 
@@ -90,12 +188,9 @@ export default function Detail() {
 
         inputSearchLawReg = input.replace(/\(/gim, '\\(');
 
-
         inputSearchLawReg = inputSearchLawReg.replace(/\)/gim, '\\)');
 
-
         inputSearchLawReg = inputSearchLawReg.replace(/\./gim, '\\.');
-
 
         inputSearchLawReg = inputSearchLawReg.replace(/\+/gim, '\\+');
 
@@ -105,7 +200,6 @@ export default function Detail() {
 
         inputSearchLawReg = inputSearchLawReg.replace(/\\/gim, '.');
 
-        
         setValueInput(inputSearchLawReg);
       } else {
         Alert.alert('Thông báo', 'Vui lòng nhập từ khóa hợp lệ');
@@ -118,55 +212,59 @@ export default function Detail() {
       Alert.alert('Thông báo', 'Vui lòng nhập từ khóa hợp lệ');
     }
   }
-  // const dispatch = useDispatch()
-
-  // const {data,loading} = useSelector(state => state);
-  // console.log('data',data);
-  // console.log('loading',loading);
-
-  // useEffect(() => {
-  //   dispatch({type:'run'})
-
-  // }, [])
-
-  const dataLawContent = useContext(dataLaw);
   const ModalVisibleStatus = useContext(ModalStatus);
 
-  let LawName =
-    dataLawContent.dataLawForApp['LawInfo'][route.name]['lawNameDisplay'];
+  // useEffect(() => {
+  //   if (internetConnected) {
+  //     if (data) {
+  //     }
+  //   } else {
+  //   }
+
+  //   if(route.params.searchLaw){
+  //     database()
+  //     .ref(`/LawContent/${route.name}`)
+  //     .once('value')
+  //     .then(snapshot => {
+  //       setContent(snapshot.val());
+  //     });
+
+  //   }else{
+  //     setContent(data[route.name])
+  //   }
+
+  //   if (route.params.input) {
+  //     setTimeout(() => {
+  //       pushToSearch();
+  //     }, 1000);
+  //   }
+
+  //   return () => {
+  //     eachSectionWithChapter = [];
+  //     sumChapterArray = [];
+  //     sumChapterArray[0] = 0;
+  //   };
+  // }, [internetConnected]);
+
+  const {loading, data, info} = useSelector(state => state['read']);
 
   useEffect(() => {
-    if (internetConnected) {
-      // const reference = database().ref('/Law1');
-      // reference.on('value', snapshot => {
-      // setContent(snapshot.val()[route.name]);
-      if (data) {
-        // setContent(data[route.name]);
-      }
-      // });
-    } else {
-      // setContent(data[route.name]);
-    }
+    dispatch({type: 'read', lawName: route.name});
 
-    setContent(dataLawContent.dataLawForApp['LawContent'][route.name]);
+    database()
+      .ref(`/LawInfo/${route.name}`)
+      .once('value')
+      .then(snapshot => {
+        setInfo(snapshot.val());
+      });
 
-    // reference.on('value', snapshot => {
-    //   setContent(snapshot.val()[route.name]);
-    //   // setContent(data[route.name]);
-    // });
-
-    if (route.params) {
-      setTimeout(() => {
-        pushToSearch();
-      }, 1000);
-    }
-
-    return () => {
-      eachSectionWithChapter = [];
-      sumChapterArray = [];
-      sumChapterArray[0] = 0;
-    };
-  }, [internetConnected]);
+    database()
+      .ref(`/LawContent/${route.name}`)
+      .once('value')
+      .then(snapshot => {
+        setContent(snapshot.val());
+      });
+  }, []);
 
   function collapse(a) {
     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
@@ -219,11 +317,8 @@ export default function Detail() {
   let searchResultCount = 0;
   // let c = 0;
   function highlight(para, word, i2) {
-
     if (para[0]) {
-
       para[0] = para[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/');
-
     }
 
     // if (word.match(/\w+/gim) || word.match(/\(/gim)|| word.match(/\)/gim) || word.match(/\./img) || word.match(/\+/img)) {
@@ -328,11 +423,10 @@ export default function Detail() {
   let positionYArrArticalDemo = positionYArrArtical;
 
   function setPositionYArtical({y, key3}) {
-    key3= key3.replace(/(?<=\w*)\\(?=\w*)/gim, '/')
+    key3 = key3.replace(/(?<=\w*)\\(?=\w*)/gim, '/');
 
     if ((!tittleArray.length && !tittleArray2.length) || go) {
       var contains = positionYArrArtical.some((elem, i) => {
-        
         return key3 == Object.keys(elem);
       });
 
@@ -340,7 +434,6 @@ export default function Detail() {
         articleCount++;
 
         positionYArrArticalDemo = positionYArrArticalDemo.map((elem, i) => {
-
           if (Object.keys(elem) == key3) {
             return {[key3]: y + currentY};
           } else {
@@ -422,11 +515,8 @@ export default function Detail() {
 
     abc = inputSearchArtical.replace(/\(/gim, '\\(');
 
-    
-
     abc = abc.replace(/\)/gim, '\\)');
 
-    
     return Object.keys(item)[0].match(new RegExp(abc, 'igm'));
   });
 
@@ -464,40 +554,38 @@ export default function Detail() {
     Keyboard.dismiss();
   }, [find]);
 
-  let onlyArticle = false     // dùng để hiển thị collapse và expand
-  const c = (key, i, ObjKeys) => { // phần nếu không mục 'phần thứ' và "chương" trong văn bản (chỉ có Điều ...)
-    onlyArticle = true
+  let onlyArticle = false; // dùng để hiển thị collapse và expand
+  const c = (key, i, ObjKeys) => {
+    // phần nếu không mục 'phần thứ' và "chương" trong văn bản (chỉ có Điều ...)
+    onlyArticle = true;
 
     return Object.keys(key)[0] != '0' ? (
-      <View
-        key={`${i}b`}
-        >
-            <View
-              onLayout={event => {
-                event.target.measure((x, y, width, height, pageX, pageY) => {
-                  setPositionYArtical({
-                    y: y + pageY,
-                    key3: ObjKeys,
-                  });
-                });
-              }}
-              style={
-                go
-                  ? {width: '100%', marginBottom: 20}
-                  : {width: '99%', marginBottom: 20}
-              }>
-              <Text key={`${i}c`} style={styles.dieu}>
-                {highlight([ObjKeys], valueInput, i)}
-              </Text>
-              <Text key={`${i}d`} style={styles.lines}>
-                {highlight([key[ObjKeys]], valueInput, i)}
-              </Text>
-            </View>
+      <View key={`${i}b`}>
+        <View
+          onLayout={event => {
+            event.target.measure((x, y, width, height, pageX, pageY) => {
+              setPositionYArtical({
+                y: y + pageY,
+                key3: ObjKeys,
+              });
+            });
+          }}
+          style={
+            go
+              ? {width: '100%', marginBottom: 20}
+              : {width: '99%', marginBottom: 20}
+          }>
+          <Text key={`${i}c`} style={styles.dieu}>
+            {highlight([ObjKeys], valueInput, i)}
+          </Text>
+          <Text key={`${i}d`} style={styles.lines}>
+            {highlight([key[ObjKeys]], valueInput, i)}
+          </Text>
+        </View>
       </View>
     ) : (
       {}
     );
-
   };
 
   const a = (key, i, key1, i1a, t) => {
@@ -517,13 +605,11 @@ export default function Detail() {
         style={
           showArticle ||
           find ||
-          (t == undefined
+          ((t == undefined
             ? !tittleArray.includes(i)
             : !tittleArray2.includes(t)) &&
-          styles.content //////////////////////////////////////////////////////////////////
-        }
-
->
+            styles.content) //////////////////////////////////////////////////////////////////
+        }>
         {key[key1].map((key2, i2) => {
           return (
             <View
@@ -554,7 +640,6 @@ export default function Detail() {
       {}
     );
   };
-
 
   const b = (keyA, i, keyB) => {
     // phần nếu có mục 'phần' trong văn bản
@@ -622,8 +707,7 @@ export default function Detail() {
                   style={
                     showArticle ||
                     find ||
-                    !tittleArray.includes(i) &&
-                    styles.content //////////////////////////////////////////////////////////////////
+                    (!tittleArray.includes(i) && styles.content) //////////////////////////////////////////////////////////////////
                   }>
                   <View
                     onLayout={event => {
@@ -657,245 +741,344 @@ export default function Detail() {
 
   return (
     <>
-      {/* { loading && (
-        <View style={{position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        opacity: 0.7,
-        backgroundColor: 'black',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex:10
-        }}>
-        <ActivityIndicator size='large' color="#cc3333" >
-
-        </ActivityIndicator>
+      {loading && (
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            opacity: 0.7,
+            backgroundColor: 'black',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10,
+          }}>
+          <Text
+            style={{
+              color: 'white',
+              marginBottom: 15,
+              fontWeight: 'bold',
+            }}>
+            Xin vui lòng đợi trong giây lát ...
+          </Text>
+          <ActivityIndicator size="large" color="white"></ActivityIndicator>
         </View>
-        )} */}
+      )}
 
       <Modal
         presentationStyle="pageSheet"
-        animationType='slide'
+        animationType="slide"
         visible={ModalVisibleStatus.modalStatus}
-        style={{}}
-        >
-
+        style={{}}>
         <ScrollView
           style={{
             backgroundColor: '#EEEFE4',
-            
           }}>
-            <View style={{paddingBottom:30}}>
-            <TouchableOpacity
-          onPress={() => {
-            ModalVisibleStatus.updateModalStatus(false);
-          }}
-          style={{
-            padding: 20,
-            // backgroundColor: 'green',
-            alignItems:'center',
-            width:70
-          }}>
-                  <Ionicons
-                    name="close-outline"
-                    style={{
-                      color: '#777777',
-                      fontSize: 30,
-                      textAlign: 'center',
-                      width: '100%',
-                      fontWeight:'bold'
-                    }}></Ionicons>
-        </TouchableOpacity>
-          <View
+          <View style={{paddingBottom: 30}}>
+            <View
             style={{
-              padding: 20,
-              paddingTop: 10,
-              paddingBottom: 20,
-              // backgroundColor: 'blue',
-            }}>
-            <Text
-              style={{
-                textAlign: 'center',
-                fontSize: 23,
-                fontWeight: 'bold',
-                color: 'black',
-              }}>
-              THÔNG TIN CHI TIẾT
-            </Text>
-          </View>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              paddingTop: 10,
-              justifyContent: 'space-evenly',
-              alignItems: 'center',
               // backgroundColor: 'green',
-              paddingLeft: 10,
-              paddingRight: 10,
+              flexDirection:'row',
+              justifyContent:'space-between'
             }}>
-            <View style={styles.ModalInfoContainer}>
-              <Text style={styles.ModalInfoTitle}>Tên gọi:</Text>
-              <Text style={styles.ModalInfoContent}>
-                {
-                  dataLawContent.dataLawForApp['LawInfo'][route.name][
-                    'lawNameDisplay'
-                  ]
-                }
+            <TouchableOpacity
+              onPress={() => {
+                ModalVisibleStatus.updateModalStatus(false);
+              }}
+              style={{
+                padding: 20,
+                alignItems: 'center',
+                width: 70,
+              
+              }}>
+              <Ionicons
+                name="close-outline"
+                style={{
+                  color: '#777777',
+                  fontSize: 30,
+                  textAlign: 'center',
+                  width: '100%',
+                  fontWeight: 'bold',
+                }}></Ionicons>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                StoreInternal()
+              }}
+              style={{
+                padding: 20,
+                alignItems: 'center',
+                width: 70,
+                right:30
+              }}>
+              <Ionicons
+                name="cloud-download-outline"
+                style={{
+                  color: '#F9CC76',
+                  fontSize: 30,
+                  textAlign: 'center',
+                  width: '100%',
+                  fontWeight: 'bold',
+                }}></Ionicons>
+            </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                padding: 20,
+                paddingTop: 10,
+                paddingBottom: 20,
+                // backgroundColor: 'blue',
+              }}>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: 23,
+                  fontWeight: 'bold',
+                  color: 'black',
+                }}>
+                THÔNG TIN CHI TIẾT
               </Text>
             </View>
-            {
-!dataLawContent.dataLawForApp['LawInfo'][route.name][
-  'lawDescription'
-].match(/^(luật|bộ luật)/igm) &&
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                paddingTop: 10,
+                justifyContent: 'space-evenly',
+                alignItems: 'center',
+                // backgroundColor: 'green',
+                paddingLeft: 10,
+                paddingRight: 10,
+              }}>
               <View style={styles.ModalInfoContainer}>
-              <Text style={styles.ModalInfoTitle}>Trích yếu nội dung:</Text>
-              <Text style={styles.ModalInfoContent}>
-                {
-                  dataLawContent.dataLawForApp['LawInfo'][route.name][
-                    'lawDescription'
-                  ]
-                }
-              </Text>
-            </View>
-                }
-            <View style={styles.ModalInfoContainer}>
-              <Text style={styles.ModalInfoTitle}>Ngày ký:</Text>
-              <Text style={styles.ModalInfoContent}>
-                {
-                  dataLawContent.dataLawForApp['LawInfo'][route.name][
-                    'lawDaySign'
-                  ]
-                }
-              </Text>
-            </View>
-            <View style={styles.ModalInfoContainer}>
-              <Text style={styles.ModalInfoTitle}>Ngày có hiệu lực:</Text>
-              <Text style={styles.ModalInfoContent}>
-                {
-                  dataLawContent.dataLawForApp['LawInfo'][route.name][
-                    'lawDayActive'
-                  ]
-                }
-              </Text>
-            </View>
-            <View style={styles.ModalInfoContainer}>
-              <Text style={styles.ModalInfoTitle}>Số văn bản:</Text>
-              <Text style={styles.ModalInfoContent}>
-                {
-                  dataLawContent.dataLawForApp['LawInfo'][route.name][
-                    'lawNumber'
-                  ]
-                }
-              </Text>
-            </View>
-            <View style={styles.ModalInfoContainer}>
-              <Text style={styles.ModalInfoTitle}>Họ Tên người ký:</Text>
-              <Text style={styles.ModalInfoContent}>
-                {
-                  dataLawContent.dataLawForApp['LawInfo'][route.name][
-                    'nameSign'
-                  ]
-                }
-              </Text>
-            </View>
-            <View style={styles.ModalInfoContainer}>
-              <Text style={styles.ModalInfoTitle}>Chức vụ người ký:</Text>
-              <Text style={styles.ModalInfoContent}>
-                {
-                  dataLawContent.dataLawForApp['LawInfo'][route.name][
-                    'roleSign'
-                  ]
-                }{' '}
-              </Text>
-            </View>
-            <View style={styles.ModalInfoContainer}>
-              <Text style={styles.ModalInfoTitle}>Cơ quan ban hành:</Text>
-              <Text style={styles.ModalInfoContent}>
-                {
-                  dataLawContent.dataLawForApp['LawInfo'][route.name][
-                    'unitPublish'
-                  ]
-                }
-              </Text>
-            </View>
-            {
-              Object.keys(dataLawContent.dataLawForApp['LawInfo'][route.name]).includes('lawRelated') &&
-            <View style={{...styles.ModalInfoContainer}}>
-              <Text style={styles.ModalInfoTitle}>Văn bản liên quan:</Text>
-              <View style={{flex: 1, paddingTop: 10}}>
-                {dataLawContent.dataLawForApp['LawInfo'][route.name][
-                  'lawRelated'
-                ].map((key, i) => {
-                  nameLaw= key.replace(/\//gim,'\\')
-                  return (
-                  <View>
-                    <Text style={styles.ModalInfoContentLawRelated}>- {
-
-                    //   nameLaw.match(/QH/gim)?
-                    // Object.keys(dataLawContent.dataLawForApp['LawInfo']).includes(nameLaw)?dataLawContent.dataLawForApp['LawInfo'][nameLaw]['lawNameDisplay']:key
-                    // :key
-                    
-                    key
-                    }</Text>
-                  </View>
-                )})}
+                <Text style={styles.ModalInfoTitle}>Tên gọi:</Text>
+                <Text style={styles.ModalInfoContent}>
+                  {Info && Info['lawNameDisplay']}
+                </Text>
               </View>
+              {Info && !Info['lawDescription'].match(/^(luật|bộ luật)/gim) && (
+                <View style={styles.ModalInfoContainer}>
+                  <Text style={styles.ModalInfoTitle}>Trích yếu nội dung:</Text>
+                  <Text style={styles.ModalInfoContent}>
+                    {Info && Info['lawDescription']}
+                  </Text>
+                </View>
+              )}
+              <View style={styles.ModalInfoContainer}>
+                <Text style={styles.ModalInfoTitle}>Ngày ký:</Text>
+                <Text style={styles.ModalInfoContent}>
+                  {Info && Info['lawDaySign']}
+                </Text>
+              </View>
+              <View style={styles.ModalInfoContainer}>
+                <Text style={styles.ModalInfoTitle}>Ngày có hiệu lực:</Text>
+                <Text style={styles.ModalInfoContent}>
+                  {Info && Info['lawDayActive']}
+                </Text>
+              </View>
+              <View style={styles.ModalInfoContainer}>
+                <Text style={styles.ModalInfoTitle}>Số văn bản:</Text>
+                <Text style={styles.ModalInfoContent}>
+                  {Info && Info['lawNumber']}
+                </Text>
+              </View>
+              <View style={styles.ModalInfoContainer}>
+                <Text style={styles.ModalInfoTitle}>Họ Tên người ký:</Text>
+                <Text style={styles.ModalInfoContent}>
+                  {Info && Info['nameSign']}
+                </Text>
+              </View>
+              <View style={styles.ModalInfoContainer}>
+                <Text style={styles.ModalInfoTitle}>Chức vụ người ký:</Text>
+                <Text style={styles.ModalInfoContent}>
+                  {Info && Info['roleSign']}{' '}
+                </Text>
+              </View>
+              <View style={styles.ModalInfoContainer}>
+                <Text style={styles.ModalInfoTitle}>Cơ quan ban hành:</Text>
+                <Text style={styles.ModalInfoContent}>
+                  {Info && Info['unitPublish']}
+                </Text>
+              </View>
+              {Info && Object.keys(Info).includes('lawRelated') && (
+                <View style={{...styles.ModalInfoContainer}}>
+                  <Text style={styles.ModalInfoTitle}>Văn bản liên quan:</Text>
+                  <View style={{flex: 1, paddingTop: 10}}>
+                    {Info &&
+                      Info['lawRelated'].map((key, i) => {
+                        nameLaw = key.replace(/\//gim, '\\');
+                        return (
+                          <View>
+                            <Text style={styles.ModalInfoContentLawRelated}>
+                              -{' '}
+                              {
+                                //   nameLaw.match(/QH/gim)?
+                                // Object.keys(dataLawContent.dataLawForApp['LawInfo']).includes(nameLaw)?dataLawContent.dataLawForApp['LawInfo'][nameLaw]['lawNameDisplay']:key
+                                // :key
+
+                                key
+                              }
+                            </Text>
+                          </View>
+                        );
+                      })}
+                  </View>
+                </View>
+              )}
+              <TouchableOpacity
+                onPress={ async() => {
+                  // ModalVisibleStatus.updateModalStatus(false);
+                  const abc = await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8');
+                  console.log('abc',JSON.parse(abc))
+              
+
+                }}
+                style={{
+                  padding: 5,
+                  marginTop: 10,
+                  backgroundColor: '#00CC33',
+                  alignItems: 'center',
+                  width: 110,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 10,
+                  // borderColor:'#555555',
+                  // borderWidth:1,
+
+                  shadowColor: 'black',
+                  shadowOpacity: 1,
+                  shadowOffset: {
+                    width: 10,
+                    height: 10,
+                  },
+                  shadowRadius: 4,
+                  elevation: 20,
+                }}>
+                <Text
+                  style={{
+                    // backgroundColor: 'red',
+                    paddingLeft: 10,
+                    paddingRight: 5,
+                    fontSize: 15,
+                    color: 'white',
+                  }}>
+                  Đóng
+                </Text>
+                <Ionicons
+                  name="log-out-outline"
+                  style={{
+                    color: 'white',
+                    fontSize: 25,
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                  }}></Ionicons>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={ async() => {
+                  // ModalVisibleStatus.updateModalStatus(false);
+                  const Info = await FileSystem.unlink(Dirs.CacheDir+'/Info.txt','utf8');
+                  console.log('Info',Info);
+              
+                  const Content = await FileSystem.unlink(Dirs.CacheDir+'/Content.txt','utf8');
+                  console.log('Content',Content);
+
+                }}
+                style={{
+                  padding: 5,
+                  marginTop: 10,
+                  backgroundColor: '#00CC33',
+                  alignItems: 'center',
+                  width: 110,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 10,
+                  // borderColor:'#555555',
+                  // borderWidth:1,
+
+                  shadowColor: 'black',
+                  shadowOpacity: 1,
+                  shadowOffset: {
+                    width: 10,
+                    height: 10,
+                  },
+                  shadowRadius: 4,
+                  elevation: 20,
+                }}>
+                <Text
+                  style={{
+                    // backgroundColor: 'red',
+                    paddingLeft: 10,
+                    paddingRight: 5,
+                    fontSize: 15,
+                    color: 'white',
+                  }}>
+                  Xóa
+                </Text>
+                <Ionicons
+                  name="log-out-outline"
+                  style={{
+                    color: 'white',
+                    fontSize: 25,
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                  }}></Ionicons>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={ async() => {
+                  // ModalVisibleStatus.updateModalStatus(false);
+                  const exists = await FileSystem.exists(Dirs.CacheDir+'/Info.txt','utf8');
+                  console.log('exists',exists);
+              
+
+                }}
+                style={{
+                  padding: 5,
+                  marginTop: 10,
+                  backgroundColor: '#00CC33',
+                  alignItems: 'center',
+                  width: 110,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 10,
+                  // borderColor:'#555555',
+                  // borderWidth:1,
+
+                  shadowColor: 'black',
+                  shadowOpacity: 1,
+                  shadowOffset: {
+                    width: 10,
+                    height: 10,
+                  },
+                  shadowRadius: 4,
+                  elevation: 20,
+                }}>
+                <Text
+                  style={{
+                    // backgroundColor: 'red',
+                    paddingLeft: 10,
+                    paddingRight: 5,
+                    fontSize: 15,
+                    color: 'white',
+                  }}>
+                  Exist
+                </Text>
+                <Ionicons
+                  name="log-out-outline"
+                  style={{
+                    color: 'white',
+                    fontSize: 25,
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                  }}></Ionicons>
+              </TouchableOpacity>
 
             </View>
-                        }
-              <TouchableOpacity
-          onPress={() => {
-            ModalVisibleStatus.updateModalStatus(false);
-          }}
-          style={{
-            padding: 5,
-            marginTop:10,
-            backgroundColor: '#00CC33',
-            alignItems:'center',
-            width:110,
-            flexDirection:'row',
-            alignItems:'center',
-            justifyContent:'center',
-            borderRadius:10,
-            // borderColor:'#555555',
-            // borderWidth:1,
-            
-            shadowColor: 'black',
-            shadowOpacity: 1,
-            shadowOffset: {
-              width: 10,
-              height: 10,
-            },
-            shadowRadius: 4,
-            elevation: 20,
-
-          }}>
-            <Text style={{
-            // backgroundColor: 'red',
-            paddingLeft:10,
-            paddingRight:5,
-            fontSize:15,
-            color:'white',
-            
-          }}>
-              Đóng
-            </Text>
-                  <Ionicons
-                    name="log-out-outline"
-                    style={{
-                      color: 'white',
-                      fontSize: 25,
-                      textAlign: 'center',
-                      fontWeight:'bold'
-                    }}></Ionicons>
-        </TouchableOpacity>
-
           </View>
-
-        </View>
         </ScrollView>
       </Modal>
 
@@ -912,38 +1095,39 @@ export default function Detail() {
           // style={  find ? {setTimeout( ()=>{ return {'marginBottom': 60}},400)} : {marginBottom: 0}}
 
           showsVerticalScrollIndicator={true}>
-          <Text style={styles.titleText}>{`${LawName}`}</Text>
+          <Text style={styles.titleText}>
+            {Info && `${Info['lawNameDisplay']}`}
+          </Text>
           {Content &&
             Content.map((key, i) => (
               <>
-              {!Object.keys(key)[0].match(/^(Điều|Điều)/gim) &&
-                <TouchableOpacity
-                  key={i}
-                  style={styles.chapter}
-                  onPress={() => {
-                    collapse(i);
-                    // setTittle(i);
-                  }}>
-                  <Text
-                    key={`${i}a`}
-                    style={{
-                      fontSize: 18,
-                      color: 'black',
-                      fontWeight: 'bold',
-                      padding: 9,
-                      textAlign: 'center',
+                {!Object.keys(key)[0].match(/^(Điều|Điều)/gim) && (
+                  <TouchableOpacity
+                    key={i}
+                    style={styles.chapter}
+                    onPress={() => {
+                      collapse(i);
+                      // setTittle(i);
                     }}>
-                    {Object.keys(key)[0].toUpperCase()}
-                  </Text>
-                </TouchableOpacity>
-                  }
+                    <Text
+                      key={`${i}a`}
+                      style={{
+                        fontSize: 18,
+                        color: 'black',
+                        fontWeight: 'bold',
+                        padding: 9,
+                        textAlign: 'center',
+                      }}>
+                      {Object.keys(key)[0].toUpperCase()}
+                    </Text>
+                  </TouchableOpacity>
+                )}
 
                 {Object.keys(key)[0].match(/^phần thứ .*/gim)
                   ? b(key, i, Object.keys(key)[0])
-                  : Object.keys(key)[0].match(/^chương .*/gim) ?a(key, i, Object.keys(key)[0])
-                  : c(key, i, Object.keys(key)[0])
-                  
-                  }
+                  : Object.keys(key)[0].match(/^chương .*/gim)
+                  ? a(key, i, Object.keys(key)[0])
+                  : c(key, i, Object.keys(key)[0])}
               </>
             ))}
         </ScrollView>
@@ -1064,60 +1248,59 @@ export default function Detail() {
         </Animated.View>
       }
       <View style={styles.functionTab}>
-        {!onlyArticle &&
+        {!onlyArticle && (
           <TouchableOpacity
-          style={styles.tab}
-          onPress={() => {
-            setFind(false);
-            
-            let timeOut = setTimeout(() => {
-              setShowArticle(false);
-              return () => {};
-            }, 600);
-            
-            setTittleArray([]);
-            Shrink();
-            
-            Animated.timing(animatedForNavi, {
-              toValue: 0,
-              // toValue:100,
-              duration: 600,
-              useNativeDriver: false,
-            }).start();
-            
-            // console.log(showArticle);
-          }}>
-          {/* <Text style={styles.innerTab}>S</Text> */}
-          <Ionicons
-            name="chevron-expand-outline"
-            style={styles.innerTab}></Ionicons>
-        </TouchableOpacity>
-          }
-                  {!onlyArticle &&
+            style={styles.tab}
+            onPress={() => {
+              setFind(false);
 
-        <TouchableOpacity
-          style={styles.tab}
-          onPress={() => {
-            setTittleArray([]);
-            setTittleArray2([]);
-            setFind(false);
-            let timeOut = setTimeout(() => {
-              setShowArticle(false);
-              return () => {};
-            }, 600);
+              let timeOut = setTimeout(() => {
+                setShowArticle(false);
+                return () => {};
+              }, 600);
 
-            Animated.timing(animatedForNavi, {
-              toValue: 0,
-              duration: 600,
-              useNativeDriver: false,
-            }).start();
-          }}>
-          {/* <Text style={styles.innerTab}>E</Text> */}
-          <Ionicons
-            name="chevron-collapse-outline"
-            style={styles.innerTab}></Ionicons>
-        </TouchableOpacity>
-}     
+              setTittleArray([]);
+              Shrink();
+
+              Animated.timing(animatedForNavi, {
+                toValue: 0,
+                // toValue:100,
+                duration: 600,
+                useNativeDriver: false,
+              }).start();
+
+              // console.log(showArticle);
+            }}>
+            {/* <Text style={styles.innerTab}>S</Text> */}
+            <Ionicons
+              name="chevron-expand-outline"
+              style={styles.innerTab}></Ionicons>
+          </TouchableOpacity>
+        )}
+        {!onlyArticle && (
+          <TouchableOpacity
+            style={styles.tab}
+            onPress={() => {
+              setTittleArray([]);
+              setTittleArray2([]);
+              setFind(false);
+              let timeOut = setTimeout(() => {
+                setShowArticle(false);
+                return () => {};
+              }, 600);
+
+              Animated.timing(animatedForNavi, {
+                toValue: 0,
+                duration: 600,
+                useNativeDriver: false,
+              }).start();
+            }}>
+            {/* <Text style={styles.innerTab}>E</Text> */}
+            <Ionicons
+              name="chevron-collapse-outline"
+              style={styles.innerTab}></Ionicons>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.tab}
           onPress={() => {
@@ -1443,9 +1626,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAEBD7',
     // width:'100%',
     overflow: 'hidden',
-    margin:0,
-    paddingTop:3,
-    paddingBottom:4
+    margin: 0,
+    paddingTop: 3,
+    paddingBottom: 4,
   },
   tabSearch: {
     display: 'flex',
@@ -1529,14 +1712,14 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     flex: 1,
     color: 'black',
-    fontSize:14,
+    fontSize: 14,
     // backgroundColor:'yellow'
   },
   ModalInfoContentLawRelated: {
     paddingBottom: 10,
     flex: 1,
     color: 'black',
-    fontSize:14,
+    fontSize: 14,
     // backgroundColor:'blue'
   },
 });

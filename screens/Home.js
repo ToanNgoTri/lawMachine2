@@ -15,8 +15,6 @@ import {useState, useEffect, useContext, useRef,} from 'react';
 import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {RefForHome} from '../App';
-import {dataLaw} from '../App';
-import {RefLoading} from '../App'
 import { useSelector, useDispatch } from 'react-redux';
 
 import {useNetInfo} from '@react-native-community/netinfo';
@@ -38,9 +36,7 @@ export default function Home({navigation}) {
   const HomeFlatlist = useContext(RefForHome);
 
 
-  const dataLawContent = useContext(dataLaw);
 
-  const Loading1 = useContext(RefLoading);
 
 
   const [showWanringInternet, setShowWanringInternet] = useState(false);
@@ -78,7 +74,6 @@ export default function Home({navigation}) {
 
 
 
-  // console.log("dataLawContent.dataLawForApp['LawInfo']",dataLawContent.dataLawForApp);
 
   const Render = ({item}) => {
 
@@ -94,9 +89,9 @@ export default function Home({navigation}) {
       }}
       onPress={() => navigation.navigate(`${item}`)}>
         <View style={styles.item}>
-        <Text style={styles.itemDisplay}>{dataLawContent.dataLawForApp && dataLawContent.dataLawForApp['LawInfo'][item]['lawNameDisplay']}</Text>
-        {!dataLawContent.dataLawForApp['LawInfo'][item]['lawNameDisplay'].match(/^(luật|bộ luật)/img) 
-        && <Text style={styles.itemDescription}>{dataLawContent.dataLawForApp && dataLawContent.dataLawForApp['LawInfo'][item]['lawDescription']}</Text>}
+        <Text style={styles.itemDisplay}>{dataOrg['LawInfo'][item]['lawNameDisplay']}</Text>
+        {!dataOrg['LawInfo'][item]['lawNameDisplay'].match(/^(luật|bộ luật)/img) 
+        && <Text style={styles.itemDescription}>{dataOrg && dataOrg['LawInfo'][item]['lawDescription']}</Text>}
         </View>
       </TouchableOpacity>
     );
@@ -141,9 +136,9 @@ export default function Home({navigation}) {
               inputSearchLawReg = inputSearchLawReg.replace(/\?/gim, '\\?');
             }
 
-            return (data['LawInfo'][item]['lawNameDisplay'].match(new RegExp(inputSearchLawReg, 'igm')) 
-            || data['LawInfo'][item]['lawDescription'].match(new RegExp(inputSearchLawReg, 'igm'))
-            || data['LawInfo'][item]['lawNumber'].match(new RegExp(inputSearchLawReg, 'igm')));
+            return (dataOrg['LawInfo'][item]['lawNameDisplay'].match(new RegExp(inputSearchLawReg, 'igm')) 
+            || dataOrg['LawInfo'][item]['lawDescription'].match(new RegExp(inputSearchLawReg, 'igm'))
+            || dataOrg['LawInfo'][item]['lawNumber'].match(new RegExp(inputSearchLawReg, 'igm')));
           }
         }),
     );
@@ -156,8 +151,6 @@ export default function Home({navigation}) {
   const [alreadyInternetWarning, setAlreadyInternetWarning] = useState(false);      // dùng để biết đã từng có internet chưa
 
   const {loading,data} = useSelector(state => state['read']);
-
-  Loading1.updateLoading(loading)
 
 
   useEffect(() => {
@@ -178,7 +171,7 @@ export default function Home({navigation}) {
 
     if (internetConnected &&!hasBeenRerender.current) {
             hasBeenRerender.current = true
-            dispatch({type:'run'})
+            // dispatch({type:'run'})
 
       
     } else if(internetConnected==false) {      
@@ -199,13 +192,18 @@ export default function Home({navigation}) {
 
   useEffect(() => {
     
-    if(data){
-    setContent(Object.keys(data['LawContent']));
-    setShowContent(Object.keys(data['LawContent']).slice(0, 7));
-    setTotalPaper(Math.floor(Object.keys(data['LawContent']).length / 7) + 1);
-    dataLawContent.updateData(data)
+    // if(data){
+    // setContent(Object.keys(data['LawContent']));
+    // setShowContent(Object.keys(data['LawContent']).slice(0, 7));
+    // setTotalPaper(Math.floor(Object.keys(data['LawContent']).length / 7) + 1);
+    // dataLawContent.updateData(data)
+
+    setContent(Object.keys(dataOrg['LawContent']));
+    setShowContent(Object.keys(dataOrg['LawContent']).slice(0, 7));
+    setTotalPaper(Math.floor(Object.keys(dataOrg['LawContent']).length / 7) + 1);
+
     
-  }
+  // }
 }, [data])
 
 
@@ -220,7 +218,7 @@ export default function Home({navigation}) {
 
   return (
     <>
-                    { (loading) && (
+                    {/* { (loading) && (
         <View style={{position: 'absolute',
         left: 0,
         right: 0,
@@ -236,7 +234,7 @@ export default function Home({navigation}) {
 
         </ActivityIndicator>
         </View>
-        )}
+        )} */}
 
       <View
         style={{
@@ -380,8 +378,8 @@ export default function Home({navigation}) {
               setContent(Object.keys(dataOrg['LawContent']));
               setShowContent(Object.keys(dataOrg['LawContent']).slice(0, 7));
               setTotalPaper(Math.floor(Object.keys(dataOrg['LawContent']).length / 7) + 1);
-              dataLawContent.updateData(dataOrg)
 
+              
               }
             
             }}

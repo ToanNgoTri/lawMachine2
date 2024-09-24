@@ -10,73 +10,39 @@ export const read = createSlice({
   name: 'read',     
   initialState: {
     data:null,
+    info:null,
     loading: true
   },
   reducers: {
     
     loader: (state,action) => {
-      // state.data=action.payload;
       state.loading= true;
-      // console.log('state.loading',state.loading);
     },
 
     handle: (state,action) => {
-      state.data=action.payload;
-      // console.log('12345');
-    },
-    noLoading: (state,action) => {
+      state.data=action.payload.a;
       state.loading= false;
-      // console.log('12345');
     },
 
 }
 })
 
-
-
-export const search = createSlice({
-  name: 'search',     
+export const searchContent = createSlice({
+  name: 'searchContent',     
   initialState: {
     data1:dataOrg,
-    loading1: true,
+    loading1: false,
     input1:'thuyền',
-    result:null
+    result:[]
   },
   reducers: {
-
-    // setData1(state,action) {
-    //   // state.data1=action.payload;
-    //   state.loading1= true;
-    // },
-
-
-
-    // type1(state,action) {
-    //   // state.input1=action.payload;
-    //   // console.log(state.data1);
-    //   state.loading1= true;
-    //   console.log('state.loading1');
-    // },
-
-
-
-
-
-
-
-
     loader1: (state,action) => {
-      // state.data1=action.payload;
       state.loading1= true;
-// state= {...state,'loading1':true}
-      // console.log('state.loading1',state.loading1);
     },
 
     handle1: (state,action) => {
       state.result=action.payload;
       state.loading1= false;
-      // state= {...state,'loading1':false}
-      // console.log('state.loading1',state.loading1);
     },
 }
 })
@@ -90,102 +56,54 @@ export const searchLaw = createSlice({
     info:null,
   },
   reducers: {
-
-
     loader2: (state,action) => {
       state.loading2= true;
-
     },
 
     handle2: (state,action) => {
       console.log('action',action);
-      
       state.content=action.payload.a;
       state.info=action.payload.b;
       state.loading2= false;
-
     },
 }
 })
 
 
-    async function search1 (input1,data1) {
-      let searchArray = {};
+export const navigator = createSlice({
+  name: 'navigator',     
+  initialState: {
+    loading3: false,
+    info3:null,
+  },
+  reducers: {
+    loader3: (state,action) => {
+      state.loading3= true;
+    },
 
-      function a(key, key1) {
-        Object.values(key1)[0].map((key2, i1) => {
-          // chọn từng điều
-
-          // Object.keys(key2).map((key5, i5) => {
-          let replace = `(.*)${input1}(.*)`;
-          let re = new RegExp(replace, 'gmi');
-          if (Object.keys(key2)[0].match(re)) {
-            searchArray[key].push({
-              [Object.keys(key2)[0]]: Object.values(key2)[0],
-            });
-          } else if (Object.values(key2)[0] != '') {
-            if (Object.values(key2)[0].match(re)) {
-              searchArray[key].push({
-                [Object.keys(key2)[0]]: Object.values(key2)[0],
-              });
-            }
-          }
-          // }
-        });
-      }
-
-      Object.keys(data1).map((key, i) => {
-        //key là tên của luật
-        // tham nhap luat (array chuong)
-
-        searchArray[key] = [];
-          data1[key].map((key1, i1) => {
-            // ra Object Chuong hoặc (array phần thứ...)
-            if (Object.keys(key1)[0].match(/phần thứ .*/gim)) {
-              // nếu có 'phần thứ
-
-              if (
-                Object.keys(Object.values(key1)[0][0])[0].match(
-                  /^Chương .*/gim,
-                )
-              ) {
-                //nếu có chương
-
-                Object.values(key1)[0].map((key2, i) => {
-                  a(key, key2);
-
-                });
-
-              } else {
-                a(key, key1);
-              }
-            } else {
-              // nếu không có phần thứ...
-              a(key, key1);
-            }
-          });
-      });
-
-      return  searchArray
-       
-
-    }
+    handle3: (state,action) => {
+      state.info3=action.payload.d;
+      state.loading3= false;
+    },
+}
+})
 
 
 
-
-
-export function* mySaga(action){
+export function* mySaga(state,action){
   try{
     yield put(loader())
-    const b = yield call( async ()=> await database().ref('/').once('value') )
+    // console.log('state',state.lawName);
+    
+       const c = yield call( async ()=> await database().ref(`/LawInfo/${state.lawName}`).once('value') )
+       const d =   c.val()      
+
+    const b = yield call( async ()=> await database().ref(`/LawContent/${state.lawName}`).once('value') )
     const a =   b.val()      
- 
 
-    yield put(handle(a))
+    yield put(handle({a}))
 
-    yield put(noLoading())
-    noLoading
+    
   }catch(e){
 
   }
@@ -194,10 +112,19 @@ export function* mySaga(action){
 export function* mySaga1(state,action){
   try{
     yield put(loader1())
+console.log(state.input);
 
-    const b = yield call(search1,'tốt nhất',dataOrg)
-    let a = b
-    yield put(handle1(a))
+    let info = yield  fetch('https://converttool2.onrender.com/searchContent',{
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body:JSON.stringify({input:state.input})
+    })
+    let a = yield info.json()
+
+yield put(handle1(a))
   }catch(e){
   }
 }
@@ -205,78 +132,59 @@ export function* mySaga1(state,action){
 export function* mySaga2(state,action){
   try{
     yield put(loader2())
-    console.log('state',state.input);
 
-  let inputSearchLawReg = state.input.replace(/\(/gim, '\\(');
-
-
-      inputSearchLawReg = inputSearchLawReg.replace(
-          /\)/gim,
-          '\\)',
-        );
-
-
-        inputSearchLawReg = inputSearchLawReg.replace(
-          /\./gim,
-          '\\.',
-        );
-
-
-        inputSearchLawReg = inputSearchLawReg.replace(
-          /\+/gim,
-          '\\+',
-        );
-
-
-        inputSearchLawReg = inputSearchLawReg.replace(
-          /\?/gim,
-          '\\?',
-        );
-
-        if (inputSearchLawReg.match(/\//gim)) {
-        inputSearchLawReg = inputSearchLawReg.replace(/\//gim, '\\');
-      }
-
-      inputSearchLawReg = inputSearchLawReg.replace(
-          /\\/gim,
-          '\\',
-        );
-        console.log('inputSearchLawReg',inputSearchLawReg);
-
-        let lawNumberDemo = inputSearchLawReg.match(/\d+\\?\d*\\\w+Đ?-\w*Đ?\w+/img);
-        console.log('lawNumberDemo',lawNumberDemo);
-        let lawNumber
-        if(lawNumberDemo){
-         lawNumber = lawNumberDemo[0].replace(/ /gim, "");
-          
-        }else{
-          lawNumber = false 
-
-        }
+        let info = yield  fetch('https://converttool2.onrender.com/searchLaw',{
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body:JSON.stringify({input:state.input})
+        })
       
-        console.log('lawNumber',lawNumber);
+      
+        let b = yield info.json()
+        
+    // const content = yield call( async ()=> await database().ref(`/LawContent/${lawNumber}`).once('value') )
+    // const a =   content.val()
 
-    const content = yield call( async ()=> await database().ref(`/LawContent/${lawNumber}`).once('value') )
-    const a =   content.val()
+    // const info = yield call( async ()=> await database().ref(`/LawInfo/${lawNumber}`).once('value') )
+    // const b =   info.val()
 
-    const info = yield call( async ()=> await database().ref(`/LawInfo/${lawNumber}`).once('value') )
-    const b =   info.val()
-
-
+    let a = []
     yield put(handle2({a,b}))
   }catch(e){
   }
 }
 
 
+
+export function* mySaga3(state,action){
+  try{
+    yield put(loader3())
+    // console.log('state',state.lawName);
+    
+       const c = yield call( async ()=> await database().ref(`/LawInfo`).once('value') )
+       const d =   c.val()      
+
+
+    yield put(handle3({d}))
+
+    
+  }catch(e){
+
+  }
+}
+
+
 export function* saga(){
-  yield takeEvery('run',mySaga) 
+  yield takeEvery('read',mySaga) 
   // yield takeEvery(handle.type,mySaga)    //xài cái này cũng được
 
 }
 
 export function* saga1(){
-  yield takeEvery('search',mySaga1)
+  yield takeEvery('searchContent',mySaga1)
   // yield takeEvery(handle1.type,mySaga1)
 
 }
@@ -286,7 +194,13 @@ export function* saga2(){
 
 }
 
+export function* saga3(){
+  yield takeEvery('navigator',mySaga3)
+
+}
+
   
 export const {loader,handle,noLoading} = read.actions;
-export const {loader1,handle1} = search.actions;
+export const {loader1,handle1} = searchContent.actions;
 export const {loader2,handle2} = searchLaw.actions;
+export const {loader3,handle3} = searchLaw.actions;

@@ -8,154 +8,49 @@ import {
   Keyboard,
   ActivityIndicator,
 } from 'react-native';
-import { handle2 } from "../redux/fetchData";
+import {handle2, searchLaw} from '../redux/fetchData';
 import database from '@react-native-firebase/database';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useSelector, useDispatch } from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 
 import React, {useEffect, useState, useRef, useContext} from 'react';
 
 import {RefForSearch} from '../App';
-import {dataLaw} from '../App';
 import {RefLoading} from '../App';
 
 export function Detail2({navigation}) {
-
-  const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
+  // const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
   const [input, setInput] = useState(undefined);
-  const [valueInput, setValueInput] = useState('');
-  const [valueInputForNav, setValueInputForNav] = useState('');
-
-
-  const dataLawContent = useContext(dataLaw);
-
+  // const [valueInput, setValueInput] = useState('');
 
   const [warning, setWanring] = useState(false);
   const list = useRef(null);
 
-  
-  
-  const dispatch = useDispatch()
-  const {loading2, content,info,input2} = useSelector(state => state['searchLaw']);
-  // console.log('content',content);
-  // console.log('info',info);
-  // console.log('input2',input2);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-
-  }, [dataLawContent.dataLawForApp]);
-
-
+  const {loading2, content, info, input2} = useSelector(
+    state => state['searchLaw'],
+  );
 
   const SearchScrollview = useContext(RefForSearch);
 
   SearchScrollview.updateSearch(list);
 
-  // function Search(input) {
-  //   let searchArray = {};
-
-  //   if (input) {
-  //     if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
-
-  //       function a(key, key1) {
-  //         // key ở đây là tên luật, key1 là Object 1 chương
-
-  //         Object.values(key1)[0].map((key2, i1) => {
-  //           // chọn từng điều
-
-  //           let replace = `(.*)${input}(.*)`;
-  //           let re = new RegExp(replace, 'gmi');
-  //           let article = Object.keys(key2)[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/')
-  //           let point = Object.values(key2)[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/')
-
-  //           if (Object.keys(key2)[0].match(re)) {
-  //             searchArray[key].push({
-  //               [article]: point,
-  //             });
-  //           } else if (point != '') {
-  //             if (point.match(re)) {
-  //               searchArray[key].push({
-  //                 [article]: point,
-  //               });
-  //             }
-  //           }
-  //         });
-
-          
-  //       }
-
-  //       Object.keys(dataLawContent.dataLawForApp['LawContent']).map(
-  //         (key, i) => {
-  //           // key là tên luật
-  //           //key là tên của luật
-  //           // tham nhap luat (array chuong)
-
-  //           searchArray[key] = [];
-  //           if (choosenLaw.includes(key)) {
-  //             dataLawContent.dataLawForApp['LawContent'][key].map(
-  //               (key1, i1) => {
-  //                 // ra Object Chuong hoặc (array phần thứ...)
-  //                 if (Object.keys(key1)[0].match(/^phần thứ .*/gim)) {
-  //                   // nếu có 'phần thứ
-  //                   // console.log('phần thứ');
-  //                   // console.log('Object.keys(key1)[0]',Object.keys(key1)[0]);
-  //                   if (
-  //                     Object.keys(Object.values(key1)[0][0])[0].match(
-  //                       /^Chương .*/gim,
-  //                     )
-  //                   ) {
-  //                     //nếu có chương trong phần thứ
-
-  //                     Object.values(key1)[0].map((key2, i) => {
-  //                       a(key, key2);
-  //                     });
-  //                   } else {
-  //                     //nếu không có chương trong phần thứ
-  //                     a(key, key1);
-  //                   }
-  //                 } else if (Object.keys(key1)[0].match(/^chương .*/gim)) {
-  //                   a(key, key1);
-  //                 } else {
-  //                   //nếu chỉ có điều
-  //                   if(i1==0){ //  đảm bảo chỉ chạy 1 lần
-  //                     a(key, {
-  //                       'chương Giả định':
-  //                         dataLawContent.dataLawForApp['LawContent'][key],
-  //                     });
-  
-  //                   }
-  //                 }
-  //               },
-  //             );
-  //           }
-  //         },
-  //       );
-
-  //       let searchResult = {};
-
-  //       Object.keys(searchArray).map((key, i) => {
-  //         searchArray[key].map((key1, i) => {
-  //           searchResult[key] = searchArray[key];
-  //         });
-  //       });
-
-  //       setSearchResult(searchResult);
-  //       // console.log('searchResult',searchResult);
-  //       searchResult = [];
-  //     } else {
-  //       setWanring(true);
-  //     }
-  //   } else {
-  //     setWanring(true);
-  //   }
-  // }
-
-
   useEffect(() => {
     setWanring(false);
   }, [input]);
 
-
+  const NoneOfResutl = () => {
+    return (
+      <View
+        style={{height: 250, alignItems: 'center', justifyContent: 'flex-end'}}>
+        <Text style={{fontSize: 40, textAlign: 'center', color: 'black'}}>
+          {' '}
+          Không có kết quả nào{' '}
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <>
@@ -173,6 +68,14 @@ export function Detail2({navigation}) {
             alignItems: 'center',
             zIndex: 10,
           }}>
+          <Text
+            style={{
+              color: 'white',
+              marginBottom: 15,
+              fontWeight: 'bold',
+            }}>
+            Xin vui lòng đợi trong giây lát ...
+          </Text>
           <ActivityIndicator size="large" color="white"></ActivityIndicator>
         </View>
       )}
@@ -185,7 +88,6 @@ export function Detail2({navigation}) {
           <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
 
           <View style={styles.inputContainer}>
-
             <View
               style={{
                 flexDirection: 'column',
@@ -246,52 +148,44 @@ export function Detail2({navigation}) {
                   height: 40,
                   top: 5,
                 }}
-                onPress={() => {
+                onPress={async () => {
                   Keyboard.dismiss();
                   let inputSearchLawReg = input;
-                  if (input) {
+                  // if (input) {
+                  //   inputSearchLawReg = input.replace(/\(/gim, '\\(');
 
-                    inputSearchLawReg = input.replace(/\(/gim, '\\(');
+                  //   inputSearchLawReg = inputSearchLawReg.replace(
+                  //     /\)/gim,
+                  //     '\\)',
+                  //   );
 
+                  //   inputSearchLawReg = inputSearchLawReg.replace(
+                  //     /\./gim,
+                  //     '\\.',
+                  //   );
 
-                    inputSearchLawReg = inputSearchLawReg.replace(
-                        /\)/gim,
-                        '\\)',
-                      );
+                  //   inputSearchLawReg = inputSearchLawReg.replace(
+                  //     /\+/gim,
+                  //     '\\+',
+                  //   );
 
+                  //   inputSearchLawReg = inputSearchLawReg.replace(
+                  //     /\?/gim,
+                  //     '\\?',
+                  //   );
 
-                      inputSearchLawReg = inputSearchLawReg.replace(
-                        /\./gim,
-                        '\\.',
-                      );
+                  //   if (input.match(/\//gim)) {
+                  //     inputSearchLawReg = inputSearchLawReg.replace(
+                  //       /\//gim,
+                  //       '.',
+                  //     );
+                  //   }
 
-
-                      inputSearchLawReg = inputSearchLawReg.replace(
-                        /\+/gim,
-                        '\\+',
-                      );
-
-
-                      inputSearchLawReg = inputSearchLawReg.replace(
-                        /\?/gim,
-                        '\\?',
-                      );
-
-                      if (input.match(/\//gim)) {
-                      inputSearchLawReg = inputSearchLawReg.replace(/\//gim, '.');
-                    }
-
-                    inputSearchLawReg = inputSearchLawReg.replace(
-                        /\\/gim,
-                        '.',
-                      );
-
-                    }
+                  //   inputSearchLawReg = inputSearchLawReg.replace(/\\/gim, '.');
+                  // }
                   Keyboard.dismiss();
-                  setValueInput(inputSearchLawReg);
-                  setValueInputForNav(input);
-                  // Search(inputSearchLawReg);
-                  dispatch({type:'searchLaw',input:input})
+
+                  dispatch({type: 'searchLaw', input: input});
                 }}>
                 <Ionicons
                   name="search-outline"
@@ -301,62 +195,47 @@ export function Detail2({navigation}) {
           </View>
         </View>
         <View style={{marginTop: 1}}>
-          {Array.isArray(SearchResult) ? null : !Object.keys(SearchResult)
-              .length ? (
-            <NoneOfResutl />
-          ) : (
-            Object.keys(SearchResult).map((key, i) => {
-              let nameLaw =
-                dataLawContent.dataLawForApp['LawInfo'][key]['lawNameDisplay'];
+          {info == null ? (
+            <></>
+          ) : info.length ? (
+            info.map((key, i) => {
+              let nameLaw = key['lawNumber'];
               if (nameLaw) {
-                if (nameLaw.match(/(?<=\w)\\(?=\w)/gim)) {
-                  nameLaw = key.replace(/(?<=\w)\\(?=\w)/gim, '/');
+                if (nameLaw.match(/(?<=\w)\/(?=\w)/gim)) {
+                  nameLaw = nameLaw.replace(/(?<=\w)\/(?=\w)/gim, '\\');
                 }
               }
 
               return (
-                <>
-                  <TouchableOpacity
-                    key={i}
-                    style={{
-                      paddingBottom:10,
-                      paddingTop:10,
-                      justifyContent:'center',
-                      backgroundColor: '#F9CC76',
-                      marginBottom:1
-                                  }}
-                    onPress={() => {
-                    }}>
-                      <View
-                                          style={styles.chapter}
->
-
+                <TouchableOpacity
+                  style={{
+                    paddingBottom: 10,
+                    paddingTop: 10,
+                    justifyContent: 'center',
+                    backgroundColor: '#F9CC76',
+                    marginBottom: 6,
+                  }}
+                  onPress={() =>
+                    navigation.navigate(`${nameLaw}`, {searchLaw: true})
+                  }>
+                  <View style={styles.item}>
                     <Text style={styles.chapterText} key={`${i}a`}>
-                      {nameLaw}
+                      {key['lawNameDisplay']}
                     </Text>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate(`${key}`, {input: valueInputForNav})
-                      }
-                      style={styles.chapterArrow}>
-                      <Ionicons
-                        name="return-down-forward-outline"
-                        style={{
-                          fontWeight: 'bold',
-                          color: 'white',
-                          textAlign: 'center',
-                          fontSize: 17,
-                        }}></Ionicons>
-                    </TouchableOpacity>
-                        </View>
-                  </TouchableOpacity>
-                </>
+                    {!key['lawNameDisplay'].match(/^(luật|bộ luật)/gim) && (
+                      <Text style={styles.descriptionText}>
+                        {key && key['lawDescription']}
+                      </Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
               );
             })
+          ) : (
+            <NoneOfResutl />
           )}
         </View>
       </ScrollView>
-
     </>
   );
 }
@@ -416,21 +295,37 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   chapter: {
-    minHeight:50,
+    minHeight: 50,
     justifyContent: 'space-around',
     backgroundColor: '#F9CC76',
     color: 'black',
     alignItems: 'center',
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
   },
+  item: {
+    minHeight: 80,
+    // height: 120,
+    // backgroundColor: 'green',
+    display: 'flex',
+    justifyContent: 'center',
+    paddingLeft: 20,
+    paddingRight: 20,
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+
   chapterText: {
     textAlign: 'center',
     color: 'black',
-    fontSize: 16,
     fontWeight: 'bold',
-    // backgroundColor:'red',
-    width:'75%'
+    textAlign: 'center',
+    fontSize: 17,
+  },
+  descriptionText: {
+    textAlign: 'center',
+    color: 'black',
+    fontSize: 14,
   },
   chapterArrow: {
     backgroundColor: 'black',
@@ -443,7 +338,6 @@ const styles = StyleSheet.create({
     height: 30,
     textAlign: 'center',
     justifyContent: 'center',
-    
   },
   articleContainer: {
     fontWeight: 'bold',
