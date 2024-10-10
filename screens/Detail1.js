@@ -9,18 +9,14 @@ import {
   Animated,
   ActivityIndicator,
 } from 'react-native';
-import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
-
 import CheckBox from 'react-native-check-box';
-import database from '@react-native-firebase/database';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector, useDispatch} from 'react-redux';
-import data from '../data/project2-197c0-default-rtdb-export.json'; ////////////////////////////////////////////// xài tạm
-
+import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState, useRef, useContext} from 'react';
 
-import {RefForSearch} from '../App';
-import {loader1, handle1} from '../redux/fetchData';
+// import {RefForSearch} from '../App';
+// import {loader1, handle1} from '../redux/fetchData';
 
 export function Detail1({navigation}) {
   // const [Content, setContent] = useState({});
@@ -44,35 +40,35 @@ export function Detail1({navigation}) {
 
 
   const [choosenLaw, setChoosenLaw] = useState([]);
+  const [LawFilted, setLawFilted] = useState(false)
 
   // const [Loading, setLoading] = useState(false);
 
   const [warning, setWanring] = useState(false);
+  
   const list = useRef(null);
 
   const dispatch = useDispatch();
 
   const {loading1, result} = useSelector(state => state['searchContent']);
-// console.log('result',result);
+
+  
+  const netInfo = useNetInfo();
+  let internetConnected = netInfo.isConnected;
 
   useEffect(() => {
-    // const listener = navigation.addListener('focus', () => {
-
-    // setContent(dataOrg['LawContent']);
-    // setLawInfo(dataOrg['LawInfo']);
-
     setChoosenLaw(
-      Object.keys(dataOrg).length
-        ? Object.keys(dataOrg['LawContent'])
+      Object.keys(SearchResult).length
+        ? Object.keys(SearchResult)
         : [],
     );
     // })
     // console.log('choosenLaw',choosenLaw);
-  }, [dataOrg]);
+  }, [SearchResult]);
   
   useEffect(() => {
     if(result){
-      setSearchResult(result)
+      setSearchResult(result['LawContent'])
 
     }
     
@@ -91,9 +87,10 @@ export function Detail1({navigation}) {
     outputRange: [0, 1],
   });
 
-  const SearchScrollview = useContext(RefForSearch);
+  // const SearchScrollview = useContext(RefForSearch);
 
-  SearchScrollview.updateSearch(list);
+  // SearchScrollview.updateSearch(list);
+
 
   // function Search(input) {
   //   let searchArray = {};
@@ -341,6 +338,27 @@ export function Detail1({navigation}) {
     }
   }
 
+
+
+  function LawFilterContent(array, obj) {
+    
+    let contentFilted = {}
+    
+    
+    Object.keys(obj).filter(key=>{
+
+    if(array.includes(key)){
+      contentFilted[key] = obj[key]
+
+    }
+      
+    } )
+
+    setLawFilted(contentFilted)
+
+  }
+
+
   useEffect(() => {
     collapse(name);
   }, [name]);
@@ -358,7 +376,7 @@ export function Detail1({navigation}) {
 
     if (
       choosenLaw.length ==
-      Object.keys(dataOrg['LawContent'] || {}).length
+      Object.keys(SearchResult || {}).length
     ) {
       setCheckedAllFilter(true);
     } else {
@@ -381,7 +399,7 @@ export function Detail1({navigation}) {
 
   return (
     <>
-          {loading1 && (
+          { (loading1 || !internetConnected) && (
         <View
           style={{
             position: 'absolute',
@@ -402,7 +420,7 @@ export function Detail1({navigation}) {
               fontWeight:'bold'
             }}
             >
-              Xin vui lòng đợi trong giây lát ...
+            {internetConnected ? "Xin vui lòng đợi trong giây lát ..." :"Vui lòng kiểm tra kết nối mạng ..."}
             </Text>
           <ActivityIndicator size="large" color="white"></ActivityIndicator>
         </View>
@@ -458,7 +476,6 @@ export function Detail1({navigation}) {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    {/* {checkedAllFilter ? 'All' : choosenLaw.length} */}
                     {choosenLaw.length}
 
                   </Text>
@@ -599,9 +616,13 @@ export function Detail1({navigation}) {
               .length ? (
             <NoneOfResutl />
           ) : (
-            Object.keys(SearchResult).map((key, i) => {
-              let nameLaw =
-                dataOrg['LawInfo'][key]['lawNameDisplay'];
+            Object.keys(LawFilted || SearchResult).map((key, i) => {
+              let nameLaw = 'unknown name'
+              if(result){
+                nameLaw =
+                  result['LawInfo'][key]['lawNameDisplay'];
+
+              }
               if (nameLaw) {
                 if (nameLaw.match(/(?<=\w)\\(?=\w)/gim)) {
                   nameLaw = key.replace(/(?<=\w)\\(?=\w)/gim, '/');
@@ -785,7 +806,7 @@ export function Detail1({navigation}) {
               </TouchableOpacity>
             </View>
 
-            {/* <TouchableOpacity
+            <TouchableOpacity
               style={{
                 display: 'flex',
                 flexDirection: 'row',
@@ -807,13 +828,13 @@ export function Detail1({navigation}) {
               onPress={() => {
                 if (
                   choosenLaw.length ==
-                  Object.keys(dataOrg['LawContent']).length
+                  Object.keys(SearchResult).length
                 ) {
                   setCheckedAllFilter(false);
                   setChoosenLaw([]);
                 } else {
                   setChoosenLaw(
-                    Object.keys(dataOrg['LawContent']),
+                    Object.keys(SearchResult),
                   );
                   setCheckedAllFilter(true);
                 }
@@ -823,14 +844,14 @@ export function Detail1({navigation}) {
                 onClick={() => {
                   if (
                     choosenLaw.length ==
-                    Object.keys(dataOrg['LawContent'])
+                    Object.keys(SearchResult)
                       .length
                   ) {
                     setCheckedAllFilter(false);
                     setChoosenLaw([]);
                   } else {
                     setChoosenLaw(
-                      Object.keys(dataOrg['LawContent']),
+                      Object.keys(SearchResult),
                     );
                     setCheckedAllFilter(true);
                   }
@@ -847,7 +868,7 @@ export function Detail1({navigation}) {
                 }}>
                 Tất cả
               </Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
 
             <ScrollView keyboardShouldPersistTaps="handled">
               <View
@@ -858,15 +879,15 @@ export function Detail1({navigation}) {
                   display: 'flex',
                   // flexDirection:'row'
                 }}>
-                {dataOrg['LawContent'] &&
-                  Object.keys(dataOrg['LawContent']).map(
+                {SearchResult &&
+                  Object.keys(SearchResult).map(
                     (key, i) => {
                       let nameLaw =
-                        dataOrg['LawInfo'][key][
+                        result['LawInfo'][key][
                           'lawNameDisplay'
                         ];
                       let lawDescription =
-                        dataOrg['LawInfo'][key][
+                        result['LawInfo'][key][
                           'lawDescription'
                         ];
                       if (nameLaw) {
@@ -935,28 +956,28 @@ export function Detail1({navigation}) {
                               width: '90%',
                               alignItems: 'center',
                             }}
-                            // onPress={() => {
-                            //   if (key == undefined) {
-                            //   } else if (choosenLaw.includes(key)) {
-                            //     setChoosenLaw(
-                            //       choosenLaw.filter(a1 => a1 !== key),
-                            //       setCheckedAllFilter(false),
-                            //     );
-                            //   } else {
-                            //     setChoosenLaw([...choosenLaw, key]);
-                            //     if (
-                            //       choosenLaw.length ==
-                            //       Object.keys(
-                            //         dataOrg['LawContent'],
-                            //       ).length -
-                            //         1
-                            //     ) {
-                            //       setCheckedAllFilter(true);
-                            //     }
-                            //   }
-                            // }}
+                            onPress={() => {
+                              if (key == undefined) {
+                              } else if (choosenLaw.includes(key)) {
+                                setChoosenLaw(
+                                  choosenLaw.filter(a1 => a1 !== key),
+                                  setCheckedAllFilter(false),
+                                );
+                              } else {
+                                setChoosenLaw([...choosenLaw, key]);
+                                if (
+                                  choosenLaw.length ==
+                                  Object.keys(
+                                    SearchResult
+                                  ).length -
+                                    1
+                                ) {
+                                  setCheckedAllFilter(true);
+                                }
+                              }
+                            }}
                             >
-                            {/* <CheckBox
+                            <CheckBox
                               onClick={() => {
                                 if (key == undefined) {
                                 } else if (choosenLaw.includes(key)) {
@@ -969,9 +990,7 @@ export function Detail1({navigation}) {
                                   if (
                                     choosenLaw.length ==
                                     Object.keys(
-                                      dataOrg[
-                                        'LawContent'
-                                      ],
+                                      SearchResult,
                                     ).length -
                                       1
                                   ) {
@@ -981,7 +1000,7 @@ export function Detail1({navigation}) {
                               }}
                               isChecked={choosenLaw.includes(key)}
                               style={{}}
-                            /> */}
+                            />
 
                             <Text style={{marginLeft: 5, color: 'black'}}>
                               {nameLaw}
@@ -998,6 +1017,7 @@ export function Detail1({navigation}) {
                 backgroundColor: 'green',
               }}
               onPress={() => {
+                LawFilterContent(choosenLaw,SearchResult)
                 let timeOut = setTimeout(() => {
                   setShowFilter(false);
                   return () => {};

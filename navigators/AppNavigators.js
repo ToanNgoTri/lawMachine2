@@ -8,8 +8,9 @@ import {Detail1} from '../screens/Detail1';
 import {Detail2} from '../screens/Detail2';
 // import Detail4 from '../screens/Detail4';
 import Detail5 from '../screens/Detail5';
-import {RefForSearch} from '../App'
-import {RefForHome} from '../App'
+import { Dirs, FileSystem } from 'react-native-file-access';
+import {ContentDownloaded} from '../App'
+import {InfoDownloaded} from '../App'
 import {ModalStatus} from "../App";
 import {
   Alert,
@@ -34,11 +35,18 @@ const Tab = createBottomTabNavigator();
 
 const AppNavigators = () => {
   // const [tabName, setTabName] = useState('home');
-
   // const animatedValue = useRef(new Animated.Value(1)).current
 
-  const SearchScrollview = useContext(RefForSearch)
-  const HomeFlatlist = useContext(RefForHome)
+
+
+  // const SearchScrollview = useContext(RefForSearch)
+  // const HomeFlatlist = useContext(RefForHome)
+
+
+
+
+  const i = useContext(ContentDownloaded)
+  const ii = useContext(InfoDownloaded)
 
   // console.log(context.value);
 
@@ -50,21 +58,21 @@ const AppNavigators = () => {
   //   }).start();
   // },[animatedValue])
 
-  const { width, height } = Dimensions.get("window");
-  let heightTab=height/2;
-  let widthTab=width/2;
-  Dimensions.addEventListener("change", ({ window: { width, height } }) => {
-    // console.log(`Width: ${width}, Height: ${height}`);
-    widthTab=width/2;
-    heightTab=height/2
+  // const { width, height } = Dimensions.get("window");
+  // let heightTab=height/2;
+  // let widthTab=width/2;
+  // Dimensions.addEventListener("change", ({ window: { width, height } }) => {
+  //   // console.log(`Width: ${width}, Height: ${height}`);
+  //   widthTab=width/2;
+  //   heightTab=height/2
     
-  });  
+  // });  
 
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        lazy:false,
+        lazy:true,
         tabBarStyle: {postion: "absolute",
           // backgroundColor:'blue',
 
@@ -155,13 +163,15 @@ const AppNavigators = () => {
 
         // }}
         // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
-
+        style={{alignItems:'center'}}
         >
                 <Ionicons
                   name="home-outline"
                   style={
                     focused ? styles.IconActive : styles.IconInActive
                   }></Ionicons>
+                                    <Text style={{...focused ? styles.IconActive : styles.IconInActive,fontSize:10}}>Offline</Text>
+
               </Animated.View>
             );
           },
@@ -173,7 +183,7 @@ const AppNavigators = () => {
         }}
         listeners={{
           tabPress: (props)=>{
-              HomeFlatlist.forHome.current.scrollToOffset({ animated: true, offset: 0 });
+              // HomeFlatlist.forHome.current.scrollToOffset({ animated: true, offset: 0 });
           }
         }}
 an
@@ -187,12 +197,14 @@ an
             return (
               <View
                 // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
-                >
+                style={{alignItems:'center'}}
+                 >
                 <Ionicons
                   name="albums-outline"
                   style={
                     focused ? styles.IconActive : styles.IconInActive
                   }></Ionicons>
+                  <Text style={{...focused ? styles.IconActive : styles.IconInActive,fontSize:10}}>Search Law</Text>
               </View>
             );
           },
@@ -202,9 +214,7 @@ an
         }}
         listeners={{
           tabPress: (props)=>{
-            // const { route, index, focused } = scene;
-            // console.log(navigation);
-            SearchScrollview.forSearch.current.scrollTo({y: 0});
+            // SearchScrollview.forSearch.current.scrollTo({y: 0});
           }
         }}
       />
@@ -217,12 +227,14 @@ an
             return (
               <View
                 // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
+                style={{alignItems:'center'}}
                 >
                 <Ionicons
                   name="search-outline"
                   style={
                     focused ? styles.IconActive : styles.IconInActive
                   }></Ionicons>
+                  <Text style={{...focused ? styles.IconActive : styles.IconInActive,fontSize:10}}>Search Content</Text>
               </View>
             );
           },
@@ -232,9 +244,7 @@ an
         }}
         listeners={{
           tabPress: (props)=>{
-            // const { route, index, focused } = scene;
-            // console.log(navigation);
-            SearchScrollview.forSearch.current.scrollTo({y: 0});
+            // SearchScrollview.forSearch.current.scrollTo({y: 0});
           }
         }}
 
@@ -244,13 +254,34 @@ an
 };
 
 const StackNavigator = () => {
+  
   const [Content, setContent] = useState(dataOrg['LawInfo']);
   const ModalVisibleStatus = useContext(ModalStatus)
+
+
+  async function getContentExist() {
+    if(await FileSystem.exists(Dirs.CacheDir+'/Content.txt','utf8')){
+      const FileInfoStringInfo = await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8');
+      if(FileInfoStringInfo){
+        return {...dataOrg['Info'],...JSON.parse(FileInfoStringInfo)}
+      }
+        // f = JSON.parse(FileInfoStringInfo)
+      }
+    }
   
-  const {loading3,info3} = useSelector(state => state['navigator']);
+
+let StackScreen
+
+// console.log('Content',Content);
+
 
 useEffect(() => {
-
+  getContentExist().then((cont)=> {
+    setContent(cont)
+    // console.log('cont',cont);
+    
+  })
+  
   database() 
   .ref(`/LawInfo`)
   .once('value')
@@ -259,12 +290,8 @@ useEffect(() => {
     setContent(snapshot.val())  /////////////////////////////////////////////////////////////////  nên sửa
   });
 
-  // if(info3){
-  //   setContent(info3)
 
-  // }
-
-}, [info3])
+}, [])
   
   function TopBarNav({route}) {
     <Text>{route.name}</Text>;
@@ -273,17 +300,6 @@ useEffect(() => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-      //       screenOptions={({ route }) => (
-      //   console.log(route.name)
-
-      // )}
-
-      // initialRouteName="Home"
-      // screenOptions={
-      //   {
-      //     header: ({route}) => <Text>{route.name}</Text>
-      //   }
-      // }
       >
         <Stack.Screen
           name="HomeStack"

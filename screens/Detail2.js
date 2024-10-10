@@ -8,15 +8,15 @@ import {
   Keyboard,
   ActivityIndicator,
 } from 'react-native';
-import {handle2, searchLaw} from '../redux/fetchData';
-import database from '@react-native-firebase/database';
+// import {handle2, searchLaw} from '../redux/fetchData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector, useDispatch} from 'react-redux';
 
 import React, {useEffect, useState, useRef, useContext} from 'react';
+import {useNetInfo} from '@react-native-community/netinfo';
 
-import {RefForSearch} from '../App';
-import {RefLoading} from '../App';
+// import {RefForSearch} from '../App';
+// import {RefLoading} from '../App';
 
 export function Detail2({navigation}) {
   // const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
@@ -24,17 +24,22 @@ export function Detail2({navigation}) {
   // const [valueInput, setValueInput] = useState('');
 
   const [warning, setWanring] = useState(false);
+
   const list = useRef(null);
 
   const dispatch = useDispatch();
 
-  const {loading2, content, info, input2} = useSelector(
+  const {loading2, info, input2} = useSelector(
     state => state['searchLaw'],
   );
 
-  const SearchScrollview = useContext(RefForSearch);
+  // const SearchScrollview = useContext(RefForSearch);
 
-  SearchScrollview.updateSearch(list);
+  // SearchScrollview.updateSearch(list);
+
+  const netInfo = useNetInfo();
+  let internetConnected = netInfo.isConnected;
+
 
   useEffect(() => {
     setWanring(false);
@@ -54,7 +59,7 @@ export function Detail2({navigation}) {
 
   return (
     <>
-      {loading2 && (
+      {(loading2 || !internetConnected) && (
         <View
           style={{
             position: 'absolute',
@@ -74,7 +79,7 @@ export function Detail2({navigation}) {
               marginBottom: 15,
               fontWeight: 'bold',
             }}>
-            Xin vui lòng đợi trong giây lát ...
+            {internetConnected ? "Xin vui lòng đợi trong giây lát ..." :"Vui lòng kiểm tra kết nối mạng ..."}
           </Text>
           <ActivityIndicator size="large" color="white"></ActivityIndicator>
         </View>
@@ -197,14 +202,15 @@ export function Detail2({navigation}) {
         <View style={{marginTop: 1}}>
           {info == null ? (
             <></>
-          ) : info.length ? (
-            info.map((key, i) => {
-              let nameLaw = key['lawNumber'];
-              if (nameLaw) {
-                if (nameLaw.match(/(?<=\w)\/(?=\w)/gim)) {
-                  nameLaw = nameLaw.replace(/(?<=\w)\/(?=\w)/gim, '\\');
-                }
-              }
+          ) : Object.keys(info).length ? (
+            Object.keys(info).map((key, i) => {
+              
+              // let nameLaw = info[key]['lawNumber'];
+              // if (nameLaw) {
+              //   if (nameLaw.match(/(?<=\w)\/(?=\w)/gim)) {
+              //     nameLaw = nameLaw.replace(/(?<=\w)\/(?=\w)/gim, '\\');
+              //   }
+              // }
 
               return (
                 <TouchableOpacity
@@ -216,15 +222,15 @@ export function Detail2({navigation}) {
                     marginBottom: 6,
                   }}
                   onPress={() =>
-                    navigation.navigate(`${nameLaw}`, {searchLaw: true})
+                    navigation.navigate(`${key}`)
                   }>
                   <View style={styles.item}>
                     <Text style={styles.chapterText} key={`${i}a`}>
-                      {key['lawNameDisplay']}
+                      {info[key]['lawNameDisplay']}
                     </Text>
-                    {!key['lawNameDisplay'].match(/^(luật|bộ luật)/gim) && (
+                    {!info[key]['lawNameDisplay'].match(/^(luật|bộ luật|Hiến)/gim) && (
                       <Text style={styles.descriptionText}>
-                        {key && key['lawDescription']}
+                        {key && info[key]['lawDescription']}
                       </Text>
                     )}
                   </View>

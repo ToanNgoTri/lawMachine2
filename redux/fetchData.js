@@ -4,6 +4,7 @@ import database from '@react-native-firebase/database';
 // import {call,put,takeEvery} from 'redux-saga'
 import dataOrg from '../data/project2-197c0-default-rtdb-export.json';       ////////////////////////////////////////////// xài tạm
 import { call,put,takeEvery,take,takeLatest } from 'redux-saga/effects';
+import { Dirs, FileSystem } from 'react-native-file-access';
 
 
 export const read = createSlice({
@@ -11,7 +12,7 @@ export const read = createSlice({
   initialState: {
     data:null,
     info:null,
-    loading: true
+    loading: false
   },
   reducers: {
     
@@ -33,7 +34,7 @@ export const searchContent = createSlice({
     data1:dataOrg,
     loading1: false,
     input1:'thuyền',
-    result:[]
+    result:false
   },
   reducers: {
     loader1: (state,action) => {
@@ -52,7 +53,6 @@ export const searchLaw = createSlice({
   initialState: {
     loading2: false,
     input2:'',
-    content:null,
     info:null,
   },
   reducers: {
@@ -62,7 +62,6 @@ export const searchLaw = createSlice({
 
     handle2: (state,action) => {
       console.log('action',action);
-      state.content=action.payload.a;
       state.info=action.payload.b;
       state.loading2= false;
     },
@@ -70,20 +69,27 @@ export const searchLaw = createSlice({
 })
 
 
-export const navigator = createSlice({
-  name: 'navigator',     
+export const offline = createSlice({    // không càn nữa
+  name: 'offline',     
   initialState: {
     loading3: false,
-    info3:null,
+    // info3:null,
+    // content3:null,
+    info3:dataOrg['LawInfo'],
+    content3:dataOrg['LawContent'],
   },
   reducers: {
     loader3: (state,action) => {
       state.loading3= true;
+
     },
 
     handle3: (state,action) => {
-      state.info3=action.payload.d;
+      state.info3=action.payload.infoObject;
+      state.content3=action.payload.contentObject;
       state.loading3= false;
+      console.log(123);
+
     },
 }
 })
@@ -114,7 +120,7 @@ export function* mySaga1(state,action){
     yield put(loader1())
 console.log(state.input);
 
-    let info = yield  fetch('https://converttool2.onrender.com/searchContent',{
+    let info = yield  fetch('http://192.168.0.104:5000/searchContent',{
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -133,7 +139,7 @@ export function* mySaga2(state,action){
   try{
     yield put(loader2())
 
-        let info = yield  fetch('https://converttool2.onrender.com/searchLaw',{
+        let info = yield  fetch('http://192.168.0.104:5000/searchLaw',{
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -151,8 +157,7 @@ export function* mySaga2(state,action){
     // const info = yield call( async ()=> await database().ref(`/LawInfo/${lawNumber}`).once('value') )
     // const b =   info.val()
 
-    let a = []
-    yield put(handle2({a,b}))
+    yield put(handle2({b}))
   }catch(e){
   }
 }
@@ -164,11 +169,13 @@ export function* mySaga3(state,action){
     yield put(loader3())
     // console.log('state',state.lawName);
     
-       const c = yield call( async ()=> await database().ref(`/LawInfo`).once('value') )
-       const d =   c.val()      
-
-
-    yield put(handle3({d}))
+    const FileInfoStringContent = yield ( async ()=> await FileSystem.readFile(Dirs.CacheDir+'/Content.txt','utf8'))
+    let contentObject = {...JSON.parse(FileInfoStringContent),...dataOrg['LawContent']}
+    
+    const FileInfoStringInfo = yield ( async ()=> await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8'))
+    let infoObject = {...JSON.parse(FileInfoStringInfo),...dataOrg['LawInfo']}
+    
+    yield put(handle3({contentObject,infoObject}))
 
     
   }catch(e){
@@ -195,12 +202,12 @@ export function* saga2(){
 }
 
 export function* saga3(){
-  yield takeEvery('navigator',mySaga3)
+  yield takeEvery('offline',mySaga3)
 
 }
 
   
-export const {loader,handle,noLoading} = read.actions;
+export const {loader,handle} = read.actions;
 export const {loader1,handle1} = searchContent.actions;
 export const {loader2,handle2} = searchLaw.actions;
-export const {loader3,handle3} = searchLaw.actions;
+export const {loader3,handle3} = offline.actions;

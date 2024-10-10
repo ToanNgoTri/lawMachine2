@@ -16,63 +16,36 @@ import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {RefForHome} from '../App';
 import { useSelector, useDispatch } from 'react-redux';
+import { Dirs, FileSystem } from 'react-native-file-access';
+import {ContentDownloaded,InfoDownloaded} from '../App';
 
-import {useNetInfo} from '@react-native-community/netinfo';
-import {loader,handle,noLoading} from '../redux/fetchData'
+import {loader,handle} from '../redux/fetchData'
 
 export default function Home({navigation}) {
   const [Content, setContent] = useState('');
-  // sử dụng để đọc realtime database, data được xuất ra ở dưới dạng object rồi không cần JSON.parse
 
+  const [Info, setInfo] = useState(false)
   
-  
-  const [showContent, setShowContent] = useState([]);
+  // const [showContent, setShowContent] = useState([]);
 
   const [inputSearchLaw, setInputSearchLaw] = useState('');
   const [searchLawResult, setSearchLawResult] = useState([]);
-  const [currentPaper, setCurrentPaper] = useState(1);
-  const [totalPaper, setTotalPaper] = useState(2);
-
-  const HomeFlatlist = useContext(RefForHome);
+  // const [currentPaper, setCurrentPaper] = useState(1);
+  // const [totalPaper, setTotalPaper] = useState(2);
 
 
-
-
-
-  const [showWanringInternet, setShowWanringInternet] = useState(false);
 
   const list1 = useRef(null);
 
 
-  const dispatch = useDispatch()
-
-
-  const animated = useRef(new Animated.Value(0)).current;
-
-  let Opacity = animated.interpolate({
-    inputRange: [-100,0,25,50,100],
-    outputRange: [0,1,0,0, 0],
-  });
-
-  let TranslateY = animated.interpolate({
-    inputRange: [-100,0, 100],
-    outputRange: [0,0, 100],
-  });
-
-
-  const {width, height} = Dimensions.get('window');
-  let heightDevice = height;
-  let widthDevice = width;
-  Dimensions.addEventListener('change', ({window: {width, height}}) => {
-    // console.log(`Width: ${width}, Height: ${height}`);
-    widthDevice = width;
-    heightDevice = height;
-  });
-
-
-  HomeFlatlist.updateHome(list1);
-
-
+  // const {width, height} = Dimensions.get('window');
+  // let heightDevice = height;
+  // let widthDevice = width;
+  // Dimensions.addEventListener('change', ({window: {width, height}}) => {
+  //   // console.log(`Width: ${width}, Height: ${height}`);
+  //   widthDevice = width;
+  //   heightDevice = height;
+  // });
 
 
   const Render = ({item}) => {
@@ -83,32 +56,32 @@ export default function Home({navigation}) {
         paddingBottom:20,
         paddingTop:20,
         justifyContent:'center',
-        backgroundColor: 'green',
+        backgroundColor: Info[item] && Info[item]['lawNameDisplay'].match(/^(Hiến)/img)?'#003300':'green',
         marginBottom: 6,
 
       }}
       onPress={() => navigation.navigate(`${item}`)}>
         <View style={styles.item}>
-        <Text style={styles.itemDisplay}>{dataOrg['LawInfo'][item]['lawNameDisplay']}</Text>
-        {!dataOrg['LawInfo'][item]['lawNameDisplay'].match(/^(luật|bộ luật)/img) 
-        && <Text style={styles.itemDescription}>{dataOrg && dataOrg['LawInfo'][item]['lawDescription']}</Text>}
+        <Text style={{...styles.itemDisplay,color:Info[item] && Info[item]['lawNameDisplay'].match(/^(Hiến)/img)?'yellow':'white'}}>{Info[item] && Info[item]['lawNameDisplay']}</Text>
+        {Info[item] && !Info[item]['lawNameDisplay'].match(/^(luật|bộ luật|hiến)/img) 
+        && <Text style={{...styles.itemDescription}}>{Info[item] && Info[item]['lawDescription']}</Text>}
         </View>
       </TouchableOpacity>
     );
   };
 
-  const renderLoader = () => {
-    return (
-      <View>
-        <ActivityIndicator size="large" color="#aaa" />
-      </View>
-    );
-  };
+  // const renderLoader = () => {
+  //   return (
+  //     <View>
+  //       <ActivityIndicator size="large" color="#aaa" />
+  //     </View>
+  //   );
+  // };
 
   useEffect(() => {
     setSearchLawResult(
       Content &&
-        Content.filter(item => {
+        Object.keys(Content).filter(item => {
           if (
             inputSearchLaw.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\s?)/gim)
           ) {
@@ -136,105 +109,98 @@ export default function Home({navigation}) {
               inputSearchLawReg = inputSearchLawReg.replace(/\?/gim, '\\?');
             }
 
-            return (dataOrg['LawInfo'][item]['lawNameDisplay'].match(new RegExp(inputSearchLawReg, 'igm')) 
-            || dataOrg['LawInfo'][item]['lawDescription'].match(new RegExp(inputSearchLawReg, 'igm'))
-            || dataOrg['LawInfo'][item]['lawNumber'].match(new RegExp(inputSearchLawReg, 'igm')));
+            return (Info[item]['lawNameDisplay'].match(new RegExp(inputSearchLawReg, 'igm')) 
+            || Info[item]['lawDescription'].match(new RegExp(inputSearchLawReg, 'igm'))
+            || Info[item]['lawNumber'].match(new RegExp(inputSearchLawReg, 'igm')));
           }
         }),
     );
   }, [inputSearchLaw]);
 
-  const netInfo = useNetInfo();
-  let internetConnected = netInfo.isConnected;
-  const hasBeenRerender = useRef(false);      // nếu true có nghĩa là warning sẽ không xuất hiện thêm lần nào nữa
+  // const netInfo = useNetInfo();
+  // let internetConnected = netInfo.isConnected;
 
-  const [alreadyInternetWarning, setAlreadyInternetWarning] = useState(false);      // dùng để biết đã từng có internet chưa
+  // const hasBeenRerender = useRef(false);      // nếu true có nghĩa là warning sẽ không xuất hiện thêm lần nào nữa
 
-  const {loading,data} = useSelector(state => state['read']);
+  // const [alreadyInternetWarning, setAlreadyInternetWarning] = useState(false);      // dùng để biết đã từng có internet chưa
 
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    if(!hasBeenRerender.current && (internetConnected==false) ){
-      setShowWanringInternet(true);
-      setAlreadyInternetWarning(true)
+  //   if(!hasBeenRerender.current && (internetConnected==false) ){
+  //     setShowWanringInternet(true);
+  //     setAlreadyInternetWarning(true)
   
-    }
-    else if(!hasBeenRerender.current && internetConnected && alreadyInternetWarning){
-      setShowWanringInternet(true);
-      // dispatch({type:'run'})
-      setTimeout(()=>{
-        hasBeenRerender.current = true
-      setShowWanringInternet(false);
-      },3000)
-    }
+  //   }
+  //   else if(!hasBeenRerender.current && internetConnected && alreadyInternetWarning){
+  //     setShowWanringInternet(true);
+  //     // dispatch({type:'run'})
+  //     setTimeout(()=>{
+  //       hasBeenRerender.current = true
+  //     setShowWanringInternet(false);
+  //     },3000)
+  //   }
 
-    if (internetConnected &&!hasBeenRerender.current) {
-            hasBeenRerender.current = true
-            // dispatch({type:'run'})
+  //   if (internetConnected &&!hasBeenRerender.current) {
+  //           hasBeenRerender.current = true
+  //           // dispatch({type:'run'})
 
       
-    } else if(internetConnected==false) {      
-       dispatch(noLoading())
+  //   } else if(internetConnected==false) {      
+  //     //  dispatch(noLoading())
+  //   }
+
+  //   setTimeout(()=>{
+  //     Animated.timing(animated, {
+  //       toValue: internetConnected ?100:0,
+  //       duration: 2000,
+  //       useNativeDriver: true,
+  //     }).start();
+  //   },2000)
+  // }, [internetConnected]);
+
+
+// const {loading3, info3, content3} = useSelector(state => state['offline']);
+// console.log('Content',Content);
+
+
+useEffect(() => {
+  
+  const listener = navigation.addListener('focus', () => {
+    async function getContentExist() {
+      if(await FileSystem.exists(Dirs.CacheDir+'/Content.txt','utf8')){
+        const FileInfoStringContent = await FileSystem.readFile(Dirs.CacheDir+'/Content.txt','utf8');
+        const FileInfoStringInfo = await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8');
+        if(FileInfoStringContent){
+          return {'content':JSON.parse(FileInfoStringContent),'info':JSON.parse(FileInfoStringInfo)}
+        // f = JSON.parse(FileInfoStringInfo)
+        }
+      }
     }
-
-    setTimeout(()=>{
-      Animated.timing(animated, {
-        toValue: internetConnected ?100:0,
-        duration: 2000,
-        useNativeDriver: true,
-      }).start();
-    },2000)
-  }, [internetConnected]);
-
-
-// console.log(dataOrg['LawContent']);
-
-  useEffect(() => {
     
-    // if(data){
-    // setContent(Object.keys(data['LawContent']));
-    // setShowContent(Object.keys(data['LawContent']).slice(0, 7));
-    // setTotalPaper(Math.floor(Object.keys(data['LawContent']).length / 7) + 1);
-    // dataLawContent.updateData(data)
+    getContentExist().then((cont)=> {
+      if(cont){
+        setContent(({...dataOrg['LawContent'],...cont.content}));
+        setInfo({...dataOrg['LawInfo'],...cont.info})
 
-    setContent(Object.keys(dataOrg['LawContent']));
-    setShowContent(Object.keys(dataOrg['LawContent']).slice(0, 7));
-    setTotalPaper(Math.floor(Object.keys(dataOrg['LawContent']).length / 7) + 1);
+      }else{
+        setContent(dataOrg['LawContent'])
+        setInfo(dataOrg['LawInfo'])
+      }
 
-    
-  // }
-}, [data])
+  })
+  
+
+  })
+
+
+}, [])
 
 
 
-  const loadMoreItem = () => {
-    if (currentPaper < totalPaper) {
-      // bị lỗi: tuy totalPaper đã dc thêm mới nhưng trong if() vẫn false
-      setCurrentPaper(currentPaper + 1);
-    }
-    setShowContent(Content.slice(0, 7 * currentPaper));
-  };
 
   return (
     <>
-                    {/* { (loading) && (
-        <View style={{position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        opacity: 0.7,
-        backgroundColor: 'black',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex:100
-        }}>
-        <ActivityIndicator size='large' color="white" >
-
-        </ActivityIndicator>
-        </View>
-        )} */}
 
       <View
         style={{
@@ -257,7 +223,7 @@ export default function Home({navigation}) {
           <Ionicons
             name="book-outline"
             style={{
-              color: internetConnected ? 'green' : 'red',
+              color: 'green' ,
               fontSize: 25,
             }}></Ionicons>
         </View>
@@ -293,39 +259,19 @@ export default function Home({navigation}) {
         </TouchableOpacity>
       </View>
 
-      {/* <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-            <View style={styles.item}>
-                <Text style={styles.text}>
-                Tìm kiếm
-                </Text>
-            </View>
-        </TouchableOpacity> */}
-
-      {/* { Content && (searchLawResult || Content).map( (key,i) => (
-
-<TouchableOpacity key={i} onPress={() => navigation.navigate(`${key}`)}>
-            <View style={styles.item}>
-                <Text style={styles.text}>
-                {key}
-                </Text>
-            </View>
-        </TouchableOpacity>
-)
-)
-  } */}
 
       <FlatList
         ref={list1}
         style={{          backgroundColor:'#EEEFE4',
         }}
         keyboardShouldPersistTaps="handled"
-        data={Content && (searchLawResult || Content)}
+        data={Content && (searchLawResult || Object.keys(Content))}
         renderItem={Render}
         //   ListFooterComponent={(totalPaper > currentPaper) && renderLoader} //(totalPaper > currentPaper) &&
         //   onEndReached={ loadMoreItem}
       ></FlatList>
 
-      { (!internetConnected && showWanringInternet) ? (
+      {/* { (!internetConnected && showWanringInternet) ? (
         <View
           style={{
             position: 'absolute',
@@ -376,8 +322,8 @@ export default function Home({navigation}) {
 
               if(!internetConnected){
               setContent(Object.keys(dataOrg['LawContent']));
-              setShowContent(Object.keys(dataOrg['LawContent']).slice(0, 7));
-              setTotalPaper(Math.floor(Object.keys(dataOrg['LawContent']).length / 7) + 1);
+              // setShowContent(Object.keys(dataOrg['LawContent']).slice(0, 7));
+              // setTotalPaper(Math.floor(Object.keys(dataOrg['LawContent']).length / 7) + 1);
 
               
               }
@@ -485,7 +431,7 @@ export default function Home({navigation}) {
           </Animated.View>
         ))
       )
-      }
+      } */}
     </>
   );
 }
@@ -493,8 +439,6 @@ export default function Home({navigation}) {
 const styles = StyleSheet.create({
   item: {
     minHeight:100,
-    // height: 120,
-    // backgroundColor: 'green',
     display: 'flex',
     justifyContent: 'center',
     paddingLeft:20,

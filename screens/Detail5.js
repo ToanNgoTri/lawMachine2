@@ -11,10 +11,9 @@ import {
   Dimensions,
   Modal,
   ActivityIndicator,
-  PermissionsAndroid
+  
 } from 'react-native';
-// import RNFS from 'react-native-fs';
-import { Dirs, FileSystem } from 'react-native-file-access';
+import {Dirs, FileSystem} from 'react-native-file-access';
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import {useRoute} from '@react-navigation/native';
 import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
@@ -24,6 +23,7 @@ import {Shadow} from 'react-native-shadow-2';
 import database from '@react-native-firebase/database';
 import {ModalStatus} from '../App';
 import {useSelector, useDispatch} from 'react-redux';
+import {ContentDownloaded, InfoDownloaded} from '../App';
 
 let TopUnitCount; // là đơn vị lớn nhất vd là 'phần thứ' hoặc chương
 let articleCount = 0;
@@ -41,25 +41,13 @@ let eachSectionWithChapter = [];
 // chỗ chapter nếu bung được thì bung hết
 
 export default function Detail() {
-
-
-
-  // RNFS.writeFile(`${RNFS.DocumentDirectoryPath}/te.json`,'ád', 'utf8')
-  // .then(contents => {
-  //   console.log('contents',contents);
-  //   console.log('File created successfully!');
-  // })
-
-
-  
-
-
-
+  // const inf = useContext(InfoDownloaded);
+  // const con = useContext(ContentDownloaded);
 
   // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
-  const [tittleArray, setTittleArray] = useState([]); // đây là 'phần thứ...' hoặc chương (nói chung là section cao nhất)
+  const [tittleArray, setTittleArray] = useState([true]); // đây là 'phần thứ...' hoặc chương (nói chung là section cao nhất)
 
-  const [tittleArray2, setTittleArray2] = useState([]); // nếu có 'phần thứ...' thì đây sẽ là chương
+  const [tittleArray2, setTittleArray2] = useState([true]); // nếu có 'phần thứ...' thì đây sẽ là chương
 
   const [positionYArr, setPositionYArr] = useState([]); // tập hợp pos Y Search
   const [positionYArrArtical, setPositionYArrArtical] = useState([]);
@@ -71,93 +59,140 @@ export default function Detail() {
 
   const [currentSearchPoint, setCurrentSearchPoint] = useState(1); // thứ tự kết quả search đang trỏ tới
 
+  const [exists, setExists] = useState(false)
+
   const dispatch = useDispatch();
 
   const route = useRoute();
 
-
-
-
-  if(Object.keys(dataOrg['LawInfo']).includes(route.name)){
-    console.log(true);
-    
-  }else{
-    console.log(false);
-    
-  }
-  
-  // async function  y () {
-  //   const FileInfoString = await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8');
-  //   console.log('FileContentString',JSON.parse(FileInfoString));
-
-  // }
-
-  // y()
-
-  async function  StoreInternal () {
-
+  async function StoreInternal() {
     async function k() {
-      if(await FileSystem.exists(Dirs.CacheDir+'/Info.txt','utf8')){
-        const FileInfoString = await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8');
-        console.log('FileContentString',JSON.parse(FileInfoString));
-        return JSON.parse(FileInfoString)
-    
+      if (await FileSystem.exists(Dirs.CacheDir + '/Info.txt', 'utf8')) {
+        const FileInfoString = await FileSystem.readFile(
+          Dirs.CacheDir + '/Info.txt',
+          'utf8',
+        );
+        console.log('FileContentString', JSON.parse(FileInfoString));
+        return JSON.parse(FileInfoString);
       }
-
-}
-
-
-if(k()){
-  // const addContent = await FileSystem.writeFile(Dirs.CacheDir+'/Content.txt',JSON.stringify([Content]),'utf8');
-  // console.log('addContent1',addContent);
-
-  // const addInfo = await FileSystem.writeFile(Dirs.CacheDir+'/Info.txt',JSON.stringify(k().push(Info)),'utf8');
-  // console.log('addInfo1',addInfo);
-
-
-  const addContent = await FileSystem.writeFile(Dirs.CacheDir+'/Content.txt',JSON.stringify(Content),'utf8');
-  console.log('addContent2',addContent);
-
-  const addInfo = await FileSystem.writeFile(Dirs.CacheDir+'/Info.txt',JSON.stringify([Info]),'utf8');
-  console.log('addInfo2',addInfo);
-
-}else{
-  const addContent = await FileSystem.writeFile(Dirs.CacheDir+'/Content.txt',JSON.stringify([Content]),'utf8');
-  console.log('addContent2',addContent);
-
-  const addInfo = await FileSystem.writeFile(Dirs.CacheDir+'/Info.txt',JSON.stringify([Info]),'utf8');
-  console.log('addInfo2',addInfo);
-
-}
-
-    
-
     }
 
+    let m = await k();
+    if (m) {
+      const FileInfoStringContent = await FileSystem.readFile(
+        Dirs.CacheDir + '/Content.txt',
+        'utf8',
+      );
+      let contentObject = JSON.parse(FileInfoStringContent);
+      contentObject[route.name] = Content;
 
+      const addContent = await FileSystem.writeFile(
+        Dirs.CacheDir + '/Content.txt',
+        JSON.stringify(contentObject),
+        'utf8',
+      );
+      console.log('addContent1', addContent);
 
+      const FileInfoStringInfo = await FileSystem.readFile(
+        Dirs.CacheDir + '/Info.txt',
+        'utf8',
+      );
+      let infoObject = JSON.parse(FileInfoStringInfo);
+      infoObject[route.name] = Info;
 
+      const addInfo = await FileSystem.writeFile(
+        Dirs.CacheDir + '/Info.txt',
+        JSON.stringify(infoObject),
+        'utf8',
+      );
+      console.log('addInfo1', addInfo);
+    } else {
+      const addContent = await FileSystem.writeFile(
+        Dirs.CacheDir + '/Content.txt',
+        JSON.stringify({[route.name]: Content}),
+        'utf8',
+      );
+      console.log('addContent2', addContent);
 
+      const addInfo = await FileSystem.writeFile(
+        Dirs.CacheDir + '/Info.txt',
+        JSON.stringify({[route.name]: Info}),
+        'utf8',
+      );
+      console.log('addInfo2', addInfo);
+    }
 
+    const FileInfoStringContent1 = await FileSystem.readFile(
+      Dirs.CacheDir + '/Content.txt',
+      'utf8',
+    );
+    let contentObject = JSON.parse(FileInfoStringContent1);
 
+    const FileInfoStringInfo1 = await FileSystem.readFile(
+      Dirs.CacheDir + '/Info.txt',
+      'utf8',
+    );
+    let infoObject = JSON.parse(FileInfoStringInfo1);
+    console.log('infoObject', infoObject);
 
+    // con.updateContent({...dataOrg['LawContent'], ...contentObject});
+    // inf.updateInfo({...dataOrg['LawInfo'], ...infoObject});
 
+  }
 
+  
 
+  async function DeleteInternal() {
+    console.log('Delete');
+    const FileInfoStringContent = await FileSystem.readFile(
+      Dirs.CacheDir + '/Content.txt',
+      'utf8',
+    );
+    let contentObject = JSON.parse(FileInfoStringContent);
+    delete contentObject[route.name];
 
+    const addContent = await FileSystem.writeFile(
+      Dirs.CacheDir + '/Content.txt',
+      JSON.stringify(contentObject),
+      'utf8',
+    );
+    console.log('addContent1', addContent);
 
+    const FileInfoStringInfo = await FileSystem.readFile(
+      Dirs.CacheDir + '/Info.txt',
+      'utf8',
+    );
+    let infoObject = JSON.parse(FileInfoStringInfo);
+    delete infoObject[route.name];
 
+    const addInfo = await FileSystem.writeFile(
+      Dirs.CacheDir + '/Info.txt',
+      JSON.stringify(infoObject),
+      'utf8',
+    );
+    console.log('addInfo1', addInfo);
+    // else {
+    //   const addContent = await FileSystem.writeFile(
+    //     Dirs.CacheDir + '/Content.txt',
+    //     JSON.stringify({[route.name]: Content}),
+    //     'utf8',
+    //   );
+    //   console.log('addContent2', addContent);
 
-
-
-
-
-
+    //   const addInfo = await FileSystem.writeFile(
+    //     Dirs.CacheDir + '/Info.txt',
+    //     JSON.stringify({[route.name]: Info}),
+    //     'utf8',
+    //   );
+    //   console.log('addInfo2', addInfo);
+    // }
+  }
 
   const animatedForNavi = useRef(new Animated.Value(0)).current;
 
   const list = useRef(null);
-
+  const q = useRef(null);
+q.current = []
   const [input, setInput] = useState(route.params ? route.params.input : '');
   const [valueInput, setValueInput] = useState('');
   const [find, setFind] = useState(route.params ? true : false);
@@ -175,9 +210,6 @@ if(k()){
     widthDevice = width;
     heightDevice = height;
   });
-
-
-  
 
   function pushToSearch() {
     setGo(true);
@@ -248,22 +280,59 @@ if(k()){
 
   const {loading, data, info} = useSelector(state => state['read']);
 
+  async function getContentExist() {
+    if (await FileSystem.exists(Dirs.CacheDir + '/Content.txt', 'utf8')) {
+      const FileInfoStringContent = await FileSystem.readFile(
+        Dirs.CacheDir + '/Content.txt',
+        'utf8',
+      );
+      const FileInfoStringInfo = await FileSystem.readFile(
+        Dirs.CacheDir + '/Info.txt',
+        'utf8',
+      );
+      if (FileInfoStringContent) {
+        return {
+          content: JSON.parse(FileInfoStringContent),
+          info: JSON.parse(FileInfoStringInfo),
+        };
+        // f = JSON.parse(FileInfoStringInfo)
+      }
+    }
+  }
+
+
   useEffect(() => {
-    dispatch({type: 'read', lawName: route.name});
+    getContentExist().then(cont => {
+      if (
+        cont &&
+        Object.keys({...dataOrg['LawInfo'], ...cont.info}).includes(route.name)
+      ) {
+        setInfo({...dataOrg['LawInfo'], ...cont.info}[route.name]);
+        setContent({...dataOrg['LawContent'], ...cont.content}[route.name]);
+      } else if (Object.keys(dataOrg['LawInfo']).includes(route.name)) {
+        setInfo(dataOrg['LawInfo'][route.name]);
+        setContent(dataOrg['LawContent'][route.name]);
+      } else {
+        setExists(true)
+        dispatch({type: 'read', lawName: route.name});
 
-    database()
-      .ref(`/LawInfo/${route.name}`)
-      .once('value')
-      .then(snapshot => {
-        setInfo(snapshot.val());
-      });
+        database()
+          .ref(`/LawInfo/${route.name}`)
+          .once('value')
+          .then(snapshot => {
+            setInfo(snapshot.val());
+          });
 
-    database()
-      .ref(`/LawContent/${route.name}`)
-      .once('value')
-      .then(snapshot => {
-        setContent(snapshot.val());
-      });
+        database()
+          .ref(`/LawContent/${route.name}`)
+          .once('value')
+          .then(snapshot => {
+            setContent(snapshot.val());
+          });
+      }
+    });
+
+
   }, []);
 
   function collapse(a) {
@@ -378,11 +447,6 @@ if(k()){
                   }}></View>
 
                 <Text
-                  //         onLayout={event => {
-                  //         const {y} = event.nativeEvent.layout;
-                  //         console.log('height: ' + y);
-                  // }}
-
                   style={
                     searchResultCount - inputRexgex.length + i - 1 <
                       currentSearchPoint &&
@@ -392,7 +456,7 @@ if(k()){
                       : styles.highlight
                   }
                   key={`${i2}d`}
-                  onp>
+                  >
                   {inputRexgex[i - 1]}
                 </Text>
                 {/* </Text> */}
@@ -403,7 +467,8 @@ if(k()){
                   display: 'flex',
                   margin: 0,
                   lineHeight: 23,
-                }}>
+                }}
+                >
                 {current}
               </Text>,
             );
@@ -421,36 +486,71 @@ if(k()){
   }
 
   let positionYArrArticalDemo = positionYArrArtical;
-
+  
   function setPositionYArtical({y, key3}) {
     key3 = key3.replace(/(?<=\w*)\\(?=\w*)/gim, '/');
-
-    if ((!tittleArray.length && !tittleArray2.length) || go) {
+    
+    // console.log('key3',key3);
+    // console.log('tittleArray.length',tittleArray.length);
+    
+    if(true){
+    if (
+      // true
+      ((tittleArray.length || tittleArray2.length)) || go || tittleArray[0] || tittleArray2[0]
+    ) {
+      
       var contains = positionYArrArtical.some((elem, i) => {
         return key3 == Object.keys(elem);
       });
 
-      if (contains) {
-        articleCount++;
 
-        positionYArrArticalDemo = positionYArrArticalDemo.map((elem, i) => {
-          if (Object.keys(elem) == key3) {
-            return {[key3]: y + currentY};
-          } else {
-            return elem;
+      if(!showArticle){
+        if (contains) {
+          articleCount++;
+          
+          // console.log(123);
+          for(let g = 0;g<= positionYArrArtical.length; g++){
+            if(positionYArrArticalDemo[g][key3]){
+              
+              positionYArrArticalDemo[g][key3] =  y + currentY
+              break
+              
+            }
+            
           }
-        });
 
-        if (articleCount >= positionYArrArtical.length) {
-          setPositionYArrArtical(positionYArrArticalDemo);
-          articleCount = 0;
+          if (articleCount >= positionYArrArtical.length) {
+            setPositionYArrArtical(positionYArrArticalDemo);
+            // setPositionYArrArtical(q.current);
+            q.current = []
+
+            articleCount = 0;
+          }
+        } else {
+          positionYArrArtical.push({[key3]: y + currentY});
+          // console.log(567);
+
         }
-      } else {
-        positionYArrArtical.push({[key3]: y + currentY});
+      }else{
+        articleCount++;
+        
+        // positionYArrArtical.map((elem, i) => {
+          q.current[articleCount-1] = {[key3]: y + currentY}
+          
+        // });
+        if (articleCount >= positionYArrArtical.length) {
+          setPositionYArrArtical(q.current);
+          articleCount = 0;
+          q.current = []
+        }
+  
+                // console.log('q.current',q.current);
+        
       }
-    }
+    }}
   }
 
+  
   TopUnitCount = Content && Object.keys(Content).length;
 
   function Shrink() {
@@ -461,8 +561,6 @@ if(k()){
         setTittleArray(oldArray => [...oldArray, b]);
       }
     }
-    // console.log('sumChapter',sumChapter);
-    // console.log('sumChapterArray',sumChapterArray);
 
     let sumChapter = sumChapterArray.reduce((total, currentValue) => {
       // tổng chapter nếu có phần thứ
@@ -554,43 +652,10 @@ if(k()){
     Keyboard.dismiss();
   }, [find]);
 
-  let onlyArticle = false; // dùng để hiển thị collapse và expand
-  const c = (key, i, ObjKeys) => {
-    // phần nếu không mục 'phần thứ' và "chương" trong văn bản (chỉ có Điều ...)
-    onlyArticle = true;
-
-    return Object.keys(key)[0] != '0' ? (
-      <View key={`${i}b`}>
-        <View
-          onLayout={event => {
-            event.target.measure((x, y, width, height, pageX, pageY) => {
-              setPositionYArtical({
-                y: y + pageY,
-                key3: ObjKeys,
-              });
-            });
-          }}
-          style={
-            go
-              ? {width: '100%', marginBottom: 20}
-              : {width: '99%', marginBottom: 20}
-          }>
-          <Text key={`${i}c`} style={styles.dieu}>
-            {highlight([ObjKeys], valueInput, i)}
-          </Text>
-          <Text key={`${i}d`} style={styles.lines}>
-            {highlight([key[ObjKeys]], valueInput, i)}
-          </Text>
-        </View>
-      </View>
-    ) : (
-      {}
-    );
-  };
 
   const a = (key, i, key1, i1a, t) => {
     // phần nếu không mục 'phần thứ' trong văn bản
-
+    
     return Object.keys(key)[0] != '0' ? (
       <View
         key={`${i}b`}
@@ -614,6 +679,7 @@ if(k()){
           return (
             <View
               onLayout={event => {
+                
                 event.target.measure((x, y, width, height, pageX, pageY) => {
                   setPositionYArtical({
                     y: y + pageY,
@@ -737,7 +803,39 @@ if(k()){
     );
   };
 
-  // console.log('detail5');
+  let onlyArticle = false; // dùng để hiển thị collapse và expand
+  const c = (key, i, ObjKeys) => {
+    // phần nếu không mục 'phần thứ' và "chương" trong văn bản (chỉ có Điều ...)
+    onlyArticle = true;
+
+    return Object.keys(key)[0] != '0' ? (
+      <View key={`${i}b`}>
+        <View
+          onLayout={event => {
+            event.target.measure((x, y, width, height, pageX, pageY) => {
+              setPositionYArtical({
+                y: y + pageY,
+                key3: ObjKeys,
+              });
+            });
+          }}
+          style={
+            go
+              ? {width: '100%', marginBottom: 20}
+              : {width: '99%', marginBottom: 20}
+          }>
+          <Text key={`${i}c`} style={styles.dieu}>
+            {highlight([ObjKeys], valueInput, i)}
+          </Text>
+          <Text key={`${i}d`} style={styles.lines}>
+            {highlight([key[ObjKeys]], valueInput, i)}
+          </Text>
+        </View>
+      </View>
+    ) : (
+      {}
+    );
+  };
 
   return (
     <>
@@ -771,63 +869,144 @@ if(k()){
         presentationStyle="pageSheet"
         animationType="slide"
         visible={ModalVisibleStatus.modalStatus}
+        onRequestClose={()=>ModalVisibleStatus.updateModalStatus(false)}
         style={{}}>
         <ScrollView
           style={{
             backgroundColor: '#EEEFE4',
           }}>
-          <View style={{paddingBottom: 30}}>
+          <View style={{paddingBottom: 30,}}>
             <View
-            style={{
-              // backgroundColor: 'green',
-              flexDirection:'row',
-              justifyContent:'space-between'
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                ModalVisibleStatus.updateModalStatus(false);
-              }}
               style={{
-                padding: 20,
+                // marginTop:20,
+                backgroundColor: '#CCCCCC',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
                 alignItems: 'center',
-                width: 70,
-              
+                height:60,
+                // borderBottomWidth:3,
+                borderColor:'#2F4F4F',
+                shadowColor: 'black',
+                shadowOpacity: 1,
+                shadowOffset: {
+                  width: 10,
+                  height: 10,
+                },
+                shadowRadius: 4,
+                elevation: 10,
+
+
               }}>
-              <Ionicons
-                name="close-outline"
+              <TouchableOpacity
+                onPress={() => {
+                  ModalVisibleStatus.updateModalStatus(false);
+                }}
                 style={{
-                  color: '#777777',
-                  fontSize: 30,
-                  textAlign: 'center',
-                  width: '100%',
-                  fontWeight: 'bold',
-                }}></Ionicons>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                StoreInternal()
-              }}
-              style={{
-                padding: 20,
-                alignItems: 'center',
-                width: 70,
-                right:30
-              }}>
-              <Ionicons
-                name="cloud-download-outline"
+                  alignItems: 'center',
+                  justifyContent:'center',
+                  height:60,
+                  width:60,
+                  // borderWidth:4,
+                  borderColor:'black',
+                  // borderRadius:10,
+                  // backgroundColor:'#528B8B',
+
+                }}>
+                <Ionicons
+                  name="close-outline"
+                  style={{
+                    color: 'black',
+                    fontSize: 30,
+                    textAlign: 'center',
+                    // width: '100%',
+                    fontWeight: 'bold',
+                  }}></Ionicons>
+              </TouchableOpacity>
+                <View
                 style={{
-                  color: '#F9CC76',
-                  fontSize: 30,
-                  textAlign: 'center',
-                  width: '100%',
-                  fontWeight: 'bold',
-                }}></Ionicons>
-            </TouchableOpacity>
+                  flexDirection:'row',
+                  backgroundColor:'#CCCCCC',
+                  alignItems: 'center',
+                  flex:1,
+                  justifyContent:'flex-end'
+                }}>
+                  {exists && !dataOrg['LawInfo'][route.name] && (
+                <TouchableOpacity
+                  onPress={() => {
+                    StoreInternal();
+                    setExists(false)
+                  }}
+                  style={{
+                    // backgroundColor: '#00CC33',
+                    // padding: 20,
+                    alignItems: 'center',
+                    width: 70,
+                    height:60,
+                    alignItems:'center',
+                    justifyContent:'center'
+                  }}>
+                  <Ionicons
+                    name="cloud-download-outline"
+                    style={{
+                      color: '#009933',
+                      fontSize: 25,
+                      textAlign: 'center',
+                      width: '100%',
+                      fontWeight: 'bold',
+                    }}></Ionicons>
+                </TouchableOpacity>
+                  )}
+                                    {!exists && !dataOrg['LawInfo'][route.name]   && (
+
+                <TouchableOpacity
+                  onPress={async () => {
+                    Alert.alert('thông báo','Bạn có muốn xóa văn bản ra khỏi bộ nhớ không?', [
+                      {
+                        text: 'Cancel',
+                        style: 'cancel',
+                      },
+                      {text: 'OK', onPress: () => {DeleteInternal();setExists(true)}},
+                    ]);
+                                  
+                    
+
+                  }}
+                  style={{
+                    // backgroundColor: '#00CC33',
+                    // padding: 20,
+                    alignItems: 'center',
+                    width: 70,
+                    height:60,
+                    alignItems:'center',
+                    justifyContent:'center'
+                  }}>
+                  {/* <Text
+                    style={{
+                      // backgroundColor: 'red',
+                      paddingLeft: 10,
+                      paddingRight: 5,
+                      fontSize: 15,
+                      color: 'white',
+                    }}>
+                    Xóa
+                  </Text> */}
+                  <Ionicons
+                    name="trash-outline"
+                    style={{
+                      color: 'red',
+                      fontSize: 25,
+                      textAlign: 'center',
+                      fontWeight: 'bold',
+                    }}></Ionicons>
+                </TouchableOpacity>
+              )}
+              </View>
+
             </View>
             <View
               style={{
                 padding: 20,
-                paddingTop: 10,
+                paddingTop: 30,
                 paddingBottom: 20,
                 // backgroundColor: 'blue',
               }}>
@@ -928,17 +1107,19 @@ if(k()){
                 </View>
               )}
               <TouchableOpacity
-                onPress={ async() => {
-                  // ModalVisibleStatus.updateModalStatus(false);
-                  const abc = await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8');
-                  console.log('abc',JSON.parse(abc))
-              
-
+                onPress={async () => {
+                  ModalVisibleStatus.updateModalStatus(false);
+                  // const exists = await FileSystem.exists(
+                  //   Dirs.CacheDir + '/Info.txt',
+                  //   'utf8',
+                  // );
+                  // console.log('exists', exists);
                 }}
                 style={{
                   padding: 5,
-                  marginTop: 10,
-                  backgroundColor: '#00CC33',
+                  marginTop: 30,
+                  backgroundColor: '#778899',
+                  // backgroundColor: '#00CC33',
                   alignItems: 'center',
                   width: 110,
                   flexDirection: 'row',
@@ -955,7 +1136,7 @@ if(k()){
                     height: 10,
                   },
                   shadowRadius: 4,
-                  elevation: 20,
+                  elevation: 10,
                 }}>
                 <Text
                   style={{
@@ -976,107 +1157,6 @@ if(k()){
                     fontWeight: 'bold',
                   }}></Ionicons>
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={ async() => {
-                  // ModalVisibleStatus.updateModalStatus(false);
-                  const Info = await FileSystem.unlink(Dirs.CacheDir+'/Info.txt','utf8');
-                  console.log('Info',Info);
-              
-                  const Content = await FileSystem.unlink(Dirs.CacheDir+'/Content.txt','utf8');
-                  console.log('Content',Content);
-
-                }}
-                style={{
-                  padding: 5,
-                  marginTop: 10,
-                  backgroundColor: '#00CC33',
-                  alignItems: 'center',
-                  width: 110,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 10,
-                  // borderColor:'#555555',
-                  // borderWidth:1,
-
-                  shadowColor: 'black',
-                  shadowOpacity: 1,
-                  shadowOffset: {
-                    width: 10,
-                    height: 10,
-                  },
-                  shadowRadius: 4,
-                  elevation: 20,
-                }}>
-                <Text
-                  style={{
-                    // backgroundColor: 'red',
-                    paddingLeft: 10,
-                    paddingRight: 5,
-                    fontSize: 15,
-                    color: 'white',
-                  }}>
-                  Xóa
-                </Text>
-                <Ionicons
-                  name="log-out-outline"
-                  style={{
-                    color: 'white',
-                    fontSize: 25,
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                  }}></Ionicons>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={ async() => {
-                  // ModalVisibleStatus.updateModalStatus(false);
-                  const exists = await FileSystem.exists(Dirs.CacheDir+'/Info.txt','utf8');
-                  console.log('exists',exists);
-              
-
-                }}
-                style={{
-                  padding: 5,
-                  marginTop: 10,
-                  backgroundColor: '#00CC33',
-                  alignItems: 'center',
-                  width: 110,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 10,
-                  // borderColor:'#555555',
-                  // borderWidth:1,
-
-                  shadowColor: 'black',
-                  shadowOpacity: 1,
-                  shadowOffset: {
-                    width: 10,
-                    height: 10,
-                  },
-                  shadowRadius: 4,
-                  elevation: 20,
-                }}>
-                <Text
-                  style={{
-                    // backgroundColor: 'red',
-                    paddingLeft: 10,
-                    paddingRight: 5,
-                    fontSize: 15,
-                    color: 'white',
-                  }}>
-                  Exist
-                </Text>
-                <Ionicons
-                  name="log-out-outline"
-                  style={{
-                    color: 'white',
-                    fontSize: 25,
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                  }}></Ionicons>
-              </TouchableOpacity>
-
             </View>
           </View>
         </ScrollView>
@@ -1088,6 +1168,8 @@ if(k()){
             {
               const {y} = event.nativeEvent.contentOffset;
               setCurrentY(y);
+              // console.log('y',y);
+              
             }
           }}
           ref={list}
@@ -1269,7 +1351,6 @@ if(k()){
                 useNativeDriver: false,
               }).start();
 
-              // console.log(showArticle);
             }}>
             {/* <Text style={styles.innerTab}>S</Text> */}
             <Ionicons
@@ -1327,6 +1408,11 @@ if(k()){
               duration: 600,
               useNativeDriver: false,
             }).start();
+
+            setTittleArray([]);
+            setTittleArray2([]);
+            Shrink()
+            setGo(false)
           }}>
           {/* <Text style={styles.innerTab}>Find</Text> */}
           <Ionicons
@@ -1355,6 +1441,7 @@ if(k()){
 
             setTittleArray([]);
             setTittleArray2([]);
+            Shrink()
           }}>
           <Ionicons
             name="menu-outline"
