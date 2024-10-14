@@ -120,7 +120,7 @@ export function* mySaga1(state,action){
     yield put(loader1())
 console.log(state.input);
 
-    let info = yield  fetch('http://192.168.0.104:5000/searchContent',{
+    let info = yield  fetch('https://converttool2.onrender.com/searchContent',{
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -139,7 +139,7 @@ export function* mySaga2(state,action){
   try{
     yield put(loader2())
 
-        let info = yield  fetch('http://192.168.0.104:5000/searchLaw',{
+        let info = yield  fetch('https://converttool2.onrender.com/searchLaw',{
           method: 'POST',
           headers: {
             Accept: 'application/json',

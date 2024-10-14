@@ -2,16 +2,15 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import database from '@react-native-firebase/database';
-import {useState, useEffect,useContext} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import Home from '../screens/Home';
 import {Detail1} from '../screens/Detail1';
 import {Detail2} from '../screens/Detail2';
 // import Detail4 from '../screens/Detail4';
 import Detail5 from '../screens/Detail5';
-import { Dirs, FileSystem } from 'react-native-file-access';
-import {ContentDownloaded} from '../App'
-import {InfoDownloaded} from '../App'
-import {ModalStatus} from "../App";
+import {Dirs, FileSystem} from 'react-native-file-access';
+import {InfoDownloaded} from '../App';
+import {ModalStatus} from '../App';
 import {
   Alert,
   Text,
@@ -19,15 +18,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
-  Dimensions
-
+  Dimensions,
+  Image,
+  Button
 } from 'react-native';
 import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 // import {useNetInfo} from "@react-native-community/netinfo";
 import {useSelector, useDispatch} from 'react-redux';
-
 
 const Stack = createNativeStackNavigator();
 
@@ -37,16 +36,11 @@ const AppNavigators = () => {
   // const [tabName, setTabName] = useState('home');
   // const animatedValue = useRef(new Animated.Value(1)).current
 
-
-
   // const SearchScrollview = useContext(RefForSearch)
   // const HomeFlatlist = useContext(RefForHome)
 
-
-
-
-  const i = useContext(ContentDownloaded)
-  const ii = useContext(InfoDownloaded)
+  // const i = useContext(ContentDownloaded)
+  // const ii = useContext(InfoDownloaded)
 
   // console.log(context.value);
 
@@ -65,25 +59,22 @@ const AppNavigators = () => {
   //   // console.log(`Width: ${width}, Height: ${height}`);
   //   widthTab=width/2;
   //   heightTab=height/2
-    
-  // });  
 
+  // });
 
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        lazy:true,
-        tabBarStyle: {postion: "absolute",
+      screenOptions={({route}) => ({
+        lazy: true,
+        tabBarStyle: {
+          postion: 'absolute',
           // backgroundColor:'blue',
+        },
+        // khi app chạy thì sẽ sẽ chạy hết tất cả các tab đồng loạt chứ không phải nhấn vô mới load
+      })}
 
-
-        }
-                                                  // khi app chạy thì sẽ sẽ chạy hết tất cả các tab đồng loạt chứ không phải nhấn vô mới load
-  })
-}
-      
       // screenOptions={
-        
+
       //   ({route, navigation}) => ({
       //   tabBarIcon: ({focused, color, size}) => {
       //     return (
@@ -135,8 +126,7 @@ const AppNavigators = () => {
       //   },
       // })}
       // lazy={false}                                   ///////////////////// mới bỏ có sao hông
-      >
-        
+    >
       <Tab.Screen
         name="Home"
         component={Home}
@@ -145,33 +135,37 @@ const AppNavigators = () => {
           tabBarIcon: ({focused, color, size}) => {
             return (
               <Animated.View
-        //         style={focused ? {width: '100%',
-        //         height: '102%',
-        //         position: 'relative',
-        //         display: 'flex',
-        //         alignItems: 'center',
-        //         justifyContent: 'center',
-        //         borderTopColor:'red',
-        //         borderTopWidth:animatedValue,
-        //     } : {    position: 'relative',
-        //     width: '100%',
-        //     height: '102%',
-        //     display: 'flex',
-        //     alignItems: 'center',
-        //     justifyContent: 'center',
-        //     borderTopWidth:0,
+                //         style={focused ? {width: '100%',
+                //         height: '102%',
+                //         position: 'relative',
+                //         display: 'flex',
+                //         alignItems: 'center',
+                //         justifyContent: 'center',
+                //         borderTopColor:'red',
+                //         borderTopWidth:animatedValue,
+                //     } : {    position: 'relative',
+                //     width: '100%',
+                //     height: '102%',
+                //     display: 'flex',
+                //     alignItems: 'center',
+                //     justifyContent: 'center',
+                //     borderTopWidth:0,
 
-        // }}
-        // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
-        style={{alignItems:'center'}}
-        >
+                // }}
+                // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
+                style={{alignItems: 'center', minWidth: 80}}>
                 <Ionicons
                   name="home-outline"
                   style={
                     focused ? styles.IconActive : styles.IconInActive
                   }></Ionicons>
-                                    <Text style={{...focused ? styles.IconActive : styles.IconInActive,fontSize:10}}>Offline</Text>
-
+                <Text
+                  style={{
+                    ...(focused ? styles.IconActive : styles.IconInActive),
+                    fontSize: 10,
+                  }}>
+                  Offline
+                </Text>
               </Animated.View>
             );
           },
@@ -179,16 +173,15 @@ const AppNavigators = () => {
           tabBarLabel: () => {
             return null;
           },
-          
         }}
         listeners={{
-          tabPress: (props)=>{
-              // HomeFlatlist.forHome.current.scrollToOffset({ animated: true, offset: 0 });
-          }
+          tabPress: props => {
+            // HomeFlatlist.forHome.current.scrollToOffset({ animated: true, offset: 0 });
+          },
         }}
-an
+        an
       />
-          <Tab.Screen
+      <Tab.Screen
         name="SearchLaw"
         component={Detail2}
         options={{
@@ -197,14 +190,19 @@ an
             return (
               <View
                 // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
-                style={{alignItems:'center'}}
-                 >
+                style={{alignItems: 'center', minWidth: 80}}>
                 <Ionicons
                   name="albums-outline"
                   style={
                     focused ? styles.IconActive : styles.IconInActive
                   }></Ionicons>
-                  <Text style={{...focused ? styles.IconActive : styles.IconInActive,fontSize:10}}>Search Law</Text>
+                <Text
+                  style={{
+                    ...(focused ? styles.IconActive : styles.IconInActive),
+                    fontSize: 10,
+                  }}>
+                  Search Law
+                </Text>
               </View>
             );
           },
@@ -213,12 +211,12 @@ an
           },
         }}
         listeners={{
-          tabPress: (props)=>{
+          tabPress: props => {
             // SearchScrollview.forSearch.current.scrollTo({y: 0});
-          }
+          },
         }}
       />
-  <Tab.Screen
+      <Tab.Screen
         name="Search"
         component={Detail1}
         options={{
@@ -227,14 +225,19 @@ an
             return (
               <View
                 // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
-                style={{alignItems:'center'}}
-                >
+                style={{alignItems: 'center', minWidth: 80}}>
                 <Ionicons
                   name="search-outline"
                   style={
                     focused ? styles.IconActive : styles.IconInActive
                   }></Ionicons>
-                  <Text style={{...focused ? styles.IconActive : styles.IconInActive,fontSize:10}}>Search Content</Text>
+                <Text
+                  style={{
+                    ...(focused ? styles.IconActive : styles.IconInActive),
+                    fontSize: 10,
+                  }}>
+                  Search Content
+                </Text>
               </View>
             );
           },
@@ -243,69 +246,69 @@ an
           },
         }}
         listeners={{
-          tabPress: (props)=>{
+          tabPress: props => {
             // SearchScrollview.forSearch.current.scrollTo({y: 0});
-          }
+          },
         }}
-
       />
     </Tab.Navigator>
   );
 };
 
 const StackNavigator = () => {
-  
   const [Content, setContent] = useState(dataOrg['LawInfo']);
-  const ModalVisibleStatus = useContext(ModalStatus)
-
+  const ModalVisibleStatus = useContext(ModalStatus);
+  const info = useContext(InfoDownloaded);
 
   async function getContentExist() {
-    if(await FileSystem.exists(Dirs.CacheDir+'/Content.txt','utf8')){
-      const FileInfoStringInfo = await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8');
-      if(FileInfoStringInfo){
-        return {...dataOrg['Info'],...JSON.parse(FileInfoStringInfo)}
+    if (await FileSystem.exists(Dirs.CacheDir + '/Content.txt', 'utf8')) {
+      const FileInfoStringInfo = await FileSystem.readFile(
+        Dirs.CacheDir + '/Info.txt',
+        'utf8',
+      );
+      if (FileInfoStringInfo) {
+        return {...dataOrg['Info'], ...JSON.parse(FileInfoStringInfo)};
       }
-        // f = JSON.parse(FileInfoStringInfo)
-      }
+      // f = JSON.parse(FileInfoStringInfo)
     }
-  
-
-let StackScreen
-
-// console.log('Content',Content);
+  }
 
 
-useEffect(() => {
-  getContentExist().then((cont)=> {
-    setContent(cont)
-    // console.log('cont',cont);
-    
-  })
-  
-  database() 
-  .ref(`/LawInfo`)
-  .once('value')
-  .then(snapshot => {
-    // setInfo(snapshot.val());
-    setContent(snapshot.val())  /////////////////////////////////////////////////////////////////  nên sửa
-  });
+  useEffect(() => {
+    getContentExist().then(cont => {
+      if(cont){
+        setContent(cont);
+        info.updateInfo(cont);
+      }
+      // console.log('cont',cont);
+    });
 
+    database()
+      .ref(`/LawInfo`)
+      .once('value')
+      .then(snapshot => {
+        // setInfo(snapshot.val());
+        if(Boolean(snapshot.val())){
+          
+          info.updateInfo(snapshot.val());
+          
+          setContent(snapshot.val()); /////////////////////////////////////////////////////////////////  nên sửa
 
-}, [])
-  
+        }
+      });
+  }, []);
+
   function TopBarNav({route}) {
     <Text>{route.name}</Text>;
   }
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-      >
+      <Stack.Navigator>
         <Stack.Screen
           name="HomeStack"
           component={AppNavigators}
-          options={{animationEnabled: false, header: () => null}}
-          
+          options={{animationEnabled: false, header: () => null,}}
         />
 
         {Content &&
@@ -315,23 +318,42 @@ useEffect(() => {
               name={`${key}`}
               component={Detail5}
               // options={{animationEnabled: true}}
-              options={({ route}) => ({
-                animation:'slide_from_right',
-                animationTypeForReplace:'push',
+              options={({navigation, route}) => ({
+                headerBackVisible: false ,
+                headerLeft: () =>   <TouchableOpacity onPress={()=>navigation.goBack()}><Ionicons
+                name="chevron-back-outline"
+                style={styles.IconInfo}></Ionicons></TouchableOpacity>,                // headerStyle: { backgroundColor: 'black',alignItems:'center',justifyContent:'flex-end',display:'flex',padding:100 },
+                headerTitleAlign: 'center',
+                animation: 'slide_from_right',
+                animationTypeForReplace: 'push',
                 title: '',
+                headerTitle: props => (
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: 'yellow',
+                      height: '60%',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      borderRadius: 30,
+                    }}
+                    onPress={() => navigation.popToTop()}>
+                    <Image source={require('../assets/t.png')}></Image>
+                  </TouchableOpacity>
+                ),
                 headerRight: () => (
-                  <>
+                  <View style={{alignItems: 'center'}}>
                     <TouchableOpacity
                       style={styles.iconInfoContainer}
                       onPress={() => {
                         // navigation.navigate('Search')
-                        ModalVisibleStatus.updateModalStatus(true)
+                        ModalVisibleStatus.updateModalStatus(true);
                       }}>
                       <Ionicons
                         name="information-circle-outline"
                         style={styles.IconInfo}></Ionicons>
                     </TouchableOpacity>
-                  </>
+                  </View>
                 ),
               })}
             />
@@ -352,9 +374,9 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderTopColor:'red',
-    borderTopWidth:4,
-    overflow:'hidden',
+    borderTopColor: 'red',
+    borderTopWidth: 4,
+    overflow: 'hidden',
   },
   tabItemInactive: {
     position: 'relative',
@@ -363,13 +385,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    
   },
   IconActive: {
     fontSize: 23,
     color: 'red',
     // transform:animatedValue
-
   },
   IconInActive: {
     fontSize: 23,
@@ -381,7 +401,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   iconInfoContainer: {
-    width: 50,
+    // width: 50,
     height: 40,
     display: 'flex',
     alignItems: 'center',

@@ -15,7 +15,7 @@ const RefForSearch = createContext(); // lấy ref.current của Tab Search (Det
 const RefForHome = createContext(); // lấy ref.current của Tab Home (Home) để ScrollToTop khi click vào bottom tab
 const ModalStatus = createContext(); // lấy modalVisible status
 const InfoDownloaded = createContext(); //
-const ContentDownloaded = createContext(); //
+// const ContentDownloaded = createContext(); //
 
 function App() {
 
@@ -41,10 +41,10 @@ function App() {
   const updateInfo = data => {
     setInfo(data);
   };
-  const [content, setContent] = useState(dataOrg['LawContent']);
-  const updateContent = data => {
-    setContent(data);
-  };
+  // const [content, setContent] = useState(dataOrg['LawContent']);
+  // const updateContent = data => {
+  //   setContent(data);
+  // };
 
   return (
     <Provider store={store}>
@@ -52,10 +52,10 @@ function App() {
         <RefForHome.Provider value={{forHome, updateHome}}>
           <RefForSearch.Provider value={{forSearch, updateSearch}}>
             <InfoDownloaded.Provider value={{info,updateInfo}}>
-            <ContentDownloaded.Provider value={{content,updateContent}}>
+            {/* <ContentDownloaded.Provider value={{content,updateContent}}> */}
 
             <StackNavigator />
-            </ContentDownloaded.Provider>
+            {/* </ContentDownloaded.Provider> */}
             </InfoDownloaded.Provider>
           </RefForSearch.Provider>
         </RefForHome.Provider>
@@ -65,7 +65,7 @@ function App() {
 }
 
 // export default App;
-export {RefForSearch, RefForHome, ModalStatus,ContentDownloaded,InfoDownloaded, App};
+export {RefForSearch, RefForHome, ModalStatus,InfoDownloaded, App};
 // export {RefForHome};
 // export {dataLaw};
 // export {RefLoading};

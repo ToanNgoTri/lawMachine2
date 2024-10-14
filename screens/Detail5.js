@@ -23,7 +23,7 @@ import {Shadow} from 'react-native-shadow-2';
 import database from '@react-native-firebase/database';
 import {ModalStatus} from '../App';
 import {useSelector, useDispatch} from 'react-redux';
-import {ContentDownloaded, InfoDownloaded} from '../App';
+import {InfoDownloaded} from '../App';
 
 let TopUnitCount; // là đơn vị lớn nhất vd là 'phần thứ' hoặc chương
 let articleCount = 0;
@@ -40,9 +40,8 @@ let eachSectionWithChapter = [];
 // hơi bị leak memory chỗ ScrollVIew nha
 // chỗ chapter nếu bung được thì bung hết
 
-export default function Detail() {
-  // const inf = useContext(InfoDownloaded);
-  // const con = useContext(ContentDownloaded);
+export default function Detail({navigation}) {
+  const inf = useContext(InfoDownloaded);
 
   // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
   const [tittleArray, setTittleArray] = useState([true]); // đây là 'phần thứ...' hoặc chương (nói chung là section cao nhất)
@@ -642,6 +641,7 @@ q.current = []
     if (find == true) {
       setTittleArray([]);
       setTittleArray2([]);
+      Shrink()
     }
     // Animated.timing(animatedForNavi, {
     //   toValue:find ? 50 : 0,
@@ -836,6 +836,9 @@ q.current = []
       {}
     );
   };
+
+
+  
 
   return (
     <>
@@ -1087,20 +1090,34 @@ q.current = []
                   <View style={{flex: 1, paddingTop: 10}}>
                     {Info &&
                       Info['lawRelated'].map((key, i) => {
-                        nameLaw = key.replace(/\//gim, '\\');
-                        return (
-                          <View>
-                            <Text style={styles.ModalInfoContentLawRelated}>
-                              -{' '}
-                              {
-                                //   nameLaw.match(/QH/gim)?
-                                // Object.keys(dataLawContent.dataLawForApp['LawInfo']).includes(nameLaw)?dataLawContent.dataLawForApp['LawInfo'][nameLaw]['lawNameDisplay']:key
-                                // :key
+                       let nameLaw = key.replace(/\//gim, '\\');
 
-                                key
+                       let nameLaw2
+                       for(let a = 0 ; a<Object.keys(inf.info).length;a++ ){
+                        if(Object.values(inf.info)[a]['lawNameDisplay'].match(new RegExp(key, "gim"))){
+                          nameLaw2 = (Object.keys(inf.info)[a]);
+                          break
+                        }
+                       }
+                        return (
+                          <TouchableOpacity onPress={()=>{
+                            if(Object.keys(inf.info).includes(nameLaw)){
+                              navigation.navigate(nameLaw);
+                              ModalVisibleStatus.updateModalStatus(false)
+                            }else if(nameLaw2){
+                              navigation.navigate(nameLaw2);
+                              ModalVisibleStatus.updateModalStatus(false)                            }
+                          }}>
+                            <Text style={{...styles.ModalInfoContentLawRelated,fontWeight:Object.keys(inf.info).includes(nameLaw)||nameLaw2?'bold':'300'}}>
+                              {
+                                 
+                                Object.keys(inf.info).includes(nameLaw)?inf.info[nameLaw]['lawNameDisplay']:nameLaw2?inf.info[nameLaw2]['lawNameDisplay']:key
+                                
+
+                                // key
                               }
                             </Text>
-                          </View>
+                          </TouchableOpacity>
                         );
                       })}
                   </View>
@@ -1215,8 +1232,7 @@ q.current = []
         </ScrollView>
       </Animated.View>
       {Boolean(searchResultCount) &&
-        !Boolean(tittleArray.length) &&
-        !Boolean(tittleArray2.length) &&
+       (find) &&
         searchResultCount > 1 && (
           <Animated.View
             style={{
