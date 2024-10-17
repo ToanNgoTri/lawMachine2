@@ -11,15 +11,11 @@ import {
   Animated,
   Dimensions
 } from 'react-native';
-import {useState, useEffect, useContext, useRef,} from 'react';
+import {useState, useEffect,useRef} from 'react';
 import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {RefForHome} from '../App';
-import { useSelector, useDispatch } from 'react-redux';
 import { Dirs, FileSystem } from 'react-native-file-access';
-import {ContentDownloaded,InfoDownloaded} from '../App';
-
-import {loader,handle} from '../redux/fetchData'
+import { useScrollToTop } from '@react-navigation/native';
 
 export default function Home({navigation}) {
   const [Content, setContent] = useState('');
@@ -36,6 +32,7 @@ export default function Home({navigation}) {
 
 
   const list1 = useRef(null);
+  useScrollToTop(list1);
 
 
   // const {width, height} = Dimensions.get('window');
@@ -189,9 +186,18 @@ useEffect(() => {
       }
 
   })
-  
-
   })
+
+
+  // if (__DEV__) {
+  //   // If you are running on a physical device, replace http://localhost with the local ip of your PC. (http://192.168.x.x)
+  //   functions().useEmulator('localhost', 5001);
+  // }
+  // functions()
+  // .httpsCallable('helloWorld')()
+  // .then(response => {
+  //   console.log(response.data);
+  // });
 
 
 }, [])
