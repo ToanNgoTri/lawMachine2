@@ -267,7 +267,7 @@ const StackNavigator = () => {
         'utf8',
       );
       if (FileInfoStringInfo) {
-        return {...dataOrg['Info'], ...JSON.parse(FileInfoStringInfo)};
+        return {...dataOrg['LawInfo'], ...JSON.parse(FileInfoStringInfo)};
       }
       // f = JSON.parse(FileInfoStringInfo)
     }
@@ -287,7 +287,6 @@ const StackNavigator = () => {
       .ref(`/LawInfo`)
       .once('value')
       .then(snapshot => {
-        // setInfo(snapshot.val());
         if(Boolean(snapshot.val())){
           
           info.updateInfo(snapshot.val());

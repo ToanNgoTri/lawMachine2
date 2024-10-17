@@ -61,7 +61,6 @@ export const searchLaw = createSlice({
     },
 
     handle2: (state,action) => {
-      console.log('action',action);
       state.info=action.payload.b;
       state.loading2= false;
     },
@@ -118,15 +117,14 @@ export function* mySaga(state,action){
 export function* mySaga1(state,action){
   try{
     yield put(loader1())
-console.log(state.input);
 
-    let info = yield  fetch('https://converttool2.onrender.com/searchContent',{
-      method: 'POST',
+    let info = yield  fetch(`https://searchcontentfunction-pshgpplquq-uc.a.run.app?input=${state.input}`,{
+      method: 'GET',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body:JSON.stringify({input:state.input})
+      // body:JSON.stringify({input:state.input})
     })
     let a = yield info.json()
 
@@ -139,13 +137,13 @@ export function* mySaga2(state,action){
   try{
     yield put(loader2())
 
-        let info = yield  fetch('https://converttool2.onrender.com/searchLaw',{
-          method: 'POST',
+        let info = yield  fetch(`https://searchlawfunction-pshgpplquq-uc.a.run.app?input=${state.input}`,{
+          method: 'GET',
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
           },
-          body:JSON.stringify({input:state.input})
+          // body:JSON.stringify({input:state.input})
         })
       
       
@@ -156,6 +154,7 @@ export function* mySaga2(state,action){
 
     // const info = yield call( async ()=> await database().ref(`/LawInfo/${lawNumber}`).once('value') )
     // const b =   info.val()
+
 
     yield put(handle2({b}))
   }catch(e){

@@ -11,7 +11,6 @@ import {
   Dimensions,
   Modal,
   ActivityIndicator,
-  
 } from 'react-native';
 import {Dirs, FileSystem} from 'react-native-file-access';
 import React, {useState, useEffect, useRef, useContext} from 'react';
@@ -58,7 +57,7 @@ export default function Detail({navigation}) {
 
   const [currentSearchPoint, setCurrentSearchPoint] = useState(1); // thứ tự kết quả search đang trỏ tới
 
-  const [exists, setExists] = useState(false)
+  const [exists, setExists] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -136,10 +135,7 @@ export default function Detail({navigation}) {
 
     // con.updateContent({...dataOrg['LawContent'], ...contentObject});
     // inf.updateInfo({...dataOrg['LawInfo'], ...infoObject});
-
   }
-
-  
 
   async function DeleteInternal() {
     console.log('Delete');
@@ -191,7 +187,7 @@ export default function Detail({navigation}) {
 
   const list = useRef(null);
   const q = useRef(null);
-q.current = []
+  q.current = [];
   const [input, setInput] = useState(route.params ? route.params.input : '');
   const [valueInput, setValueInput] = useState('');
   const [find, setFind] = useState(route.params ? true : false);
@@ -299,7 +295,6 @@ q.current = []
     }
   }
 
-
   useEffect(() => {
     getContentExist().then(cont => {
       if (
@@ -312,7 +307,7 @@ q.current = []
         setInfo(dataOrg['LawInfo'][route.name]);
         setContent(dataOrg['LawContent'][route.name]);
       } else {
-        setExists(true)
+        setExists(true);
         dispatch({type: 'read', lawName: route.name});
 
         database()
@@ -330,8 +325,6 @@ q.current = []
           });
       }
     });
-
-
   }, []);
 
   function collapse(a) {
@@ -454,8 +447,7 @@ q.current = []
                       ? styles.highlight1
                       : styles.highlight
                   }
-                  key={`${i2}d`}
-                  >
+                  key={`${i2}d`}>
                   {inputRexgex[i - 1]}
                 </Text>
                 {/* </Text> */}
@@ -466,8 +458,7 @@ q.current = []
                   display: 'flex',
                   margin: 0,
                   lineHeight: 23,
-                }}
-                >
+                }}>
                 {current}
               </Text>,
             );
@@ -485,71 +476,68 @@ q.current = []
   }
 
   let positionYArrArticalDemo = positionYArrArtical;
-  
+
   function setPositionYArtical({y, key3}) {
     key3 = key3.replace(/(?<=\w*)\\(?=\w*)/gim, '/');
-    
+
     // console.log('key3',key3);
     // console.log('tittleArray.length',tittleArray.length);
-    
-    if(true){
-    if (
-      // true
-      ((tittleArray.length || tittleArray2.length)) || go || tittleArray[0] || tittleArray2[0]
-    ) {
-      
-      var contains = positionYArrArtical.some((elem, i) => {
-        return key3 == Object.keys(elem);
-      });
 
+    if (true) {
+      if (
+        // true
+        tittleArray.length ||
+        tittleArray2.length ||
+        go ||
+        tittleArray[0] ||
+        tittleArray2[0]
+      ) {
+        var contains = positionYArrArtical.some((elem, i) => {
+          return key3 == Object.keys(elem);
+        });
 
-      if(!showArticle){
-        if (contains) {
-          articleCount++;
-          
-          // console.log(123);
-          for(let g = 0;g<= positionYArrArtical.length; g++){
-            if(positionYArrArticalDemo[g][key3]){
-              
-              positionYArrArticalDemo[g][key3] =  y + currentY
-              break
-              
+        if (!showArticle) {
+          if (contains) {
+            articleCount++;
+
+            // console.log(123);
+            for (let g = 0; g <= positionYArrArtical.length; g++) {
+              if (positionYArrArticalDemo[g][key3]) {
+                positionYArrArticalDemo[g][key3] = y + currentY;
+                break;
+              }
             }
-            
-          }
 
-          if (articleCount >= positionYArrArtical.length) {
-            setPositionYArrArtical(positionYArrArticalDemo);
-            // setPositionYArrArtical(q.current);
-            q.current = []
+            if (articleCount >= positionYArrArtical.length) {
+              setPositionYArrArtical(positionYArrArticalDemo);
+              // setPositionYArrArtical(q.current);
+              q.current = [];
 
-            articleCount = 0;
+              articleCount = 0;
+            }
+          } else {
+            positionYArrArtical.push({[key3]: y + currentY});
+            // console.log(567);
           }
         } else {
-          positionYArrArtical.push({[key3]: y + currentY});
-          // console.log(567);
+          articleCount++;
 
+          // positionYArrArtical.map((elem, i) => {
+          q.current[articleCount - 1] = {[key3]: y + currentY};
+
+          // });
+          if (articleCount >= positionYArrArtical.length) {
+            setPositionYArrArtical(q.current);
+            articleCount = 0;
+            q.current = [];
+          }
+
+          // console.log('q.current',q.current);
         }
-      }else{
-        articleCount++;
-        
-        // positionYArrArtical.map((elem, i) => {
-          q.current[articleCount-1] = {[key3]: y + currentY}
-          
-        // });
-        if (articleCount >= positionYArrArtical.length) {
-          setPositionYArrArtical(q.current);
-          articleCount = 0;
-          q.current = []
-        }
-  
-                // console.log('q.current',q.current);
-        
       }
-    }}
+    }
   }
 
-  
   TopUnitCount = Content && Object.keys(Content).length;
 
   function Shrink() {
@@ -641,7 +629,7 @@ q.current = []
     if (find == true) {
       setTittleArray([]);
       setTittleArray2([]);
-      Shrink()
+      Shrink();
     }
     // Animated.timing(animatedForNavi, {
     //   toValue:find ? 50 : 0,
@@ -652,10 +640,9 @@ q.current = []
     Keyboard.dismiss();
   }, [find]);
 
-
   const a = (key, i, key1, i1a, t) => {
     // phần nếu không mục 'phần thứ' trong văn bản
-    
+
     return Object.keys(key)[0] != '0' ? (
       <View
         key={`${i}b`}
@@ -679,7 +666,6 @@ q.current = []
           return (
             <View
               onLayout={event => {
-                
                 event.target.measure((x, y, width, height, pageX, pageY) => {
                   setPositionYArtical({
                     y: y + pageY,
@@ -837,9 +823,6 @@ q.current = []
     );
   };
 
-
-  
-
   return (
     <>
       {loading && (
@@ -872,13 +855,13 @@ q.current = []
         presentationStyle="pageSheet"
         animationType="slide"
         visible={ModalVisibleStatus.modalStatus}
-        onRequestClose={()=>ModalVisibleStatus.updateModalStatus(false)}
+        onRequestClose={() => ModalVisibleStatus.updateModalStatus(false)}
         style={{}}>
         <ScrollView
           style={{
             backgroundColor: '#EEEFE4',
           }}>
-          <View style={{paddingBottom: 30,}}>
+          <View style={{paddingBottom: 30}}>
             <View
               style={{
                 // marginTop:20,
@@ -886,9 +869,9 @@ q.current = []
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                height:60,
+                height: 60,
                 // borderBottomWidth:3,
-                borderColor:'#2F4F4F',
+                borderColor: '#2F4F4F',
                 shadowColor: 'black',
                 shadowOpacity: 1,
                 shadowOffset: {
@@ -897,8 +880,6 @@ q.current = []
                 },
                 shadowRadius: 4,
                 elevation: 10,
-
-
               }}>
               <TouchableOpacity
                 onPress={() => {
@@ -906,14 +887,13 @@ q.current = []
                 }}
                 style={{
                   alignItems: 'center',
-                  justifyContent:'center',
-                  height:60,
-                  width:60,
+                  justifyContent: 'center',
+                  height: 60,
+                  width: 60,
                   // borderWidth:4,
-                  borderColor:'black',
+                  borderColor: 'black',
                   // borderRadius:10,
                   // backgroundColor:'#528B8B',
-
                 }}>
                 <Ionicons
                   name="close-outline"
@@ -925,65 +905,71 @@ q.current = []
                     fontWeight: 'bold',
                   }}></Ionicons>
               </TouchableOpacity>
-                <View
+              <View
                 style={{
-                  flexDirection:'row',
-                  backgroundColor:'#CCCCCC',
+                  flexDirection: 'row',
+                  backgroundColor: '#CCCCCC',
                   alignItems: 'center',
-                  flex:1,
-                  justifyContent:'flex-end'
+                  flex: 1,
+                  justifyContent: 'flex-end',
                 }}>
-                  {exists && !dataOrg['LawInfo'][route.name] && (
-                <TouchableOpacity
-                  onPress={() => {
-                    StoreInternal();
-                    setExists(false)
-                  }}
-                  style={{
-                    // backgroundColor: '#00CC33',
-                    // padding: 20,
-                    alignItems: 'center',
-                    width: 70,
-                    height:60,
-                    alignItems:'center',
-                    justifyContent:'center'
-                  }}>
-                  <Ionicons
-                    name="cloud-download-outline"
+                {exists && !dataOrg['LawInfo'][route.name] && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      StoreInternal();
+                      setExists(false);
+                    }}
                     style={{
-                      color: '#009933',
-                      fontSize: 25,
-                      textAlign: 'center',
-                      width: '100%',
-                      fontWeight: 'bold',
-                    }}></Ionicons>
-                </TouchableOpacity>
-                  )}
-                                    {!exists && !dataOrg['LawInfo'][route.name]   && (
-
-                <TouchableOpacity
-                  onPress={async () => {
-                    Alert.alert('thông báo','Bạn có muốn xóa văn bản ra khỏi bộ nhớ không?', [
-                      {
-                        text: 'Cancel',
-                        style: 'cancel',
-                      },
-                      {text: 'OK', onPress: () => {DeleteInternal();setExists(true)}},
-                    ]);
-                                  
-                    
-
-                  }}
-                  style={{
-                    // backgroundColor: '#00CC33',
-                    // padding: 20,
-                    alignItems: 'center',
-                    width: 70,
-                    height:60,
-                    alignItems:'center',
-                    justifyContent:'center'
-                  }}>
-                  {/* <Text
+                      // backgroundColor: '#00CC33',
+                      // padding: 20,
+                      alignItems: 'center',
+                      width: 70,
+                      height: 60,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Ionicons
+                      name="cloud-download-outline"
+                      style={{
+                        color: '#009933',
+                        fontSize: 25,
+                        textAlign: 'center',
+                        width: '100%',
+                        fontWeight: 'bold',
+                      }}></Ionicons>
+                  </TouchableOpacity>
+                )}
+                {!exists && !dataOrg['LawInfo'][route.name] && (
+                  <TouchableOpacity
+                    onPress={async () => {
+                      Alert.alert(
+                        'thông báo',
+                        'Bạn có muốn xóa văn bản ra khỏi bộ nhớ không?',
+                        [
+                          {
+                            text: 'Cancel',
+                            style: 'cancel',
+                          },
+                          {
+                            text: 'OK',
+                            onPress: () => {
+                              DeleteInternal();
+                              setExists(true);
+                            },
+                          },
+                        ],
+                      );
+                    }}
+                    style={{
+                      // backgroundColor: '#00CC33',
+                      // padding: 20,
+                      alignItems: 'center',
+                      width: 70,
+                      height: 60,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    {/* <Text
                     style={{
                       // backgroundColor: 'red',
                       paddingLeft: 10,
@@ -993,18 +979,17 @@ q.current = []
                     }}>
                     Xóa
                   </Text> */}
-                  <Ionicons
-                    name="trash-outline"
-                    style={{
-                      color: 'red',
-                      fontSize: 25,
-                      textAlign: 'center',
-                      fontWeight: 'bold',
-                    }}></Ionicons>
-                </TouchableOpacity>
-              )}
+                    <Ionicons
+                      name="trash-outline"
+                      style={{
+                        color: 'red',
+                        fontSize: 25,
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}></Ionicons>
+                  </TouchableOpacity>
+                )}
               </View>
-
             </View>
             <View
               style={{
@@ -1031,88 +1016,176 @@ q.current = []
                 justifyContent: 'space-evenly',
                 alignItems: 'center',
                 // backgroundColor: 'green',
-                paddingLeft: 10,
-                paddingRight: 10,
+                paddingLeft: '5%',
+                paddingRight: '5%',
+                
               }}>
-              <View style={styles.ModalInfoContainer}>
-                <Text style={styles.ModalInfoTitle}>Tên gọi:</Text>
-                <Text style={styles.ModalInfoContent}>
-                  {Info && Info['lawNameDisplay']}
-                </Text>
+              <View style={{...styles.ModalInfoContainer,borderTopWidth:2}}>
+                <View style={{width: '40%',justifyContent:'center',
+
+}}>
+                  <Text style={styles.ModalInfoTitle}>Tên gọi:</Text>
+                </View>
+                <View style={{flex:1}}>
+                  <Text style={styles.ModalInfoContent}>
+                    {Info && Info['lawNameDisplay']}
+                  </Text>
+                </View>
               </View>
               {Info && !Info['lawDescription'].match(/^(luật|bộ luật)/gim) && (
                 <View style={styles.ModalInfoContainer}>
-                  <Text style={styles.ModalInfoTitle}>Trích yếu nội dung:</Text>
-                  <Text style={styles.ModalInfoContent}>
-                    {Info && Info['lawDescription']}
-                  </Text>
+                  <View style={{width: '40%',justifyContent:'center',}}>
+                    <Text style={styles.ModalInfoTitle}>
+                      Trích yếu nội dung:
+                    </Text>
+                  </View>
+                  <View style={{flex:1}}>
+                    <Text style={styles.ModalInfoContent}>
+                      {Info && Info['lawDescription']}
+                    </Text>
+                  </View>
                 </View>
               )}
               <View style={styles.ModalInfoContainer}>
-                <Text style={styles.ModalInfoTitle}>Ngày ký:</Text>
-                <Text style={styles.ModalInfoContent}>
-                  {Info && Info['lawDaySign']}
-                </Text>
+                <View style={{width: '40%'}}>
+                  <Text style={styles.ModalInfoTitle}>Ngày ký:</Text>
+                </View>
+                <View style={{flex:1}}>
+                  <Text style={styles.ModalInfoContent}>
+                    {Info && Info['lawDaySign']}
+                  </Text>
+                </View>
               </View>
               <View style={styles.ModalInfoContainer}>
-                <Text style={styles.ModalInfoTitle}>Ngày có hiệu lực:</Text>
-                <Text style={styles.ModalInfoContent}>
-                  {Info && Info['lawDayActive']}
-                </Text>
+                <View style={{width: '40%'}}>
+                  <Text style={styles.ModalInfoTitle}>Ngày có hiệu lực:</Text>
+                </View>
+                <View style={{flex:1}}>
+                  <Text style={styles.ModalInfoContent}>
+                    {Info && Info['lawDayActive']}
+                  </Text>
+                </View>
               </View>
+              {Info['lawNumber'] && (
+                <View style={styles.ModalInfoContainer}>
+                  <View style={{width: '40%'}}>
+                    <Text style={styles.ModalInfoTitle}>Số văn bản:</Text>
+                  </View>
+                  <View style={{flex:1}}>
+                    <Text style={styles.ModalInfoContent}>
+                      {Info && Info['lawNumber']}
+                    </Text>
+                  </View>
+                </View>
+              )}
+
               <View style={styles.ModalInfoContainer}>
-                <Text style={styles.ModalInfoTitle}>Số văn bản:</Text>
-                <Text style={styles.ModalInfoContent}>
-                  {Info && Info['lawNumber']}
-                </Text>
+                <View style={{width: '40%'}}>
+                  <Text style={styles.ModalInfoTitle}>Họ Tên người ký:</Text>
+                </View>
+                <View style={{flex:1,paddingBottom:10,paddingTop:10}}>
+                  {Info && !Array.isArray(Info['nameSign']) ? (
+                    <Text style={styles.ModalInfoContent}>{Info['nameSign']}</Text>
+                  ) : (
+                    Info['nameSign'] &&
+                    Info['nameSign'].map(key => (
+                      <View>
+                        <Text style={{...styles.ModalInfoContentLawRelated}}>
+                          {`- ${key}`}
+                        </Text>
+                      </View>
+                    ))
+                  )}
+                </View>
               </View>
+
               <View style={styles.ModalInfoContainer}>
-                <Text style={styles.ModalInfoTitle}>Họ Tên người ký:</Text>
-                <Text style={styles.ModalInfoContent}>
-                  {Info && Info['nameSign']}
-                </Text>
+                <View style={{width: '40%'}}>
+                  <Text style={styles.ModalInfoTitle}>Chức vụ người ký:</Text>
+                </View>
+                <View style={{flex:1,paddingBottom:10,paddingTop:10}}>
+                  {Info && !Array.isArray(Info['roleSign']) ? (
+                    <Text style={styles.ModalInfoContent}>{Info['roleSign']}</Text>
+                  ) : (
+                    Info['roleSign'] &&
+                    Info['roleSign'].map(key => (
+                      <View>
+                        <Text style={{...styles.ModalInfoContentLawRelated}}>
+                          {`- ${key}`}
+                        </Text>
+                      </View>
+                    ))
+                  )}
+                </View>
               </View>
-              <View style={styles.ModalInfoContainer}>
-                <Text style={styles.ModalInfoTitle}>Chức vụ người ký:</Text>
-                <Text style={styles.ModalInfoContent}>
-                  {Info && Info['roleSign']}{' '}
-                </Text>
-              </View>
-              <View style={styles.ModalInfoContainer}>
-                <Text style={styles.ModalInfoTitle}>Cơ quan ban hành:</Text>
-                <Text style={styles.ModalInfoContent}>
-                  {Info && Info['unitPublish']}
-                </Text>
+              <View style={{...styles.ModalInfoContainer}}>
+                <View style={{width: '40%'}}>
+                  <Text style={{...styles.ModalInfoTitle}}>
+                    Cơ quan ban hành:
+                  </Text>
+                </View>
+                <View style={{flex:1,paddingBottom:10,paddingTop:10}}>
+                  {Info && !Array.isArray(Info['unitPublish']) ? (
+                    <Text style={styles.ModalInfoContent}>{Info['unitPublish']}</Text>
+                  ) : (
+                    Info['unitPublish'] &&
+                    Info['unitPublish'].map(key => (
+                      <View>
+                        <Text style={{...styles.ModalInfoContentLawRelated}}>
+                          {`- ${key}`}
+                        </Text>
+                      </View>
+                    ))
+                  )}
+                </View>
               </View>
               {Info && Object.keys(Info).includes('lawRelated') && (
-                <View style={{...styles.ModalInfoContainer}}>
-                  <Text style={styles.ModalInfoTitle}>Văn bản liên quan:</Text>
-                  <View style={{flex: 1, paddingTop: 10}}>
+                <View style={{...styles.ModalInfoContainer,borderBottomWidth:2}}>
+                <View style={{width: '40%'}}>
+                <Text style={styles.ModalInfoTitle}>Văn bản liên quan:</Text>
+                </View>
+                  <View style={{flex: 1,paddingBottom:10,paddingTop:10}}>
                     {Info &&
                       Info['lawRelated'].map((key, i) => {
-                       let nameLaw = key.replace(/\//gim, '\\');
+                        let nameLaw = key.replace(/\//gim, '\\');
 
-                       let nameLaw2
-                       for(let a = 0 ; a<Object.keys(inf.info).length;a++ ){
-                        if(Object.values(inf.info)[a]['lawNameDisplay'].match(new RegExp(key, "gim"))){
-                          nameLaw2 = (Object.keys(inf.info)[a]);
-                          break
+                        let nameLaw2;
+                        for (let a = 0; a < Object.keys(inf.info).length; a++) {
+                          if (
+                            Object.values(inf.info)[a]['lawNameDisplay'].match(
+                              new RegExp(key, 'gim'),
+                            )
+                          ) {
+                            nameLaw2 = Object.keys(inf.info)[a];
+                            break;
+                          }
                         }
-                       }
                         return (
-                          <TouchableOpacity onPress={()=>{
-                            if(Object.keys(inf.info).includes(nameLaw)){
-                              navigation.navigate(nameLaw);
-                              ModalVisibleStatus.updateModalStatus(false)
-                            }else if(nameLaw2){
-                              navigation.navigate(nameLaw2);
-                              ModalVisibleStatus.updateModalStatus(false)                            }
-                          }}>
-                            <Text style={{...styles.ModalInfoContentLawRelated,fontWeight:Object.keys(inf.info).includes(nameLaw)||nameLaw2?'bold':'300'}}>
-                              {
-                                 
-                                Object.keys(inf.info).includes(nameLaw)?inf.info[nameLaw]['lawNameDisplay']:nameLaw2?inf.info[nameLaw2]['lawNameDisplay']:key
-                                
+                          <TouchableOpacity
+                            onPress={() => {
+                              if (Object.keys(inf.info).includes(nameLaw)) {
+                                navigation.navigate(nameLaw);
+                                ModalVisibleStatus.updateModalStatus(false);
+                              } else if (nameLaw2) {
+                                navigation.navigate(nameLaw2);
+                                ModalVisibleStatus.updateModalStatus(false);
+                              }
+                            }}>
+                            <Text
+                              style={{
+                                ...styles.ModalInfoContentLawRelated,
+                                fontWeight:
+                                  Object.keys(inf.info).includes(nameLaw) ||
+                                  nameLaw2
+                                    ? 'bold'
+                                    : '300',
+                              }}>
+                             -{' '}{
+                                Object.keys(inf.info).includes(nameLaw)
+                                  ? inf.info[nameLaw]['lawNameDisplay']
+                                  : nameLaw2
+                                  ? inf.info[nameLaw2]['lawNameDisplay']
+                                  : key
 
                                 // key
                               }
@@ -1186,7 +1259,6 @@ q.current = []
               const {y} = event.nativeEvent.contentOffset;
               setCurrentY(y);
               // console.log('y',y);
-              
             }
           }}
           ref={list}
@@ -1231,55 +1303,53 @@ q.current = []
             ))}
         </ScrollView>
       </Animated.View>
-      {Boolean(searchResultCount) &&
-       (find) &&
-        searchResultCount > 1 && (
-          <Animated.View
-            style={{
-              right: 25,
-              display: 'flex',
-              flexDirection: 'column',
-              position: 'absolute',
-              justifyContent: 'space-between',
-              height: 130,
-              opacity: 0.5,
-              transform: [{translateY: transY}],
-              bottom: 80,
+      {Boolean(searchResultCount) && find && searchResultCount > 1 && (
+        <Animated.View
+          style={{
+            right: 25,
+            display: 'flex',
+            flexDirection: 'column',
+            position: 'absolute',
+            justifyContent: 'space-between',
+            height: 130,
+            opacity: 0.5,
+            transform: [{translateY: transY}],
+            bottom: 80,
+          }}>
+          <TouchableOpacity
+            style={styles.tabSearch}
+            onPress={() => {
+              currentSearchPoint == 1
+                ? setCurrentSearchPoint(positionYArr.length)
+                : setCurrentSearchPoint(currentSearchPoint - 1);
             }}>
-            <TouchableOpacity
-              style={styles.tabSearch}
-              onPress={() => {
-                currentSearchPoint == 1
-                  ? setCurrentSearchPoint(positionYArr.length)
-                  : setCurrentSearchPoint(currentSearchPoint - 1);
-              }}>
-              <Ionicons
-                name="caret-up-outline"
-                style={{
-                  color: 'rgb(240,240,208)',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                  fontSize: 25,
-                }}></Ionicons>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.tabSearch}
-              onPress={() => {
-                currentSearchPoint == positionYArr.length
-                  ? setCurrentSearchPoint(1)
-                  : setCurrentSearchPoint(currentSearchPoint + 1);
-              }}>
-              <Ionicons
-                name="caret-down-outline"
-                style={{
-                  color: 'rgb(240,240,208)',
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                  fontSize: 25,
-                }}></Ionicons>
-            </TouchableOpacity>
-          </Animated.View>
-        )}
+            <Ionicons
+              name="caret-up-outline"
+              style={{
+                color: 'rgb(240,240,208)',
+                textAlign: 'center',
+                fontWeight: 'bold',
+                fontSize: 25,
+              }}></Ionicons>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.tabSearch}
+            onPress={() => {
+              currentSearchPoint == positionYArr.length
+                ? setCurrentSearchPoint(1)
+                : setCurrentSearchPoint(currentSearchPoint + 1);
+            }}>
+            <Ionicons
+              name="caret-down-outline"
+              style={{
+                color: 'rgb(240,240,208)',
+                textAlign: 'center',
+                fontWeight: 'bold',
+                fontSize: 25,
+              }}></Ionicons>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
 
       {
         <Animated.View
@@ -1366,7 +1436,6 @@ q.current = []
                 duration: 600,
                 useNativeDriver: false,
               }).start();
-
             }}>
             {/* <Text style={styles.innerTab}>S</Text> */}
             <Ionicons
@@ -1427,8 +1496,8 @@ q.current = []
 
             setTittleArray([]);
             setTittleArray2([]);
-            Shrink()
-            setGo(false)
+            Shrink();
+            setGo(false);
           }}>
           {/* <Text style={styles.innerTab}>Find</Text> */}
           <Ionicons
@@ -1457,7 +1526,7 @@ q.current = []
 
             setTittleArray([]);
             setTittleArray2([]);
-            Shrink()
+            Shrink();
           }}>
           <Ionicons
             name="menu-outline"
@@ -1798,31 +1867,47 @@ const styles = StyleSheet.create({
   ModalInfoContainer: {
     display: 'flex',
     flexDirection: 'row',
-    paddingLeft: 20,
-    paddingRight: 5,
+    paddingLeft:'2%',
+    paddingRight: '2%',
+    flexWrap: 'wrap',
+    borderWidth: 2,
+    // paddingTop: 10,
+    borderBottomWidth: 1,
+    borderTopWidth: 1,
+    marginLeft:5,
+    justifyContent:'center',
+    alignItems:'center',
+    // paddingBottom:10
   },
   ModalInfoTitle: {
-    paddingTop: 10,
     paddingBottom: 10,
-    flex: 1,
+    paddingTop:10,
+    // flex: 1,
     fontWeight: 'bold',
-    // backgroundColor:'red',
-    fontSize: 16,
+    fontSize: 15,
     color: 'black',
+    paddingRight:5,
+    top:0,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
   },
   ModalInfoContent: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    flex: 1,
+  paddingBottom:10,
+  paddingTop:10,
+   flex: 1,
     color: 'black',
     fontSize: 14,
-    // backgroundColor:'yellow'
+    paddingLeft:'4%',
+    // backgroundColor:'yellow',
+    textAlignVertical:'center'
   },
   ModalInfoContentLawRelated: {
-    paddingBottom: 10,
+    paddingBottom: 5,
+    paddingTop:5,
     flex: 1,
     color: 'black',
     fontSize: 14,
-    // backgroundColor:'blue'
+    paddingLeft:'4%',
   },
 });

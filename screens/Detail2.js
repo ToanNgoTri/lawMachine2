@@ -11,10 +11,9 @@ import {
 // import {handle2, searchLaw} from '../redux/fetchData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector, useDispatch} from 'react-redux';
-
+import { useScrollToTop } from '@react-navigation/native';
 import React, {useEffect, useState, useRef, useContext} from 'react';
 import {useNetInfo} from '@react-native-community/netinfo';
-
 // import {RefForSearch} from '../App';
 // import {RefLoading} from '../App';
 
@@ -33,6 +32,7 @@ export function Detail2({navigation}) {
     state => state['searchLaw'],
   );
 
+  useScrollToTop(list);
   // const SearchScrollview = useContext(RefForSearch);
 
   // SearchScrollview.updateSearch(list);
@@ -114,7 +114,9 @@ export function Detail2({navigation}) {
                   }}
                   value={input}
                   selectTextOnFocus={true}
-                  placeholder="Nhập từ tên luật, trích dẫn, ..."></TextInput>
+                  placeholder="Nhập từ tên luật, trích dẫn, ..."
+                  onSubmitEditing={()=>dispatch({type: 'searchLaw', input: input})
+                  }></TextInput>
                 <TouchableOpacity
                   onPress={() => setInput('')}
                   style={{
@@ -191,7 +193,8 @@ export function Detail2({navigation}) {
                   Keyboard.dismiss();
 
                   dispatch({type: 'searchLaw', input: input});
-                }}>
+                }}
+                >
                 <Ionicons
                   name="search-outline"
                   style={styles.inputBtbText}></Ionicons>

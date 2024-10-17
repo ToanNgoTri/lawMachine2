@@ -14,6 +14,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector, useDispatch} from 'react-redux';
 import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState, useRef, useContext} from 'react';
+import { useScrollToTop } from '@react-navigation/native';
 
 // import {RefForSearch} from '../App';
 // import {loader1, handle1} from '../redux/fetchData';
@@ -47,6 +48,7 @@ export function Detail1({navigation}) {
   const [warning, setWanring] = useState(false);
   
   const list = useRef(null);
+  useScrollToTop(list);
 
   const dispatch = useDispatch();
 
@@ -506,7 +508,9 @@ export function Detail1({navigation}) {
                   }}
                   value={input}
                   selectTextOnFocus={true}
-                  placeholder="Nhập từ khóa..."></TextInput>
+                  placeholder="Nhập từ khóa..."
+                  onSubmitEditing={()=>dispatch({type:'searchContent',input:input})
+                }></TextInput>
                 <TouchableOpacity
                   onPress={() => setInput('')}
                   style={{
