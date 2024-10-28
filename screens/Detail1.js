@@ -15,6 +15,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState, useRef, useContext} from 'react';
 import { useScrollToTop } from '@react-navigation/native';
+import {InfoDownloaded} from '../App';
 
 // import {RefForSearch} from '../App';
 // import {loader1, handle1} from '../redux/fetchData';
@@ -43,10 +44,11 @@ export function Detail1({navigation}) {
   const [choosenLaw, setChoosenLaw] = useState([]);
   const [LawFilted, setLawFilted] = useState(false)
 
-  // const [Loading, setLoading] = useState(false);
+  const inf = useContext(InfoDownloaded);
 
   const [warning, setWanring] = useState(false);
   
+  const textInput = useRef(null)
   const list = useRef(null);
   useScrollToTop(list);
 
@@ -422,7 +424,12 @@ export function Detail1({navigation}) {
               fontWeight:'bold'
             }}
             >
-            {internetConnected ? "Xin vui lòng đợi trong giây lát ..." :"Vui lòng kiểm tra kết nối mạng ..."}
+            {internetConnected ?<View ><Text style={{color:'white',fontWeight:'bold',textAlign:'center'}}>{`Đang tìm từ khóa trong số ${(Object.keys(inf.info)).length} văn bản`}</Text>
+            <Text style={{color:'white',fontWeight:'bold',textAlign:'center'}}>
+             Quá trình có thể mất vài phút </Text></View> 
+              
+              
+              :"Vui lòng kiểm tra kết nối mạng ..."}
             </Text>
           <ActivityIndicator size="large" color="white"></ActivityIndicator>
         </View>
@@ -501,6 +508,7 @@ export function Detail1({navigation}) {
                   borderRadius: 15,
                 }}>
                 <TextInput
+                  ref={textInput}
                   style={styles.inputArea}
                   onChangeText={text => {
                     setInput(text);
@@ -512,7 +520,7 @@ export function Detail1({navigation}) {
                   onSubmitEditing={()=>dispatch({type:'searchContent',input:input})
                 }></TextInput>
                 <TouchableOpacity
-                  onPress={() => setInput('')}
+                  onPress={() => {setInput('');textInput.current.focus()}}
                   style={{
                     width: '15%',
                     display: 'flex',

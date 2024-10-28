@@ -41,6 +41,8 @@ let eachSectionWithChapter = [];
 
 export default function Detail({navigation}) {
   const inf = useContext(InfoDownloaded);
+  // console.log('inf.info',inf.info);
+  
 
   // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
   const [tittleArray, setTittleArray] = useState([true]); // đây là 'phần thứ...' hoặc chương (nói chung là section cao nhất)
@@ -186,8 +188,10 @@ export default function Detail({navigation}) {
   const animatedForNavi = useRef(new Animated.Value(0)).current;
 
   const list = useRef(null);
-  const q = useRef(null);
-  q.current = [];
+  const textInputFind = useRef(null);
+  const textInputArticle = useRef(null);
+  const PositionYArrArticalForDev = useRef(null);
+  PositionYArrArticalForDev.current = [];
   const [input, setInput] = useState(route.params ? route.params.input : '');
   const [valueInput, setValueInput] = useState('');
   const [find, setFind] = useState(route.params ? true : false);
@@ -483,7 +487,6 @@ export default function Detail({navigation}) {
     // console.log('key3',key3);
     // console.log('tittleArray.length',tittleArray.length);
 
-    if (true) {
       if (
         // true
         tittleArray.length ||
@@ -496,11 +499,10 @@ export default function Detail({navigation}) {
           return key3 == Object.keys(elem);
         });
 
-        if (!showArticle) {
-          if (contains) {
+        if (!showArticle) {   // nếu showArticle đang đóng
+          if (contains) {   // nếu positionYArrArtical chưa có "điều" gì đó
             articleCount++;
 
-            // console.log(123);
             for (let g = 0; g <= positionYArrArtical.length; g++) {
               if (positionYArrArticalDemo[g][key3]) {
                 positionYArrArticalDemo[g][key3] = y + currentY;
@@ -508,34 +510,33 @@ export default function Detail({navigation}) {
               }
             }
 
-            if (articleCount >= positionYArrArtical.length) {
+            if (articleCount >= positionYArrArtical.length) {   // nếu positionYArrArtical đã đủ số lượng điều
               setPositionYArrArtical(positionYArrArticalDemo);
               // setPositionYArrArtical(q.current);
-              q.current = [];
+              PositionYArrArticalForDev.current = [];
 
               articleCount = 0;
             }
-          } else {
+          } else { // nếu positionYArrArtical chưa đủ số lượng điều
             positionYArrArtical.push({[key3]: y + currentY});
             // console.log(567);
           }
-        } else {
+        } else {   // nếu showArticle đang mở
           articleCount++;
 
           // positionYArrArtical.map((elem, i) => {
-          q.current[articleCount - 1] = {[key3]: y + currentY};
+          PositionYArrArticalForDev.current[articleCount - 1] = {[key3]: y + currentY};
 
           // });
           if (articleCount >= positionYArrArtical.length) {
-            setPositionYArrArtical(q.current);
+            setPositionYArrArtical(PositionYArrArticalForDev.current);
             articleCount = 0;
-            q.current = [];
+            PositionYArrArticalForDev.current = [];
           }
 
           // console.log('q.current',q.current);
         }
       }
-    }
   }
 
   TopUnitCount = Content && Object.keys(Content).length;
@@ -565,19 +566,6 @@ export default function Detail({navigation}) {
     }
   }
 
-  // useEffect(() => {
-  //   setGo(false);
-  //   setSearchCount(0);
-  //   setCurrentSearchPoint(0);
-
-  // }, [input]);
-
-  // useEffect(() => {
-  //   setSearchCount(searchResultCount);
-  //   setPositionYArr([]);
-  //   setCurrentSearchPoint(1)
-
-  // }, [go]);
 
   useEffect(() => {
     setGo(false);
@@ -641,7 +629,7 @@ export default function Detail({navigation}) {
   }, [find]);
 
   const a = (key, i, key1, i1a, t) => {
-    // phần nếu không mục 'phần thứ' trong văn bản
+    // phần nếu có mục 'chương' trong văn bản 
 
     return Object.keys(key)[0] != '0' ? (
       <View
@@ -791,7 +779,7 @@ export default function Detail({navigation}) {
 
   let onlyArticle = false; // dùng để hiển thị collapse và expand
   const c = (key, i, ObjKeys) => {
-    // phần nếu không mục 'phần thứ' và "chương" trong văn bản (chỉ có Điều ...)
+    // phần nếu chỉ có Điều ...
     onlyArticle = true;
 
     return Object.keys(key)[0] != '0' ? (
@@ -823,6 +811,27 @@ export default function Detail({navigation}) {
     );
   };
 
+  const d = (key,i)=>{    // dành cho phụ lục, danh mục
+
+    
+return(
+  <View   style={
+    showArticle ||
+    find ||
+    (!tittleArray.includes(i) && styles.content)        }>
+
+   { Object.values(key)[0].map( (key1,i)=>(
+      <Text style={styles.lines}>
+        {`${(key1)}\n`}
+        </Text>
+  
+    ))
+  }
+  </View>
+)
+  }
+
+  
   return (
     <>
       {loading && (
@@ -1032,7 +1041,6 @@ export default function Detail({navigation}) {
                   </Text>
                 </View>
               </View>
-              {Info && !Info['lawDescription'].match(/^(luật|bộ luật)/gim) && (
                 <View style={styles.ModalInfoContainer}>
                   <View style={{width: '40%',justifyContent:'center',}}>
                     <Text style={styles.ModalInfoTitle}>
@@ -1045,7 +1053,6 @@ export default function Detail({navigation}) {
                     </Text>
                   </View>
                 </View>
-              )}
               <View style={styles.ModalInfoContainer}>
                 <View style={{width: '40%'}}>
                   <Text style={styles.ModalInfoTitle}>Ngày ký:</Text>
@@ -1073,7 +1080,7 @@ export default function Detail({navigation}) {
                   </View>
                   <View style={{flex:1}}>
                     <Text style={styles.ModalInfoContent}>
-                      {Info && Info['lawNumber']}
+                      {Info && Info['lawNumber'].match(/^0001\\HP/img)?Info['lawNumber']:''}
                     </Text>
                   </View>
                 </View>
@@ -1150,16 +1157,20 @@ export default function Detail({navigation}) {
                         let nameLaw = key.replace(/\//gim, '\\');
 
                         let nameLaw2;
-                        for (let a = 0; a < Object.keys(inf.info).length; a++) {
-                          if (
-                            Object.values(inf.info)[a]['lawNameDisplay'].match(
-                              new RegExp(key, 'gim'),
-                            )
-                          ) {
-                            nameLaw2 = Object.keys(inf.info)[a];
-                            break;
-                          }
-                        }
+                        // for (let a = 0; a < (inf.info).length; a++) {
+                        //   if (
+                        //     Object.values(inf.info)[a]['lawNameDisplay'].match(
+                        //       new RegExp(`^${key}`, 'gim'),
+                        //     )
+                        //   ) {
+                        //     nameLaw2 = (inf.info)[a];
+                        //     break;
+                        //   }else if(Object.values(inf.info)[a]['lawDescription'].match(
+                        //     new RegExp(`^${key}`, 'gim'),
+                        //   )){
+                        //     nameLaw2 = (inf.info)[a];
+                        //   }
+                        // }
                         return (
                           <TouchableOpacity
                             onPress={() => {
@@ -1181,13 +1192,12 @@ export default function Detail({navigation}) {
                                     : '300',
                               }}>
                              -{' '}{
-                                Object.keys(inf.info).includes(nameLaw)
-                                  ? inf.info[nameLaw]['lawNameDisplay']
-                                  : nameLaw2
-                                  ? inf.info[nameLaw2]['lawNameDisplay']
-                                  : key
-
-                                // key
+                                // (inf.info).includes(nameLaw)
+                                //   ? inf.info[nameLaw]['lawNameDisplay']
+                                //   : nameLaw2
+                                //   ? inf.info[nameLaw2]['lawNameDisplay']
+                                //   : key
+                                inf.info[nameLaw]?inf.info[nameLaw]:nameLaw
                               }
                             </Text>
                           </TouchableOpacity>
@@ -1298,7 +1308,7 @@ export default function Detail({navigation}) {
                   ? b(key, i, Object.keys(key)[0])
                   : Object.keys(key)[0].match(/^chương .*/gim)
                   ? a(key, i, Object.keys(key)[0])
-                  : c(key, i, Object.keys(key)[0])}
+                  : Object.keys(key)[0].match(/^điều .*/gim)?c(key, i, Object.keys(key)[0]):d(key,i)}
               </>
             ))}
         </ScrollView>
@@ -1362,6 +1372,9 @@ export default function Detail({navigation}) {
             {/* <View style={styles.searchView}> */}
             <View style={styles.inputArea}>
               <TextInput
+                                      ref={textInputFind}
+                                      selectTextOnFocus={true}
+
                 style={{width: '65%', color: 'white'}}
                 onChangeText={text => setInput(text)}
                 autoFocus={false}
@@ -1383,7 +1396,7 @@ export default function Detail({navigation}) {
               <TouchableOpacity
                 style={{color: 'white', fontSize: 16, width: '12%'}}
                 onPress={() => {
-                  setInput('');
+                  setInput('');textInputFind.current.focus()
                 }}>
                 {input && (
                   <Ionicons
@@ -1585,7 +1598,10 @@ export default function Detail({navigation}) {
                   height: 50,
                 }}>
                 <TextInput
-                  onChangeText={text => setInputSearchArtical(text)}
+                        ref={textInputArticle}
+                        onChangeText={text => setInputSearchArtical(text)}
+                        selectTextOnFocus={true}
+
                   value={inputSearchArtical}
                   style={{
                     paddingLeft: 10,
@@ -1597,7 +1613,7 @@ export default function Detail({navigation}) {
                   placeholder=" Nhập từ điều luật ..."
                   placeholderTextColor={'gray'}></TextInput>
                 <TouchableOpacity
-                  onPress={() => setInputSearchArtical('')}
+                  onPress={() => {setInputSearchArtical('');textInputArticle.current.focus()}}
                   style={{
                     width: '15%',
                     display: 'flex',
@@ -1631,7 +1647,7 @@ export default function Detail({navigation}) {
                     style={styles.listItem}
                     onPress={() => {
                       setShowArticle(false);
-                      list.current.scrollTo({y: Object.values(key) - 57});
+                      list.current.scrollTo({y: Object.values(key) - 70});
                       Animated.timing(animatedForNavi, {
                         toValue: !showArticle ? -100 : 0,
                         duration: 600,
@@ -1872,8 +1888,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     borderWidth: 2,
     // paddingTop: 10,
-    borderBottomWidth: 1,
-    borderTopWidth: 1,
+    // borderBottomWidth: 1,
+    borderTopWidth: 2,
+    borderBottomWidth: 0,
     marginLeft:5,
     justifyContent:'center',
     alignItems:'center',

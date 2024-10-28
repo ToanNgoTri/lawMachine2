@@ -25,6 +25,7 @@ export function Detail2({navigation}) {
   const [warning, setWanring] = useState(false);
 
   const list = useRef(null);
+  const textInput = useRef(null);
 
   const dispatch = useDispatch();
 
@@ -108,6 +109,7 @@ export function Detail2({navigation}) {
                   borderRadius: 15,
                 }}>
                 <TextInput
+                        ref={textInput}
                   style={styles.inputArea}
                   onChangeText={text => {
                     setInput(text);
@@ -118,7 +120,7 @@ export function Detail2({navigation}) {
                   onSubmitEditing={()=>dispatch({type: 'searchLaw', input: input})
                   }></TextInput>
                 <TouchableOpacity
-                  onPress={() => setInput('')}
+                  onPress={() => {setInput('');textInput.current.focus()}}
                   style={{
                     width: '15%',
                     display: 'flex',

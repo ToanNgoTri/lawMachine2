@@ -164,7 +164,7 @@ const AppNavigators = () => {
                     ...(focused ? styles.IconActive : styles.IconInActive),
                     fontSize: 10,
                   }}>
-                  Offline
+                  Downloaded
                 </Text>
               </Animated.View>
             );
@@ -256,7 +256,7 @@ const AppNavigators = () => {
 };
 
 const StackNavigator = () => {
-  const [Content, setContent] = useState(dataOrg['LawInfo']);
+  const [Content, setContent] = useState(Object.keys(dataOrg['LawInfo']));
   const ModalVisibleStatus = useContext(ModalStatus);
   const info = useContext(InfoDownloaded);
 
@@ -267,7 +267,7 @@ const StackNavigator = () => {
         'utf8',
       );
       if (FileInfoStringInfo) {
-        return {...dataOrg['LawInfo'], ...JSON.parse(FileInfoStringInfo)};
+        return [...Object.keys(dataOrg['LawInfo']), ...Object.keys(JSON.parse(FileInfoStringInfo))];
       }
       // f = JSON.parse(FileInfoStringInfo)
     }
@@ -277,6 +277,8 @@ const StackNavigator = () => {
   useEffect(() => {
     getContentExist().then(cont => {
       if(cont){
+        console.log('cont',cont);
+        
         setContent(cont);
         info.updateInfo(cont);
       }
@@ -289,13 +291,30 @@ const StackNavigator = () => {
       .then(snapshot => {
         if(Boolean(snapshot.val())){
           
-          info.updateInfo(snapshot.val());
+          // info.updateInfo(Object.keys(snapshot.val()));
           
           setContent(snapshot.val()); /////////////////////////////////////////////////////////////////  nên sửa
 
         }
       });
   }, []);
+// console.log('Content',Content);
+useEffect(() => {// kiem tra xem k co mang xai dc k
+
+let b ={}
+
+if(!Array.isArray(Content)){
+  Object.keys(Content).map((key,i)=>{
+    b[key] = Content[key]['lawNameDisplay']
+    
+  })
+  info.updateInfo(b);
+}
+  // console.log('b',b);
+  // console.log('Content',Content);
+
+}, [Content])
+
 
   function TopBarNav({route}) {
     <Text>{route.name}</Text>;
@@ -310,7 +329,7 @@ const StackNavigator = () => {
           options={{animationEnabled: false, header: () => null,}}
         />
 
-        {Content &&
+        {Object.keys(Content) &&
           Object.keys(Content).map((key, i) => (
             <Stack.Screen
               key={i}
