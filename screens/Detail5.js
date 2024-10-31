@@ -42,7 +42,6 @@ let eachSectionWithChapter = [];
 export default function Detail({navigation}) {
   const inf = useContext(InfoDownloaded);
   // console.log('inf.info',inf.info);
-  
 
   // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
   const [tittleArray, setTittleArray] = useState([true]); // đây là 'phần thứ...' hoặc chương (nói chung là section cao nhất)
@@ -487,56 +486,63 @@ export default function Detail({navigation}) {
     // console.log('key3',key3);
     // console.log('tittleArray.length',tittleArray.length);
 
-      if (
-        // true
-        tittleArray.length ||
-        tittleArray2.length ||
-        go ||
-        tittleArray[0] ||
-        tittleArray2[0]
-      ) {
-        var contains = positionYArrArtical.some((elem, i) => {
-          return key3 == Object.keys(elem);
-        });
+    if (
+      // true
+      tittleArray.length ||
+      tittleArray2.length ||
+      go ||
+      tittleArray[0] ||
+      tittleArray2[0]
+    ) {
+      var contains = positionYArrArtical.some((elem, i) => {
+        return key3 == Object.keys(elem);
+      });
 
-        if (!showArticle) {   // nếu showArticle đang đóng
-          if (contains) {   // nếu positionYArrArtical chưa có "điều" gì đó
-            articleCount++;
-
-            for (let g = 0; g <= positionYArrArtical.length; g++) {
-              if (positionYArrArticalDemo[g][key3]) {
-                positionYArrArticalDemo[g][key3] = y + currentY;
-                break;
-              }
-            }
-
-            if (articleCount >= positionYArrArtical.length) {   // nếu positionYArrArtical đã đủ số lượng điều
-              setPositionYArrArtical(positionYArrArticalDemo);
-              // setPositionYArrArtical(q.current);
-              PositionYArrArticalForDev.current = [];
-
-              articleCount = 0;
-            }
-          } else { // nếu positionYArrArtical chưa đủ số lượng điều
-            positionYArrArtical.push({[key3]: y + currentY});
-            // console.log(567);
-          }
-        } else {   // nếu showArticle đang mở
+      if (!showArticle) {
+        // nếu showArticle đang đóng
+        if (contains) {
+          // nếu positionYArrArtical chưa có "điều" gì đó
           articleCount++;
 
-          // positionYArrArtical.map((elem, i) => {
-          PositionYArrArticalForDev.current[articleCount - 1] = {[key3]: y + currentY};
-
-          // });
-          if (articleCount >= positionYArrArtical.length) {
-            setPositionYArrArtical(PositionYArrArticalForDev.current);
-            articleCount = 0;
-            PositionYArrArticalForDev.current = [];
+          for (let g = 0; g <= positionYArrArtical.length; g++) {
+            if (positionYArrArticalDemo[g][key3]) {
+              positionYArrArticalDemo[g][key3] = y + currentY;
+              break;
+            }
           }
 
-          // console.log('q.current',q.current);
+          if (articleCount >= positionYArrArtical.length) {
+            // nếu positionYArrArtical đã đủ số lượng điều
+            setPositionYArrArtical(positionYArrArticalDemo);
+            // setPositionYArrArtical(q.current);
+            PositionYArrArticalForDev.current = [];
+
+            articleCount = 0;
+          }
+        } else {
+          // nếu positionYArrArtical chưa đủ số lượng điều
+          positionYArrArtical.push({[key3]: y + currentY});
+          // console.log(567);
         }
+      } else {
+        // nếu showArticle đang mở
+        articleCount++;
+
+        // positionYArrArtical.map((elem, i) => {
+        PositionYArrArticalForDev.current[articleCount - 1] = {
+          [key3]: y + currentY,
+        };
+
+        // });
+        if (articleCount >= positionYArrArtical.length) {
+          setPositionYArrArtical(PositionYArrArticalForDev.current);
+          articleCount = 0;
+          PositionYArrArticalForDev.current = [];
+        }
+
+        // console.log('q.current',q.current);
       }
+    }
   }
 
   TopUnitCount = Content && Object.keys(Content).length;
@@ -565,7 +571,6 @@ export default function Detail({navigation}) {
       }
     }
   }
-
 
   useEffect(() => {
     setGo(false);
@@ -629,7 +634,7 @@ export default function Detail({navigation}) {
   }, [find]);
 
   const a = (key, i, key1, i1a, t) => {
-    // phần nếu có mục 'chương' trong văn bản 
+    // phần nếu có mục 'chương' trong văn bản
 
     return Object.keys(key)[0] != '0' ? (
       <View
@@ -811,27 +816,20 @@ export default function Detail({navigation}) {
     );
   };
 
-  const d = (key,i)=>{    // dành cho phụ lục, danh mục
+  const d = (key, i) => {
+    // dành cho phụ lục, danh mục
+    return (
+      <View
+        style={
+          showArticle || find || (!tittleArray.includes(i) && styles.content)
+        }>
+        {Object.values(key)[0].map((key1, i) => (
+          <Text style={styles.lines}>{`${key1}\n`}</Text>
+        ))}
+      </View>
+    );
+  };
 
-    
-return(
-  <View   style={
-    showArticle ||
-    find ||
-    (!tittleArray.includes(i) && styles.content)        }>
-
-   { Object.values(key)[0].map( (key1,i)=>(
-      <Text style={styles.lines}>
-        {`${(key1)}\n`}
-        </Text>
-  
-    ))
-  }
-  </View>
-)
-  }
-
-  
   return (
     <>
       {loading && (
@@ -1027,37 +1025,32 @@ return(
                 // backgroundColor: 'green',
                 paddingLeft: '5%',
                 paddingRight: '5%',
-                
               }}>
-              <View style={{...styles.ModalInfoContainer,borderTopWidth:2}}>
-                <View style={{width: '40%',justifyContent:'center',
-
-}}>
+              <View style={{...styles.ModalInfoContainer, borderTopWidth: 2}}>
+                <View style={{width: '40%', justifyContent: 'center'}}>
                   <Text style={styles.ModalInfoTitle}>Tên gọi:</Text>
                 </View>
-                <View style={{flex:1}}>
+                <View style={{flex: 1}}>
                   <Text style={styles.ModalInfoContent}>
                     {Info && Info['lawNameDisplay']}
                   </Text>
                 </View>
               </View>
-                <View style={styles.ModalInfoContainer}>
-                  <View style={{width: '40%',justifyContent:'center',}}>
-                    <Text style={styles.ModalInfoTitle}>
-                      Trích yếu nội dung:
-                    </Text>
-                  </View>
-                  <View style={{flex:1}}>
-                    <Text style={styles.ModalInfoContent}>
-                      {Info && Info['lawDescription']}
-                    </Text>
-                  </View>
+              <View style={styles.ModalInfoContainer}>
+                <View style={{width: '40%', justifyContent: 'center'}}>
+                  <Text style={styles.ModalInfoTitle}>Trích yếu nội dung:</Text>
                 </View>
+                <View style={{flex: 1}}>
+                  <Text style={styles.ModalInfoContent}>
+                    {Info && Info['lawDescription']}
+                  </Text>
+                </View>
+              </View>
               <View style={styles.ModalInfoContainer}>
                 <View style={{width: '40%'}}>
                   <Text style={styles.ModalInfoTitle}>Ngày ký:</Text>
                 </View>
-                <View style={{flex:1}}>
+                <View style={{flex: 1}}>
                   <Text style={styles.ModalInfoContent}>
                     {Info && Info['lawDaySign']}
                   </Text>
@@ -1067,7 +1060,7 @@ return(
                 <View style={{width: '40%'}}>
                   <Text style={styles.ModalInfoTitle}>Ngày có hiệu lực:</Text>
                 </View>
-                <View style={{flex:1}}>
+                <View style={{flex: 1}}>
                   <Text style={styles.ModalInfoContent}>
                     {Info && Info['lawDayActive']}
                   </Text>
@@ -1078,9 +1071,11 @@ return(
                   <View style={{width: '40%'}}>
                     <Text style={styles.ModalInfoTitle}>Số văn bản:</Text>
                   </View>
-                  <View style={{flex:1}}>
+                  <View style={{flex: 1}}>
                     <Text style={styles.ModalInfoContent}>
-                      {Info && Info['lawNumber'].match(/^0001\\HP/img)?Info['lawNumber']:''}
+                      {Info && Info['lawNumber'].match(/^0001\\HP/gim)
+                        ? Info['lawNumber']
+                        : ''}
                     </Text>
                   </View>
                 </View>
@@ -1090,9 +1085,11 @@ return(
                 <View style={{width: '40%'}}>
                   <Text style={styles.ModalInfoTitle}>Họ Tên người ký:</Text>
                 </View>
-                <View style={{flex:1,paddingBottom:10,paddingTop:10}}>
+                <View style={{flex: 1, paddingBottom: 10, paddingTop: 10}}>
                   {Info && !Array.isArray(Info['nameSign']) ? (
-                    <Text style={styles.ModalInfoContent}>{Info['nameSign']}</Text>
+                    <Text style={styles.ModalInfoContent}>
+                      {Info['nameSign']}
+                    </Text>
                   ) : (
                     Info['nameSign'] &&
                     Info['nameSign'].map(key => (
@@ -1110,9 +1107,11 @@ return(
                 <View style={{width: '40%'}}>
                   <Text style={styles.ModalInfoTitle}>Chức vụ người ký:</Text>
                 </View>
-                <View style={{flex:1,paddingBottom:10,paddingTop:10}}>
+                <View style={{flex: 1, paddingBottom: 10, paddingTop: 10}}>
                   {Info && !Array.isArray(Info['roleSign']) ? (
-                    <Text style={styles.ModalInfoContent}>{Info['roleSign']}</Text>
+                    <Text style={styles.ModalInfoContent}>
+                      {Info['roleSign']}
+                    </Text>
                   ) : (
                     Info['roleSign'] &&
                     Info['roleSign'].map(key => (
@@ -1131,9 +1130,11 @@ return(
                     Cơ quan ban hành:
                   </Text>
                 </View>
-                <View style={{flex:1,paddingBottom:10,paddingTop:10}}>
+                <View style={{flex: 1, paddingBottom: 10, paddingTop: 10}}>
                   {Info && !Array.isArray(Info['unitPublish']) ? (
-                    <Text style={styles.ModalInfoContent}>{Info['unitPublish']}</Text>
+                    <Text style={styles.ModalInfoContent}>
+                      {Info['unitPublish']}
+                    </Text>
                   ) : (
                     Info['unitPublish'] &&
                     Info['unitPublish'].map(key => (
@@ -1147,11 +1148,14 @@ return(
                 </View>
               </View>
               {Info && Object.keys(Info).includes('lawRelated') && (
-                <View style={{...styles.ModalInfoContainer,borderBottomWidth:2}}>
-                <View style={{width: '40%'}}>
-                <Text style={styles.ModalInfoTitle}>Văn bản liên quan:</Text>
-                </View>
-                  <View style={{flex: 1,paddingBottom:10,paddingTop:10}}>
+                <View
+                  style={{...styles.ModalInfoContainer, borderBottomWidth: 2}}>
+                  <View style={{width: '40%'}}>
+                    <Text style={styles.ModalInfoTitle}>
+                      Văn bản liên quan:
+                    </Text>
+                  </View>
+                  <View style={{flex: 1, paddingBottom: 10, paddingTop: 10}}>
                     {Info &&
                       Info['lawRelated'].map((key, i) => {
                         let nameLaw = key.replace(/\//gim, '\\');
@@ -1191,13 +1195,14 @@ return(
                                     ? 'bold'
                                     : '300',
                               }}>
-                             -{' '}{
+                              -{' '}
+                              {
                                 // (inf.info).includes(nameLaw)
                                 //   ? inf.info[nameLaw]['lawNameDisplay']
                                 //   : nameLaw2
                                 //   ? inf.info[nameLaw2]['lawNameDisplay']
                                 //   : key
-                                inf.info[nameLaw]?inf.info[nameLaw]:nameLaw
+                                inf.info[nameLaw] ? inf.info[nameLaw] : nameLaw
                               }
                             </Text>
                           </TouchableOpacity>
@@ -1308,7 +1313,9 @@ return(
                   ? b(key, i, Object.keys(key)[0])
                   : Object.keys(key)[0].match(/^chương .*/gim)
                   ? a(key, i, Object.keys(key)[0])
-                  : Object.keys(key)[0].match(/^điều .*/gim)?c(key, i, Object.keys(key)[0]):d(key,i)}
+                  : Object.keys(key)[0].match(/^điều .*/gim)
+                  ? c(key, i, Object.keys(key)[0])
+                  : d(key, i)}
               </>
             ))}
         </ScrollView>
@@ -1372,9 +1379,8 @@ return(
             {/* <View style={styles.searchView}> */}
             <View style={styles.inputArea}>
               <TextInput
-                                      ref={textInputFind}
-                                      selectTextOnFocus={true}
-
+                ref={textInputFind}
+                selectTextOnFocus={true}
                 style={{width: '65%', color: 'white'}}
                 onChangeText={text => setInput(text)}
                 autoFocus={false}
@@ -1396,7 +1402,8 @@ return(
               <TouchableOpacity
                 style={{color: 'white', fontSize: 16, width: '12%'}}
                 onPress={() => {
-                  setInput('');textInputFind.current.focus()
+                  setInput('');
+                  textInputFind.current.focus();
                 }}>
                 {input && (
                   <Ionicons
@@ -1598,10 +1605,9 @@ return(
                   height: 50,
                 }}>
                 <TextInput
-                        ref={textInputArticle}
-                        onChangeText={text => setInputSearchArtical(text)}
-                        selectTextOnFocus={true}
-
+                  ref={textInputArticle}
+                  onChangeText={text => setInputSearchArtical(text)}
+                  selectTextOnFocus={true}
                   value={inputSearchArtical}
                   style={{
                     paddingLeft: 10,
@@ -1613,7 +1619,10 @@ return(
                   placeholder=" Nhập từ điều luật ..."
                   placeholderTextColor={'gray'}></TextInput>
                 <TouchableOpacity
-                  onPress={() => {setInputSearchArtical('');textInputArticle.current.focus()}}
+                  onPress={() => {
+                    setInputSearchArtical('');
+                    textInputArticle.current.focus();
+                  }}
                   style={{
                     width: '15%',
                     display: 'flex',
@@ -1883,7 +1892,7 @@ const styles = StyleSheet.create({
   ModalInfoContainer: {
     display: 'flex',
     flexDirection: 'row',
-    paddingLeft:'2%',
+    paddingLeft: '2%',
     paddingRight: '2%',
     flexWrap: 'wrap',
     borderWidth: 2,
@@ -1891,40 +1900,40 @@ const styles = StyleSheet.create({
     // borderBottomWidth: 1,
     borderTopWidth: 2,
     borderBottomWidth: 0,
-    marginLeft:5,
-    justifyContent:'center',
-    alignItems:'center',
+    marginLeft: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
     // paddingBottom:10
   },
   ModalInfoTitle: {
     paddingBottom: 10,
-    paddingTop:10,
+    paddingTop: 10,
     // flex: 1,
     fontWeight: 'bold',
     fontSize: 15,
     color: 'black',
-    paddingRight:5,
-    top:0,
-    display:'flex',
-    alignItems:'center',
-    justifyContent:'center',
+    paddingRight: 5,
+    top: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   ModalInfoContent: {
-  paddingBottom:10,
-  paddingTop:10,
-   flex: 1,
-    color: 'black',
-    fontSize: 14,
-    paddingLeft:'4%',
-    // backgroundColor:'yellow',
-    textAlignVertical:'center'
-  },
-  ModalInfoContentLawRelated: {
-    paddingBottom: 5,
-    paddingTop:5,
+    paddingBottom: 10,
+    paddingTop: 10,
     flex: 1,
     color: 'black',
     fontSize: 14,
-    paddingLeft:'4%',
+    paddingLeft: '4%',
+    // backgroundColor:'yellow',
+    textAlignVertical: 'center',
+  },
+  ModalInfoContentLawRelated: {
+    paddingBottom: 5,
+    paddingTop: 5,
+    flex: 1,
+    color: 'black',
+    fontSize: 14,
+    paddingLeft: '4%',
   },
 });
