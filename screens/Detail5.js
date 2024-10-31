@@ -816,7 +816,6 @@ export default function Detail({navigation}) {
     );
   };
 
-  
   const d = (key, i) => {
     // dành cho phụ lục, danh mục
     return (
