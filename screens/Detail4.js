@@ -1,5 +1,4 @@
 // import {  StyleSheet, Text, View,ScrollView,Dimensions, TextInput, TouchableOpacity} from 'react-native';
-
 // import firestore from '@react-native-firebase/firestore';
 // import { useState, useEffect } from 'react';
 
