@@ -33,35 +33,6 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const AppNavigators = () => {
-  // const [tabName, setTabName] = useState('home');
-  // const animatedValue = useRef(new Animated.Value(1)).current
-
-  // const SearchScrollview = useContext(RefForSearch)
-  // const HomeFlatlist = useContext(RefForHome)
-
-  // const i = useContext(ContentDownloaded)
-  // const ii = useContext(InfoDownloaded)
-
-  // console.log(context.value);
-
-  // useEffect(()=>{
-  //   Animated.timing(animatedValue, {
-  //     toValue:10,
-  //     duration: 500,
-  //     useNativeDriver: false,
-  //   }).start();
-  // },[animatedValue])
-
-  // const { width, height } = Dimensions.get("window");
-  // let heightTab=height/2;
-  // let widthTab=width/2;
-  // Dimensions.addEventListener("change", ({ window: { width, height } }) => {
-  //   // console.log(`Width: ${width}, Height: ${height}`);
-  //   widthTab=width/2;
-  //   heightTab=height/2
-
-  // });
-
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -72,60 +43,6 @@ const AppNavigators = () => {
         },
         // khi app chạy thì sẽ sẽ chạy hết tất cả các tab đồng loạt chứ không phải nhấn vô mới load
       })}
-
-      // screenOptions={
-
-      //   ({route, navigation}) => ({
-      //   tabBarIcon: ({focused, color, size}) => {
-      //     return (
-      //       <View
-      //         style={{
-      //           width: '1000%',
-      //           height: 50,
-      //           left: 0,
-      //           display: 'flex',
-      //           flexDirection: 'row',
-      //           backgroundColor:'red'
-      //         }}>
-      //         <TouchableOpacity
-      //           style={
-      //             tabName == 'home'
-      //               ? styles.tabItemActive
-      //               : styles.tabItemInactive
-      //           }
-      //           onPress={() => {
-      //             setTabName('home');
-      //             navigation.navigate('Home');
-      //           }}>
-      //           <Ionicons
-      //             name="home-outline"
-      //             style={
-      //               tabName == 'home' ? styles.IconActive : styles.IconInActive
-      //             }></Ionicons>
-      //         </TouchableOpacity>
-      //         <TouchableOpacity
-      //           style={
-      //             tabName == 'search'
-      //               ? styles.tabItemActive
-      //               : styles.tabItemInactive
-      //           }
-      //           onPress={() => {
-      //             setTabName('search');
-      //             navigation.navigate('Search');
-      //           }}>
-      //           <Ionicons
-      //             name="search-outline"
-      //             style={
-      //               tabName == 'search'
-      //                 ? styles.IconActive
-      //                 : styles.IconInActive
-      //             }></Ionicons>
-      //         </TouchableOpacity>
-      //       </View>
-      //     );
-      //   },
-      // })}
-      // lazy={false}                                   ///////////////////// mới bỏ có sao hông
     >
       <Tab.Screen
         name="Home"
@@ -135,24 +52,6 @@ const AppNavigators = () => {
           tabBarIcon: ({focused, color, size}) => {
             return (
               <Animated.View
-                //         style={focused ? {width: '100%',
-                //         height: '102%',
-                //         position: 'relative',
-                //         display: 'flex',
-                //         alignItems: 'center',
-                //         justifyContent: 'center',
-                //         borderTopColor:'red',
-                //         borderTopWidth:animatedValue,
-                //     } : {    position: 'relative',
-                //     width: '100%',
-                //     height: '102%',
-                //     display: 'flex',
-                //     alignItems: 'center',
-                //     justifyContent: 'center',
-                //     borderTopWidth:0,
-
-                // }}
-                // style={focused ? {...styles.tabItemActive,width:widthTab,height:(widthTab>heightTab?'108%':'104%')} : styles.tabItemInactive}
                 style={{alignItems: 'center', minWidth: 80}}>
                 <Ionicons
                   name="home-outline"
@@ -164,7 +63,7 @@ const AppNavigators = () => {
                     ...(focused ? styles.IconActive : styles.IconInActive),
                     fontSize: 10,
                   }}>
-                  Downloaded
+                  Đã tải về
                 </Text>
               </Animated.View>
             );
@@ -201,7 +100,7 @@ const AppNavigators = () => {
                     ...(focused ? styles.IconActive : styles.IconInActive),
                     fontSize: 10,
                   }}>
-                  Search Law
+                  Tìm văn bản
                 </Text>
               </View>
             );
@@ -216,7 +115,7 @@ const AppNavigators = () => {
           },
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Search"
         component={Detail1}
         options={{
@@ -250,7 +149,7 @@ const AppNavigators = () => {
             // SearchScrollview.forSearch.current.scrollTo({y: 0});
           },
         }}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };
@@ -293,11 +192,12 @@ const StackNavigator = () => {
           
           // info.updateInfo(Object.keys(snapshot.val()));
           
-          setContent(snapshot.val()); /////////////////////////////////////////////////////////////////  nên sửa
+          setContent(Object.keys(snapshot.val())); /////////////////////////////////////////////////////////////////  nên sửa
 
         }
       });
   }, []);
+  
 // console.log('Content',Content);
 useEffect(() => {// kiem tra xem k co mang xai dc k
 
