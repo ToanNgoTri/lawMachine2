@@ -21,12 +21,11 @@ import {InfoDownloaded} from '../App';
 // import {loader1, handle1} from '../redux/fetchData';
 
 export function Detail1({navigation}) {
-  // const [Content, setContent] = useState({});
-  // const [LawInfo, setLawInfo] = useState(null);
 
   const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
+  
   const [input, setInput] = useState(undefined);
-  const [valueInput, setValueInput] = useState('');
+  // const [valueInput, setValueInput] = useState('');
   const [valueInputForNav, setValueInputForNav] = useState('');
 
   const [inputFilter, setInputFilter] = useState('');
@@ -56,6 +55,7 @@ export function Detail1({navigation}) {
 
   const {loading1, result} = useSelector(state => state['searchContent']);
 
+  // console.log('result',result);
   
   const netInfo = useNetInfo();
   let internetConnected = netInfo.isConnected;
@@ -66,16 +66,16 @@ export function Detail1({navigation}) {
         ? Object.keys(SearchResult)
         : [],
     );
-    // })
-    // console.log('choosenLaw',choosenLaw);
   }, [SearchResult]);
   
   useEffect(() => {
     if(result){
-      setSearchResult(result['LawContent'])
-
+      let lawObject = {}
+      result.map(law=>{
+        lawObject[law._id] = {'lawNameDisplay':law.info['lawNameDisplay'],'lawDescription':law.info['lawDescription']}
+      })
+      setSearchResult(lawObject)
     }
-    
   }, [result])
   
 
@@ -90,217 +90,6 @@ export function Detail1({navigation}) {
     inputRange: [0, 100],
     outputRange: [0, 1],
   });
-
-  // const SearchScrollview = useContext(RefForSearch);
-
-  // SearchScrollview.updateSearch(list);
-
-
-  // function Search(input) {
-  //   let searchArray = {};
-
-  //   if (input) {
-  //     if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
-
-  //       function a(key, key1) {
-  //         // key ở đây là tên luật, key1 là Object 1 chương
-
-  //         Object.values(key1)[0].map((key2, i1) => {
-  //           // chọn từng điều
-
-  //           let replace = `(.*)${input}(.*)`;
-  //           let re = new RegExp(replace, 'gmi');
-  //           let article = Object.keys(key2)[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/')
-  //           let point = Object.values(key2)[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/')
-
-  //           if (Object.keys(key2)[0].match(re)) {
-  //             searchArray[key].push({
-  //               [article]: point,
-  //             });
-  //           } else if (point != '') {
-  //             if (point.match(re)) {
-  //               searchArray[key].push({
-  //                 [article]: point,
-  //               });
-  //             }
-  //           }
-  //         });
-
-          
-  //       }
-
-  //       Object.keys(dataOrg['LawContent']).map(
-  //         (key, i) => {
-  //           // key là tên luật
-  //           //key là tên của luật
-  //           // tham nhap luat (array chuong)
-
-  //           searchArray[key] = [];
-  //           if (choosenLaw.includes(key)) {
-  //             dataOrg['LawContent'][key].map(
-  //               (key1, i1) => {
-  //                 // ra Object Chuong hoặc (array phần thứ...)
-  //                 if (Object.keys(key1)[0].match(/^phần thứ .*/gim)) {
-  //                   // nếu có 'phần thứ
-  //                   // console.log('phần thứ');
-  //                   // console.log('Object.keys(key1)[0]',Object.keys(key1)[0]);
-  //                   if (
-  //                     Object.keys(Object.values(key1)[0][0])[0].match(
-  //                       /^Chương .*/gim,
-  //                     )
-  //                   ) {
-  //                     //nếu có chương trong phần thứ
-
-  //                     Object.values(key1)[0].map((key2, i) => {
-  //                       a(key, key2);
-  //                     });
-  //                   } else {
-  //                     //nếu không có chương trong phần thứ
-  //                     a(key, key1);
-  //                   }
-  //                 } else if (Object.keys(key1)[0].match(/^chương .*/gim)) {
-  //                   a(key, key1);
-  //                 } else {
-  //                   //nếu chỉ có điều
-  //                   if(i1==0){ //  đảm bảo chỉ chạy 1 lần
-  //                     a(key, {
-  //                       'chương Giả định':
-  //                         dataOrg['LawContent'][key],
-  //                     });
-  
-  //                   }
-  //                 }
-  //               },
-  //             );
-  //           }
-  //         },
-  //       );
-
-  //       let searchResult = {};
-
-  //       Object.keys(searchArray).map((key, i) => {
-  //         searchArray[key].map((key1, i) => {
-  //           searchResult[key] = searchArray[key];
-  //         });
-  //       });
-
-  //       setSearchResult(searchResult);
-  //       // console.log('searchResult',searchResult);
-  //       searchResult = [];
-  //       setArticleArray([]);
-  //       setNameArray([]);
-  //     } else {
-  //       setWanring(true);
-  //     }
-  //   } else {
-  //     setWanring(true);
-  //   }
-  // }
-
-  //    function Search(input)  {
-
-  //     let searchArray = {};
-  // console.log(0);
-  //    return new Promise( (resolve) =>{
-  //     if (input) {
-  //       // if ( (input.match(/\w+/gim)) || input.match(/\(/img) || input.match(/\)/img) || input.match(/\./img) || input.match(/\+/img)) {
-  //       if (input.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
-  //         function a(key, key1) {
-  //           // Object.keys(key2).map((key3, i3) => {
-  //           // thama nhap chuowng (array dieu)
-
-  //           Object.values(key1)[0].map((key2, i1) => {
-  //             // chọn từng điều
-
-  //             // Object.keys(key2).map((key5, i5) => {
-  //             let replace = `(.*)${input}(.*)`;
-  //             let re = new RegExp(replace, 'gmi');
-  //             if (Object.keys(key2)[0].match(re)) {
-  //               searchArray[key].push({
-  //                 [Object.keys(key2)[0]]: Object.values(key2)[0],
-  //               });
-  //             } else if (Object.values(key2)[0] != '') {
-  //               if (Object.values(key2)[0].match(re)) {
-  //                 searchArray[key].push({
-  //                   [Object.keys(key2)[0]]: Object.values(key2)[0],
-  //                 });
-  //               }
-  //             }
-  //             // }
-  //           });
-  //         }
-
-  //         Object.keys(Content).map((key, i) => {
-  //           //key là tên của luật
-  //           // tham nhap luat (array chuong)
-
-  //           searchArray[key] = [];
-  //           if (choosenLaw.includes(key)) {
-  //             Content[key].map((key1, i1) => {
-  //               // ra Object Chuong hoặc (array phần thứ...)
-  //               if (Object.keys(key1)[0].match(/phần thứ .*/gim)) {
-  //                 // nếu có 'phần thứ
-
-  //                 if (
-  //                   Object.keys(Object.values(key1)[0][0])[0].match(
-  //                     /^Chương .*/gim,
-  //                   )
-  //                 ) {
-  //                   //nếu có chương
-
-  //                   Object.values(key1)[0].map((key2, i) => {
-  //                     a(key, key2);
-
-  //                   });
-
-  //                 } else {
-  //                   a(key, key1);
-  //                 }
-  //               } else {
-  //                 // nếu không có phần thứ...
-  //                 a(key, key1);
-  //               }
-  //             });
-  //           }
-
-  //         });
-
-  //         let searchResult = {};
-
-  //         Object.keys(searchArray).map((key, i) => {
-  //           searchArray[key].map((key1, i) => {
-  //             searchResult[key] = searchArray[key];
-  //           });
-  //         });
-
-  //         // setSearchResult(searchResult);
-  //         // console.log(searchResult);
-  //         resolve(searchResult)
-
-  //         // console.log('searchResult',searchResult);
-  //         searchResult = [];
-  //         // setArticleArray([]);
-  //         // setNameArray([]);
-  //       } else {
-  //         // setWanring(true);
-  //       }
-  //     } else {
-  //       // setWanring(true);
-  //     }
-  //   })
-  //   }
-  //   async function run(inp){
-  //     // setLoading(true)
-  //     dispatch(loader1())
-  //     console.log(1);
-  //     loading2.current = true
-  //     console.log('loading2.current',loading2.current);
-  //    const abc = await Search(inp)
-  //    setSearchResult(abc)
-  //     console.log(2);
-  //     dispatch(handle1())
-
-  //   }
 
   function collapse(a) {
     if (a == undefined) {
@@ -322,25 +111,25 @@ export function Detail1({navigation}) {
     setArticle(null);
   }
 
-  function highlight(para, word) {
-    if (typeof para == 'string') {
-      let inputRexgex = para.match(new RegExp(word, 'igm'));
-      return (
-        <Text>
-          {para.split(new RegExp(word, 'igm')).reduce((prev, current, i) => {
-            if (!i) {
-              return [current];
-            }
-            // bị lỗi khi viết hoa và thường khi input
-            return prev.concat(
-              <Text style={styles.highlight}>{inputRexgex[i - 1]}</Text>,
-              current,
-            );
-          }, [])}
-        </Text>
-      );
-    }
-  }
+  // function highlight(para, word) {
+  //   if (typeof para == 'string') {
+  //     let inputRexgex = para.match(new RegExp(word, 'igm'));
+  //     return (
+  //       <Text>
+  //         {para.split(new RegExp(word, 'igm')).reduce((prev, current, i) => {
+  //           if (!i) {
+  //             return [current];
+  //           }
+  //           // bị lỗi khi viết hoa và thường khi input
+  //           return prev.concat(
+  //             <Text style={styles.highlight}>{inputRexgex[i - 1]}</Text>,
+  //             current,
+  //           );
+  //         }, [])}
+  //       </Text>
+  //     );
+  //   }
+  // }
 
 
 
@@ -447,9 +236,7 @@ export function Detail1({navigation}) {
               <TouchableOpacity
                 style={{
                   ...styles.inputBtb,
-                  // right: -5,
                   backgroundColor: 'white',
-                  // width: 50,
                 }}
                 onPress={() => {
                   setShowFilter(true);
@@ -605,7 +392,7 @@ export function Detail1({navigation}) {
 
                     }
                   Keyboard.dismiss();
-                  setValueInput(inputSearchLawReg);
+                  // setValueInput(inputSearchLawReg);
                   setValueInputForNav(input);
 
                   // Search(inputSearchLawReg);
@@ -629,10 +416,15 @@ export function Detail1({navigation}) {
             <NoneOfResutl />
           ) : (
             Object.keys(LawFilted || SearchResult).map((key, i) => {
+              // console.log('key',key);
+              
               let nameLaw = 'unknown name'
+              let descriptionLaw = 'unknown name'
               if(result){
                 nameLaw =
-                  result['LawInfo'][key]['lawNameDisplay'];
+                SearchResult[key]['lawNameDisplay'];
+
+                descriptionLaw= SearchResult[key]['lawDescription'];
 
               }
               if (nameLaw) {
@@ -653,17 +445,23 @@ export function Detail1({navigation}) {
                       marginBottom:1
                                   }}
                     onPress={() => {
+                      navigation.navigate(`accessLaw`, {screen: key,input: valueInputForNav,findShow:true})
+
                       setName(i);
                     }}>
                       <View
-                                          style={styles.chapter}
+                                          style={styles.item}
 >
 
                     <Text style={styles.chapterText} key={`${i}a`}>
-                      {nameLaw} có {0 || SearchResult[key].length} điều, khoản
-                      trùng khớp
+                      {nameLaw}
                     </Text>
-                    <TouchableOpacity
+                    {!nameLaw.match(/^(luật|bộ luật|Hiến)/gim) && (
+                      <Text style={styles.descriptionText}>
+                        {descriptionLaw}
+                      </Text>
+                    )}
+                    {/* <TouchableOpacity
                       onPress={() =>
                         navigation.navigate(`${key}`, {input: valueInputForNav,findShow:true})
                       }
@@ -676,37 +474,9 @@ export function Detail1({navigation}) {
                           textAlign: 'center',
                           fontSize: 17,
                         }}></Ionicons>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                         </View>
                   </TouchableOpacity>
-                  {SearchResult[key].map((key1, i1) => (
-                    <View
-                      key={`${i1}b`}
-                      style={nameArray.includes(i) || styles.content}>
-                      {Object.keys(key1).map((key2, i2) => (
-                        <>
-                          <TouchableOpacity
-                            style={styles.articleContainer}
-                            onPress={() => {
-                              setArticle(`${i}${i1}a${i2}c`);
-                            }}>
-                            <Text style={styles.article} key={`${i2}c`}>
-                              {highlight(key2, valueInput)}
-                            </Text>
-                          </TouchableOpacity>
-                          <Text
-                            style={
-                              articleArray.includes(`${i}${i1}a${i2}c`)
-                                ? styles.blackBackground
-                                : styles.content
-                            }
-                            key={`${i2}d`}>
-                            {highlight(key1[key2], valueInput)}
-                          </Text>
-                        </>
-                      ))}
-                    </View>
-                  ))}
                 </>
               );
             })
@@ -850,7 +620,6 @@ export function Detail1({navigation}) {
                   );
                   setCheckedAllFilter(true);
                 }
-                // console.log(choosenLaw);
               }}>
               <CheckBox
                 onClick={() => {
@@ -895,18 +664,9 @@ export function Detail1({navigation}) {
                   Object.keys(SearchResult).map(
                     (key, i) => {
                       let nameLaw =
-                        result['LawInfo'][key][
-                          'lawNameDisplay'
-                        ];
+                        key.info['lawNameDisplay']
                       let lawDescription =
-                        result['LawInfo'][key][
-                          'lawDescription'
-                        ];
-                      if (nameLaw) {
-                        if (nameLaw.match(/(?<=\w)\\(?=\w)/gim)) {
-                          nameLaw = key.replace(/(?<=\w)\\(?=\w)/gim, '/');
-                        }
-                      }
+                      key.info['lawDescription']
 
                       let inputSearchLawReg = inputFilter;
                       if (
@@ -1075,9 +835,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     display: 'flex',
     flexDirection: 'row',
-    // alignItems: 'center',
     justifyContent: 'space-evenly',
-    // backgroundColor:'red'
   },
   inputArea: {
     width: '85%',
@@ -1088,7 +846,6 @@ const styles = StyleSheet.create({
   },
   containerBtb: {
     width: '15%',
-    // backgroundColor:'yellow',
     alignItems: 'center',
   },
   inputBtb: {
@@ -1110,27 +867,28 @@ const styles = StyleSheet.create({
     height: 0,
     display: 'flex',
     position: 'relative',
-    // paddingRight: 10,
-    // paddingLeft: 10,
     margin: 0,
     overflow: 'hidden',
   },
-  chapter: {
-    minHeight:50,
-    justifyContent: 'space-around',
-    backgroundColor: '#F9CC76',
-    color: 'black',
-    alignItems: 'center',
+  item: {
+    minHeight: 80,
     display: 'flex',
-    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingLeft: 20,
+    paddingRight: 20,
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   chapterText: {
     textAlign: 'center',
     color: 'black',
     fontSize: 16,
     fontWeight: 'bold',
-    // backgroundColor:'red',
-    width:'75%'
+  },
+  descriptionText:{
+    textAlign: 'center',
+    color: 'black',
+    fontSize: 14,
   },
   chapterArrow: {
     backgroundColor: 'black',

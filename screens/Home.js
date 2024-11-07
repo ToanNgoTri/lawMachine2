@@ -16,18 +16,15 @@ import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Dirs, FileSystem } from 'react-native-file-access';
 import { useScrollToTop } from '@react-navigation/native';
+// import Realm from 'realm';
 
 export default function Home({navigation}) {
   const [Content, setContent] = useState('');
 
   const [Info, setInfo] = useState(false)
   
-  // const [showContent, setShowContent] = useState([]);
-
   const [inputSearchLaw, setInputSearchLaw] = useState('');
   const [searchLawResult, setSearchLawResult] = useState([]);
-  // const [currentPaper, setCurrentPaper] = useState(1);
-  // const [totalPaper, setTotalPaper] = useState(2);
 
 
 
@@ -35,14 +32,6 @@ export default function Home({navigation}) {
   useScrollToTop(list1);
 
 
-  // const {width, height} = Dimensions.get('window');
-  // let heightDevice = height;
-  // let widthDevice = width;
-  // Dimensions.addEventListener('change', ({window: {width, height}}) => {
-  //   // console.log(`Width: ${width}, Height: ${height}`);
-  //   widthDevice = width;
-  //   heightDevice = height;
-  // });
 
 
   const Render = ({item}) => {
@@ -57,7 +46,7 @@ export default function Home({navigation}) {
         marginBottom: 6,
 
       }}
-      onPress={() => navigation.navigate(`${item}`)}>
+      onPress={() => navigation.navigate(`accessLaw`,{screen: item})}>
         <View style={styles.item}>
         <Text style={{...styles.itemDisplay,color:Info[item] && Info[item]['lawNameDisplay'].match(/^(Hiến)/img)?'yellow':'white'}}>{Info[item] && Info[item]['lawNameDisplay']}</Text>
         {Info[item] && !Info[item]['lawNameDisplay'].match(/^(luật|bộ luật|hiến)/img) 
@@ -67,13 +56,6 @@ export default function Home({navigation}) {
     );
   };
 
-  // const renderLoader = () => {
-  //   return (
-  //     <View>
-  //       <ActivityIndicator size="large" color="#aaa" />
-  //     </View>
-  //   );
-  // };
 
   useEffect(() => {
     setSearchLawResult(
@@ -114,55 +96,32 @@ export default function Home({navigation}) {
     );
   }, [inputSearchLaw]);
 
-  // const netInfo = useNetInfo();
-  // let internetConnected = netInfo.isConnected;
 
-  // const hasBeenRerender = useRef(false);      // nếu true có nghĩa là warning sẽ không xuất hiện thêm lần nào nữa
+  // const UserSchema = {
+  //   name:'task',
+  //   properties:{
+  //     _id:'string',
+  //     info: 'string',
+  //     content: 'string',
+  //     }
+  // };
 
-  // const [alreadyInternetWarning, setAlreadyInternetWarning] = useState(false);      // dùng để biết đã từng có internet chưa
 
-
-  // useEffect(() => {
-
-  //   if(!hasBeenRerender.current && (internetConnected==false) ){
-  //     setShowWanringInternet(true);
-  //     setAlreadyInternetWarning(true)
   
-  //   }
-  //   else if(!hasBeenRerender.current && internetConnected && alreadyInternetWarning){
-  //     setShowWanringInternet(true);
-  //     // dispatch({type:'run'})
-  //     setTimeout(()=>{
-  //       hasBeenRerender.current = true
-  //     setShowWanringInternet(false);
-  //     },3000)
-  //   }
-
-  //   if (internetConnected &&!hasBeenRerender.current) {
-  //           hasBeenRerender.current = true
-  //           // dispatch({type:'run'})
-
-      
-  //   } else if(internetConnected==false) {      
-  //     //  dispatch(noLoading())
-  //   }
-
-  //   setTimeout(()=>{
-  //     Animated.timing(animated, {
-  //       toValue: internetConnected ?100:0,
-  //       duration: 2000,
-  //       useNativeDriver: true,
-  //     }).start();
-  //   },2000)
-  // }, [internetConnected]);
+  // const realmConfig = {
+  //   path: 'myrealm.realm',
+  //   schema: [UserSchema],
+  // };
+  
+  // const realm = new Realm(realmConfig);
 
 
-// const {loading3, info3, content3} = useSelector(state => state['offline']);
-// console.log('Content',Content);
+
 
 
 useEffect(() => {
-  
+
+
   const listener = navigation.addListener('focus', () => {
     async function getContentExist() {
       if(await FileSystem.exists(Dirs.CacheDir+'/Content.txt','utf8')){
@@ -177,11 +136,11 @@ useEffect(() => {
     
     getContentExist().then((cont)=> {
       if(cont){
-        setContent(({...dataOrg['LawContent'],...cont.content}));
+        // setContent(({...dataOrg['LawContent'],...cont.content}));
         setInfo({...dataOrg['LawInfo'],...cont.info})
 
       }else{
-        setContent(dataOrg['LawContent'])
+        // setContent(dataOrg['LawContent'])
         setInfo(dataOrg['LawInfo'])
       }
 
@@ -189,19 +148,10 @@ useEffect(() => {
   })
 
 
-  // if (__DEV__) {
-  //   // If you are running on a physical device, replace http://localhost with the local ip of your PC. (http://192.168.x.x)
-  //   functions().useEmulator('localhost', 5001);
-  // }
-  // functions()
-  // .httpsCallable('helloWorld')()
-  // .then(response => {
-  //   console.log(response.data);
-  // });
-
 
 }, [])
 
+console.log("Info",Info);
 
 
 
@@ -271,7 +221,7 @@ useEffect(() => {
         style={{          backgroundColor:'#EEEFE4',
         }}
         keyboardShouldPersistTaps="handled"
-        data={Content && (searchLawResult || Object.keys(Content))}
+        data={Info && (searchLawResult || Object.keys(Info))}
         renderItem={Render}
         //   ListFooterComponent={(totalPaper > currentPaper) && renderLoader} //(totalPaper > currentPaper) &&
         //   onEndReached={ loadMoreItem}

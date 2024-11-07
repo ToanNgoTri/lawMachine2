@@ -19,7 +19,6 @@ import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Shadow} from 'react-native-shadow-2';
-import database from '@react-native-firebase/database';
 import {ModalStatus} from '../App';
 import {useSelector, useDispatch} from 'react-redux';
 import {InfoDownloaded} from '../App';
@@ -83,7 +82,7 @@ export default function Detail({navigation}) {
         'utf8',
       );
       let contentObject = JSON.parse(FileInfoStringContent);
-      contentObject[route.name] = Content;
+      contentObject[route.params.screen] = Content;
 
       const addContent = await FileSystem.writeFile(
         Dirs.CacheDir + '/Content.txt',
@@ -97,7 +96,7 @@ export default function Detail({navigation}) {
         'utf8',
       );
       let infoObject = JSON.parse(FileInfoStringInfo);
-      infoObject[route.name] = Info;
+      infoObject[route.params.screen] = Info;
 
       const addInfo = await FileSystem.writeFile(
         Dirs.CacheDir + '/Info.txt',
@@ -108,14 +107,14 @@ export default function Detail({navigation}) {
     } else {
       const addContent = await FileSystem.writeFile(
         Dirs.CacheDir + '/Content.txt',
-        JSON.stringify({[route.name]: Content}),
+        JSON.stringify({[route.params.screen]: Content}),
         'utf8',
       );
       console.log('addContent2', addContent);
 
       const addInfo = await FileSystem.writeFile(
         Dirs.CacheDir + '/Info.txt',
-        JSON.stringify({[route.name]: Info}),
+        JSON.stringify({[route.params.screen]: Info}),
         'utf8',
       );
       console.log('addInfo2', addInfo);
@@ -145,7 +144,7 @@ export default function Detail({navigation}) {
       'utf8',
     );
     let contentObject = JSON.parse(FileInfoStringContent);
-    delete contentObject[route.name];
+    delete contentObject[route.params.screen];
 
     const addContent = await FileSystem.writeFile(
       Dirs.CacheDir + '/Content.txt',
@@ -159,7 +158,7 @@ export default function Detail({navigation}) {
       'utf8',
     );
     let infoObject = JSON.parse(FileInfoStringInfo);
-    delete infoObject[route.name];
+    delete infoObject[route.params.screen];
 
     const addInfo = await FileSystem.writeFile(
       Dirs.CacheDir + '/Info.txt',
@@ -170,14 +169,14 @@ export default function Detail({navigation}) {
     // else {
     //   const addContent = await FileSystem.writeFile(
     //     Dirs.CacheDir + '/Content.txt',
-    //     JSON.stringify({[route.name]: Content}),
+    //     JSON.stringify({[route.params.screen]: Content}),
     //     'utf8',
     //   );
     //   console.log('addContent2', addContent);
 
     //   const addInfo = await FileSystem.writeFile(
     //     Dirs.CacheDir + '/Info.txt',
-    //     JSON.stringify({[route.name]: Info}),
+    //     JSON.stringify({[route.params.screen]: Info}),
     //     'utf8',
     //   );
     //   console.log('addInfo2', addInfo);
@@ -193,12 +192,12 @@ export default function Detail({navigation}) {
   PositionYArrArticalForDev.current = [];
   const [input, setInput] = useState(route.params ? route.params.input : '');
   const [valueInput, setValueInput] = useState('');
-  const [find, setFind] = useState(route.params ? true : false);
+  const [find, setFind] = useState(route.params ? route.params.input? true : false: true);
 
   const [go, setGo] = useState(route.params ? true : false);
 
-  const [Content, setContent] = useState('');
-  const [Info, setInfo] = useState('');
+  const [Content, setContent] = useState([]);
+  const [Info, setInfo] = useState({});
 
   const {width, height} = Dimensions.get('window');
   let heightDevice = height;
@@ -244,39 +243,46 @@ export default function Detail({navigation}) {
   }
   const ModalVisibleStatus = useContext(ModalStatus);
 
-  // useEffect(() => {
-  //   if (internetConnected) {
-  //     if (data) {
-  //     }
-  //   } else {
-  //   }
 
-  //   if(route.params.searchLaw){
-  //     database()
-  //     .ref(`/LawContent/${route.name}`)
-  //     .once('value')
-  //     .then(snapshot => {
-  //       setContent(snapshot.val());
-  //     });
+  const {loading, content, info} = useSelector(state => state['read']);
 
-  //   }else{
-  //     setContent(data[route.name])
-  //   }
+// console.log(Content);
 
-  //   if (route.params.input) {
-  //     setTimeout(() => {
-  //       pushToSearch();
-  //     }, 1000);
-  //   }
+// console.log(route.params.screen);
 
-  //   return () => {
-  //     eachSectionWithChapter = [];
-  //     sumChapterArray = [];
-  //     sumChapterArray[0] = 0;
-  //   };
-  // }, [internetConnected]);
+async function callOneLaw() {
+  let info = await fetch(`http://192.168.0.101:5000/getonelaw`,{
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body:JSON.stringify({input:route.params.screen})
+  })
 
-  const {loading, data, info} = useSelector(state => state['read']);
+  
+  let respond = await info.json()
+  return respond
+
+}
+
+// console.log('Content',Content);
+
+  useEffect(() => {
+    // if(info && content){
+
+    callOneLaw().then(res=>{
+      
+      setContent(res['content'])
+      setInfo(res['info'])
+
+    })
+    // }
+
+      // return function cleanUp(){content=[]}
+
+  }, [info])
+  
 
   async function getContentExist() {
     if (await FileSystem.exists(Dirs.CacheDir + '/Content.txt', 'utf8')) {
@@ -302,32 +308,25 @@ export default function Detail({navigation}) {
     getContentExist().then(cont => {
       if (
         cont &&
-        Object.keys({...dataOrg['LawInfo'], ...cont.info}).includes(route.name)
+        Object.keys({...dataOrg['LawInfo'], ...cont.info}).includes(route.params.screen)
       ) {
-        setInfo({...dataOrg['LawInfo'], ...cont.info}[route.name]);
-        setContent({...dataOrg['LawContent'], ...cont.content}[route.name]);
-      } else if (Object.keys(dataOrg['LawInfo']).includes(route.name)) {
-        setInfo(dataOrg['LawInfo'][route.name]);
-        setContent(dataOrg['LawContent'][route.name]);
+        setInfo({...dataOrg['LawInfo'], ...cont.info}[route.params.screen]);
+        setContent({...dataOrg['LawContent'], ...cont.content}[route.params.screen]);
+      } else if (Object.keys(dataOrg['LawInfo']).includes(route.params.screen)) {
+        setInfo(dataOrg['LawInfo'][route.params.screen]);
+        setContent(dataOrg['LawContent'][route.params.screen]);
       } else {
         setExists(true);
-        dispatch({type: 'read', lawName: route.name});
-
-        database()
-          .ref(`/LawInfo/${route.name}`)
-          .once('value')
-          .then(snapshot => {
-            setInfo(snapshot.val());
-          });
-
-        database()
-          .ref(`/LawContent/${route.name}`)
-          .once('value')
-          .then(snapshot => {
-            setContent(snapshot.val());
-          });
+        dispatch({type: 'read', lawName: route.params.screen});
       }
     });
+
+    Animated.timing(animatedForNavi, {
+      toValue: find ? 80 : 0,
+      duration: 600,
+      useNativeDriver: false,
+    }).start();
+
   }, []);
 
   function collapse(a) {
@@ -381,11 +380,9 @@ export default function Detail({navigation}) {
   let searchResultCount = 0;
   // let c = 0;
   function highlight(para, word, i2) {
-    if (para[0]) {
-      para[0] = para[0].replace(/(?<=\w*)\\(?=\w*)/gim, '/');
-    }
-
-    // if (word.match(/\w+/gim) || word.match(/\(/gim)|| word.match(/\)/gim) || word.match(/\./img) || word.match(/\+/img)) {
+    // console.log('para',para);
+    
+    if(para[0][[0]]){     // đôi khi Điều ... không có khoản (nội dung chính trong điều) thì điều này giúp không load ['']
     if (word.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
       let inputRexgex = para[0].match(new RegExp(String(word), 'igmu'));
       // let inputRexgex = para[0].match(new RegExp('hội', 'igmu'));
@@ -476,12 +473,13 @@ export default function Detail({navigation}) {
     }
 
     // }
+    }
   }
 
   let positionYArrArticalDemo = positionYArrArtical;
 
   function setPositionYArtical({y, key3}) {
-    key3 = key3.replace(/(?<=\w*)\\(?=\w*)/gim, '/');
+    // key3 = key3.replace(/(?<=\w*)\\(?=\w*)/gim, '/');
 
     // console.log('key3',key3);
     // console.log('tittleArray.length',tittleArray.length);
@@ -656,6 +654,9 @@ export default function Detail({navigation}) {
             styles.content) //////////////////////////////////////////////////////////////////
         }>
         {key[key1].map((key2, i2) => {
+          // console.log('key2',key2);
+          // console.log('Object.keys(key2)',Object.keys(key2));
+          
           return (
             <View
               onLayout={event => {
@@ -816,19 +817,19 @@ export default function Detail({navigation}) {
     );
   };
 
-  const d = (key, i) => {
-    // dành cho phụ lục, danh mục
-    return (
-      <View
-        style={
-          showArticle || find || (!tittleArray.includes(i) && styles.content)
-        }>
-        {Object.values(key)[0].map((key1, i) => (
-          <Text style={styles.lines}>{`${key1}\n`}</Text>
-        ))}
-      </View>
-    );
-  };
+  // const d = (key, i) => {
+  //   // dành cho phụ lục, danh mục
+  //   return (
+  //     <View
+  //       style={
+  //         showArticle || find || (!tittleArray.includes(i) && styles.content)
+  //       }>
+  //       {Object.values(key)[0].map((key1, i) => (
+  //         <Text style={styles.lines}>{`${key1}\n`}</Text>
+  //       ))}
+  //     </View>
+  //   );
+  // };
 
   return (
     <>
@@ -920,7 +921,7 @@ export default function Detail({navigation}) {
                   flex: 1,
                   justifyContent: 'flex-end',
                 }}>
-                {exists && !dataOrg['LawInfo'][route.name] && (
+                {exists && !dataOrg['LawInfo'][route.params.screen] && (
                   <TouchableOpacity
                     onPress={() => {
                       StoreInternal();
@@ -946,7 +947,7 @@ export default function Detail({navigation}) {
                       }}></Ionicons>
                   </TouchableOpacity>
                 )}
-                {!exists && !dataOrg['LawInfo'][route.name] && (
+                {!exists && !dataOrg['LawInfo'][route.params.screen] && (
                   <TouchableOpacity
                     onPress={async () => {
                       Alert.alert(
@@ -1073,7 +1074,7 @@ export default function Detail({navigation}) {
                   </View>
                   <View style={{flex: 1}}>
                     <Text style={styles.ModalInfoContent}>
-                      {Info && Info['lawNumber'].match(/^0001\\HP/gim)
+                      {Info && !Info['lawNumber'].match(/^0001\\HP/gim)
                         ? Info['lawNumber']
                         : ''}
                     </Text>
@@ -1158,7 +1159,7 @@ export default function Detail({navigation}) {
                   <View style={{flex: 1, paddingBottom: 10, paddingTop: 10}}>
                     {Info &&
                       Info['lawRelated'].map((key, i) => {
-                        let nameLaw = key.replace(/\//gim, '\\');
+                        let nameLaw = key
 
                         let nameLaw2;
                         // for (let a = 0; a < (inf.info).length; a++) {
@@ -1277,12 +1278,9 @@ export default function Detail({navigation}) {
             }
           }}
           ref={list}
-          // style={  find ? {marginBottom: 60} : {marginBottom: 0}}
-          // style={  find ? {setTimeout( ()=>{ return {'marginBottom': 60}},400)} : {marginBottom: 0}}
-
           showsVerticalScrollIndicator={true}>
           <Text style={styles.titleText}>
-            {Info && `${Info['lawNameDisplay']}`}
+            {Info && Info['lawNameDisplay'] && `${Info['lawNameDisplay']}`}
           </Text>
           {Content &&
             Content.map((key, i) => (
@@ -1315,7 +1313,7 @@ export default function Detail({navigation}) {
                   ? a(key, i, Object.keys(key)[0])
                   : Object.keys(key)[0].match(/^điều .*/gim)
                   ? c(key, i, Object.keys(key)[0])
-                  : d(key, i)}
+                  : ''}
               </>
             ))}
         </ScrollView>

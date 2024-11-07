@@ -1,7 +1,7 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import database from '@react-native-firebase/database';
+// import database from '@react-native-firebase/database';
 import {useState, useEffect, useContext} from 'react';
 import Home from '../screens/Home';
 import {Detail1} from '../screens/Detail1';
@@ -63,7 +63,7 @@ const AppNavigators = () => {
                     ...(focused ? styles.IconActive : styles.IconInActive),
                     fontSize: 10,
                   }}>
-                  Đã tải về
+                  Downloaded
                 </Text>
               </Animated.View>
             );
@@ -100,7 +100,7 @@ const AppNavigators = () => {
                     ...(focused ? styles.IconActive : styles.IconInActive),
                     fontSize: 10,
                   }}>
-                  Tìm văn bản
+                  Search Law
                 </Text>
               </View>
             );
@@ -115,7 +115,7 @@ const AppNavigators = () => {
           },
         }}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Search"
         component={Detail1}
         options={{
@@ -149,13 +149,14 @@ const AppNavigators = () => {
             // SearchScrollview.forSearch.current.scrollTo({y: 0});
           },
         }}
-      /> */}
+      />
     </Tab.Navigator>
   );
 };
 
 const StackNavigator = () => {
   const [Content, setContent] = useState(Object.keys(dataOrg['LawInfo']));
+  // const [Content, setContent] = useState(['01/2022/NQ-HĐTP']);
   const ModalVisibleStatus = useContext(ModalStatus);
   const info = useContext(InfoDownloaded);
 
@@ -173,36 +174,49 @@ const StackNavigator = () => {
   }
 
 
+  async function getStackScreen() {
+    let info =  await fetch(`http://192.168.0.101:5000/stackscreen`,{
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      // body:JSON.stringify({input:state.input})
+    })
+    
+    
+    let b = await info.json()
+return b
+  }
+
+
   useEffect(() => {
     getContentExist().then(cont => {
-      if(cont){
-        console.log('cont',cont);
-        
+      if(cont){        
         setContent(cont);
         info.updateInfo(cont);
       }
       // console.log('cont',cont);
     });
 
-    database()
-      .ref(`/LawInfo`)
-      .once('value')
-      .then(snapshot => {
-        if(Boolean(snapshot.val())){
+    // database()
+    //   .ref(`/LawInfo`)
+    //   .once('value')
+    //   .then(snapshot => {
+    //     if(Boolean(snapshot.val())){
           
-          // info.updateInfo(Object.keys(snapshot.val()));
+    //       // info.updateInfo(Object.keys(snapshot.val()));
           
-          setContent(Object.keys(snapshot.val())); /////////////////////////////////////////////////////////////////  nên sửa
+    //       setContent(Object.keys(snapshot.val())); /////////////////////////////////////////////////////////////////  nên sửa
 
-        }
-      });
+    //     }
+    //   });
+
+  getStackScreen().then(id=>setContent(id))
   }, []);
-  
-// console.log('Content',Content);
 useEffect(() => {// kiem tra xem k co mang xai dc k
 
 let b ={}
-
 if(!Array.isArray(Content)){
   Object.keys(Content).map((key,i)=>{
     b[key] = Content[key]['lawNameDisplay']
@@ -229,13 +243,13 @@ if(!Array.isArray(Content)){
           options={{animationEnabled: false, header: () => null,}}
         />
 
-        {Object.keys(Content) &&
-          Object.keys(Content).map((key, i) => (
+        {/* {(Content) &&
+          (Content).map((id, i) => ( */}
             <Stack.Screen
-              key={i}
-              name={`${key}`}
+              // key={i}
+              // name={`${id._id}`}
+              name={`accessLaw`}
               component={Detail5}
-              // options={{animationEnabled: true}}
               options={({navigation, route}) => ({
                 headerBackVisible: false ,
                 headerLeft: () =>   <TouchableOpacity onPress={()=>navigation.goBack()}><Ionicons
@@ -275,7 +289,7 @@ if(!Array.isArray(Content)){
                 ),
               })}
             />
-          ))}
+          {/* ))} */}
       </Stack.Navigator>
     </NavigationContainer>
   );
