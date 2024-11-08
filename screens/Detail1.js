@@ -14,13 +14,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector, useDispatch} from 'react-redux';
 import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState, useRef, useContext} from 'react';
-import { useScrollToTop } from '@react-navigation/native';
+import { useNavigation} from '@react-navigation/native';
 import {InfoDownloaded} from '../App';
 
 // import {RefForSearch} from '../App';
 // import {loader1, handle1} from '../redux/fetchData';
 
-export function Detail1({navigation}) {
+export function Detail1({}) {
 
   const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
   
@@ -48,14 +48,12 @@ export function Detail1({navigation}) {
   const [warning, setWanring] = useState(false);
   
   const textInput = useRef(null)
-  const list = useRef(null);
-  useScrollToTop(list);
 
   const dispatch = useDispatch();
 
   const {loading1, result} = useSelector(state => state['searchContent']);
 
-  // console.log('result',result);
+  const navigation = useNavigation();
   
   const netInfo = useNetInfo();
   let internetConnected = netInfo.isConnected;
@@ -226,7 +224,6 @@ export function Detail1({navigation}) {
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        ref={list}
         style={{backgroundColor: '#EEEFE4'}}>
         <View style={{backgroundColor: 'green'}}>
           <Text style={styles.titleText}>{`Tìm kiếm nội dung`}</Text>
@@ -445,8 +442,7 @@ export function Detail1({navigation}) {
                       marginBottom:1
                                   }}
                     onPress={() => {
-                      navigation.navigate(`accessLaw`, {screen: key,input: valueInputForNav,findShow:true})
-
+                      navigation.push(`accessLaw`, {screen: key,input: valueInputForNav})
                       setName(i);
                     }}>
                       <View

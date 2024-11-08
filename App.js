@@ -10,10 +10,11 @@ import StackNavigator from './navigators/AppNavigators';
 import {createContext, useState} from 'react';
 import {Provider} from 'react-redux';
 import {store} from './redux/store';
-import dataOrg from './data/project2-197c0-default-rtdb-export.json';
+import dataOrg from './data/data.json';
+import './navigators/gesture-handler.native';
 const ModalStatus = createContext(); // lấy modalVisible status
 const InfoDownloaded = createContext(); //
-// const ContentDownloaded = createContext(); //
+const RefOfSearchLaw = createContext(); //
 
 function App() {
 
@@ -22,29 +23,31 @@ function App() {
   const updateModalStatus = data => {
     setModalStatus(data);
   };
-
-
-
   
-  const [info, setInfo] = useState(dataOrg['LawInfo']);
+  const [info, setInfo] = useState(dataOrg['info']);
   const updateInfo = data => {
     setInfo(data);
   };
-  // const [content, setContent] = useState(dataOrg['LawContent']);
-  // const updateContent = data => {
-  //   setContent(data);
-  // };
 
+  const [searchLawRef, setSearchLawRef] = useState('');
+  const updatesearchLawRef = data => {
+    setSearchLawRef(data);
+  };
+
+  
   return (
     <Provider store={store}>
       <ModalStatus.Provider value={{modalStatus, updateModalStatus}}>
+      <RefOfSearchLaw.Provider value={{searchLawRef, updatesearchLawRef}}>
+
             <InfoDownloaded.Provider value={{info,updateInfo}}>
             <StackNavigator />
             </InfoDownloaded.Provider>
+            </RefOfSearchLaw.Provider>
       </ModalStatus.Provider>
     </Provider>
   );
 }
 
 // export default App;
-export { ModalStatus,InfoDownloaded, App};
+export { ModalStatus,InfoDownloaded,RefOfSearchLaw, App};

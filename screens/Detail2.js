@@ -12,12 +12,14 @@ import {
 // import {handle2, searchLaw} from '../redux/fetchData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector, useDispatch} from 'react-redux';
-import { useScrollToTop } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, {useEffect, useState, useRef, useContext} from 'react';
 import {useNetInfo} from '@react-native-community/netinfo';
 import CheckBox from 'react-native-check-box';
+// import {RefOfSearchLaw} from '../App';
 
-export function Detail2({navigation}) {
+
+export function Detail2({}) {
   const [input, setInput] = useState(undefined);
 
   const [warning, setWanring] = useState(false);
@@ -31,12 +33,15 @@ export function Detail2({navigation}) {
   const [choosenLaw, setChoosenLaw] = useState([]);
   const [LawFilted, setLawFilted] = useState(false)
 
+  // const RefLawSearch = useContext(RefOfSearchLaw);
+  const navigation = useNavigation();
 
   const {loading2, info, input2} = useSelector(
     state => state['searchLaw'],
   );
 
-  const list = useRef(null);
+  // RefLawSearch.updatesearchLawRef(list)
+
   const textInput = useRef(null);
 
   const dispatch = useDispatch();
@@ -105,7 +110,6 @@ export function Detail2({navigation}) {
 
 
 
-  useScrollToTop(list);
 
   const netInfo = useNetInfo();
   let internetConnected = netInfo.isConnected;
@@ -153,10 +157,9 @@ export function Detail2({navigation}) {
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        ref={list}
         style={{backgroundColor: '#EEEFE4'}}>
         <View style={{backgroundColor: 'green'}}>
-          <Text style={styles.titleText}>{`Tìm kiếm nội dung`}</Text>
+          <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
 
           <View style={styles.inputContainer}>
             <View style={styles.containerBtb}>
@@ -296,9 +299,8 @@ export function Detail2({navigation}) {
           {info == null ? (
             <></>
           ) : (info).length ? (
-            Object.values(LawFilted || SearchResult).map((detailInfo, i) => {  
-              console.log('detailInfo',detailInfo);
-                          
+            Object.keys(LawFilted || SearchResult).map((detailId, i) => {  
+
               return (
                 <TouchableOpacity
                   style={{
@@ -308,17 +310,18 @@ export function Detail2({navigation}) {
                     backgroundColor: '#F9CC76',
                     marginBottom: 6,
                   }}
-                  onPress={() =>
+                  onPress={() =>{
                     // navigation.navigate(`${detailInfo._id}`)
-                    navigation.navigate(`accessLaw`, {screen: detailInfo._id})
+                    navigation.push(`accessLaw`, {screen: detailId})
+                  }
                   }>
                   <View style={styles.item}>
                     <Text style={styles.chapterText} key={`${i}a`}>
-                      {detailInfo['lawNameDisplay']}
+                      {SearchResult[detailId]['lawNameDisplay']}
                     </Text>
-                    {!detailInfo['lawNameDisplay'].match(/^(luật|bộ luật|Hiến)/gim) && (
+                    {!SearchResult[detailId]['lawNameDisplay'].match(/^(luật|bộ luật|Hiến)/gim) && (
                       <Text style={styles.descriptionText}>
-                        {detailInfo && detailInfo['lawDescription']}
+                        {SearchResult[detailId] && SearchResult[detailId]['lawDescription']}
                       </Text>
                     )}
                   </View>
@@ -809,3 +812,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+

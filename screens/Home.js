@@ -12,13 +12,16 @@ import {
   Dimensions
 } from 'react-native';
 import {useState, useEffect,useRef} from 'react';
-import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
+import dataOrg from '../data/data.json';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Dirs, FileSystem } from 'react-native-file-access';
 import { useScrollToTop } from '@react-navigation/native';
-// import Realm from 'realm';
+import {useNavigation} from '@react-navigation/native';
+export default function Home({}) {
 
-export default function Home({navigation}) {
+  const navigation = useNavigation();
+
+
   const [Content, setContent] = useState('');
 
   const [Info, setInfo] = useState(false)
@@ -136,12 +139,13 @@ useEffect(() => {
     
     getContentExist().then((cont)=> {
       if(cont){
+        
         // setContent(({...dataOrg['LawContent'],...cont.content}));
-        setInfo({...dataOrg['LawInfo'],...cont.info})
+        setInfo({...dataOrg['info'],...cont.info})
 
       }else{
         // setContent(dataOrg['LawContent'])
-        setInfo(dataOrg['LawInfo'])
+        setInfo(dataOrg['info'])
       }
 
   })
@@ -150,10 +154,6 @@ useEffect(() => {
 
 
 }, [])
-
-console.log("Info",Info);
-
-
 
   return (
     <>

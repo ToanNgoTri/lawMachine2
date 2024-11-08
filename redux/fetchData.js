@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import {combineReducers} from 'redux'
 // import {call,put,takeEvery} from 'redux-saga'
-import dataOrg from '../data/project2-197c0-default-rtdb-export.json';       ////////////////////////////////////////////// xài tạm
+import dataOrg from '../data/data.json';       ////////////////////////////////////////////// xài tạm
 import { call,put,takeEvery,take,takeLatest } from 'redux-saga/effects';
 import { Dirs, FileSystem } from 'react-native-file-access';
 
@@ -9,20 +9,25 @@ import { Dirs, FileSystem } from 'react-native-file-access';
 export const read = createSlice({
   name: 'read',     
   initialState: {
-    content:null,
-    info:null,
-    loading: false
+    content:[],
+    info:{},
+    loading: true
   },
   reducers: {
     
     loader: (state,action) => {
       state.loading= true;
       state.content=[];
+      state.info={};
     },
 
     handle: (state,action) => {
       state.content=action.payload.a['content'];
       state.info=action.payload.a['info'];
+      state.loading= true;
+    },
+
+    noLoading: (state,action) => {
       state.loading= false;
     },
 
@@ -101,13 +106,13 @@ export function* mySaga(state,action){
 
 
 
-    let info = yield fetch(`http://192.168.0.101:5000/getonelaw`,{
+    let info = yield fetch(`http://192.168.0.103:5000/getonelaw`,{
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body:JSON.stringify({input:state.lawName})
+      body:JSON.stringify({screen:state.lawName})
     })
   
   
@@ -137,7 +142,7 @@ export function* mySaga1(state,action){
     // })
     // let a = yield info.json()
 
-    let info = yield  fetch(`http://192.168.0.101:5000/searchcontent`,{
+    let info = yield  fetch(`http://192.168.0.103:5000/searchcontent`,{
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -159,7 +164,7 @@ export function* mySaga2(state,action){
   try{
     yield put(loader2())
 
-        let info = yield  fetch(`http://192.168.0.101:5000/searchlaw`,{
+        let info = yield  fetch(`http://192.168.0.103:5000/searchlaw`,{
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -221,7 +226,7 @@ export function* saga3(){
 }
 
   
-export const {loader,handle} = read.actions;
+export const {loader,handle,noLoading} = read.actions;
 export const {loader1,handle1} = searchContent.actions;
 export const {loader2,handle2} = searchLaw.actions;
 export const {loader3,handle3} = offline.actions;

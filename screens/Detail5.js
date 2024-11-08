@@ -15,13 +15,14 @@ import {
 import {Dirs, FileSystem} from 'react-native-file-access';
 import React, {useState, useEffect, useRef, useContext} from 'react';
 import {useRoute} from '@react-navigation/native';
-import dataOrg from '../data/project2-197c0-default-rtdb-export.json';
+import dataOrg from '../data/data.json';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Shadow} from 'react-native-shadow-2';
 import {ModalStatus} from '../App';
 import {useSelector, useDispatch} from 'react-redux';
 import {InfoDownloaded} from '../App';
+import { loader,noLoading } from "../redux/fetchData";
 
 let TopUnitCount; // là đơn vị lớn nhất vd là 'phần thứ' hoặc chương
 let articleCount = 0;
@@ -32,15 +33,9 @@ let sumChapterPrevious; // sum cộng dồn các phần trư của các chương
 let eachSectionWithChapter = [];
 //lineHeight trong lines phải luôn nhỏ hơn trong highlight và View Hightlight
 
-// để searchArticle transition vào cho đẹp
-
-// search result bị xô lệch, đang xử lý theo hướng dúng onLayout trong Text
-// hơi bị leak memory chỗ ScrollVIew nha
-// chỗ chapter nếu bung được thì bung hết
 
 export default function Detail({navigation}) {
   const inf = useContext(InfoDownloaded);
-  // console.log('inf.info',inf.info);
 
   // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
   const [tittleArray, setTittleArray] = useState([true]); // đây là 'phần thứ...' hoặc chương (nói chung là section cao nhất)
@@ -133,8 +128,6 @@ export default function Detail({navigation}) {
     let infoObject = JSON.parse(FileInfoStringInfo1);
     console.log('infoObject', infoObject);
 
-    // con.updateContent({...dataOrg['LawContent'], ...contentObject});
-    // inf.updateInfo({...dataOrg['LawInfo'], ...infoObject});
   }
 
   async function DeleteInternal() {
@@ -246,42 +239,40 @@ export default function Detail({navigation}) {
 
   const {loading, content, info} = useSelector(state => state['read']);
 
-// console.log(Content);
+// console.log('info',info);
 
 // console.log(route.params.screen);
 
-async function callOneLaw() {
-  let info = await fetch(`http://192.168.0.101:5000/getonelaw`,{
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body:JSON.stringify({input:route.params.screen})
-  })
-
+// async function callOneLaw() {
+//   let info = await fetch(`http://192.168.0.102:5000/getonelaw`,{
+//     method: 'POST',
+//     headers: {
+//       Accept: 'application/json',
+//       'Content-Type': 'application/json',
+//     },
+//     body:JSON.stringify({screen:route.params.screen})
+//   })
   
-  let respond = await info.json()
-  return respond
-
-}
-
-// console.log('Content',Content);
+//   let respond = await info.json()
+//   return respond
+// }
 
   useEffect(() => {
-    // if(info && content){
 
-    callOneLaw().then(res=>{
-      
-      setContent(res['content'])
-      setInfo(res['info'])
 
-    })
-    // }
-
-      // return function cleanUp(){content=[]}
+      setContent(content)
+      setInfo(info)
+    
 
   }, [info])
+  
+
+  useEffect(() => {
+    if(!exists){
+      // dispatch(noLoading())
+    }
+  }, [exists])
+  
   
 
   async function getContentExist() {
@@ -296,8 +287,9 @@ async function callOneLaw() {
       );
       if (FileInfoStringContent) {
         return {
-          content: JSON.parse(FileInfoStringContent),
-          info: JSON.parse(FileInfoStringInfo),
+          _id:route.params.screen,
+          "content": JSON.parse(FileInfoStringContent),
+          "info": JSON.parse(FileInfoStringInfo),
         };
         // f = JSON.parse(FileInfoStringInfo)
       }
@@ -308,13 +300,13 @@ async function callOneLaw() {
     getContentExist().then(cont => {
       if (
         cont &&
-        Object.keys({...dataOrg['LawInfo'], ...cont.info}).includes(route.params.screen)
+        Object.keys({...dataOrg['info'], ...cont.info}).includes(route.params.screen)
       ) {
-        setInfo({...dataOrg['LawInfo'], ...cont.info}[route.params.screen]);
-        setContent({...dataOrg['LawContent'], ...cont.content}[route.params.screen]);
-      } else if (Object.keys(dataOrg['LawInfo']).includes(route.params.screen)) {
-        setInfo(dataOrg['LawInfo'][route.params.screen]);
-        setContent(dataOrg['LawContent'][route.params.screen]);
+        setInfo({...dataOrg['info'], ...cont.info}[route.params.screen]);
+        setContent({...dataOrg['content'], ...cont.content}[route.params.screen]);
+      } else if (Object.keys(dataOrg['info']).includes(route.params.screen)) {
+        setInfo(dataOrg['info'][route.params.screen]);
+        setContent(dataOrg['content'][route.params.screen]);
       } else {
         setExists(true);
         dispatch({type: 'read', lawName: route.params.screen});
@@ -327,9 +319,15 @@ async function callOneLaw() {
       useNativeDriver: false,
     }).start();
 
+    return()=>{
+      dispatch(loader())
+      eachSectionWithChapter=[]
+    }
   }, []);
 
+  
   function collapse(a) {
+    
     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
     if (a == undefined) {
     } else if (tittleArray.includes(a)) {
@@ -367,7 +365,6 @@ async function callOneLaw() {
 
   function collapse2(a) {
     // để collapse chương nếu có mục 'phần thứ...'
-
     if (a == undefined) {
     } else if (tittleArray2.includes(a)) {
       setTittleArray2(tittleArray2.filter(a1 => a1 !== a));
@@ -479,10 +476,6 @@ async function callOneLaw() {
   let positionYArrArticalDemo = positionYArrArtical;
 
   function setPositionYArtical({y, key3}) {
-    // key3 = key3.replace(/(?<=\w*)\\(?=\w*)/gim, '/');
-
-    // console.log('key3',key3);
-    // console.log('tittleArray.length',tittleArray.length);
 
     if (
       // true
@@ -520,7 +513,6 @@ async function callOneLaw() {
         } else {
           // nếu positionYArrArtical chưa đủ số lượng điều
           positionYArrArtical.push({[key3]: y + currentY});
-          // console.log(567);
         }
       } else {
         // nếu showArticle đang mở
@@ -538,7 +530,6 @@ async function callOneLaw() {
           PositionYArrArticalForDev.current = [];
         }
 
-        // console.log('q.current',q.current);
       }
     }
   }
@@ -577,6 +568,15 @@ async function callOneLaw() {
   useEffect(() => {
     setPositionYArr([]);
   }, [go]);
+
+
+  useEffect(() => {
+    if(!loading && route.params.input){
+      pushToSearch()
+    }
+  }, [loading]);
+
+
 
   useEffect(() => {
     if (currentSearchPoint != 0 && searchResultCount) {
@@ -654,8 +654,6 @@ async function callOneLaw() {
             styles.content) //////////////////////////////////////////////////////////////////
         }>
         {key[key1].map((key2, i2) => {
-          // console.log('key2',key2);
-          // console.log('Object.keys(key2)',Object.keys(key2));
           
           return (
             <View
@@ -816,7 +814,7 @@ async function callOneLaw() {
       {}
     );
   };
-
+  
   // const d = (key, i) => {
   //   // dành cho phụ lục, danh mục
   //   return (
@@ -921,7 +919,7 @@ async function callOneLaw() {
                   flex: 1,
                   justifyContent: 'flex-end',
                 }}>
-                {exists && !dataOrg['LawInfo'][route.params.screen] && (
+                {exists && !dataOrg['info'][route.params.screen] && (
                   <TouchableOpacity
                     onPress={() => {
                       StoreInternal();
@@ -947,7 +945,7 @@ async function callOneLaw() {
                       }}></Ionicons>
                   </TouchableOpacity>
                 )}
-                {!exists && !dataOrg['LawInfo'][route.params.screen] && (
+                {!exists && !dataOrg['info'][route.params.screen] && (
                   <TouchableOpacity
                     onPress={async () => {
                       Alert.alert(
@@ -1215,11 +1213,6 @@ async function callOneLaw() {
               <TouchableOpacity
                 onPress={async () => {
                   ModalVisibleStatus.updateModalStatus(false);
-                  // const exists = await FileSystem.exists(
-                  //   Dirs.CacheDir + '/Info.txt',
-                  //   'utf8',
-                  // );
-                  // console.log('exists', exists);
                 }}
                 style={{
                   padding: 5,
@@ -1280,10 +1273,17 @@ async function callOneLaw() {
           ref={list}
           showsVerticalScrollIndicator={true}>
           <Text style={styles.titleText}>
-            {Info && Info['lawNameDisplay'] && `${Info['lawNameDisplay']}`}
+            {Info && Info['lawNameDisplay']}
           </Text>
           {Content &&
-            Content.map((key, i) => (
+            Content.map((key, i) => {
+              if(i+1 == Content.length){
+                
+                // setTimeout(() => {
+                  dispatch(noLoading())
+                // }, 500);
+              }
+              return (
               <>
                 {!Object.keys(key)[0].match(/^(Điều|Điều)/gim) && (
                   <TouchableOpacity
@@ -1315,7 +1315,7 @@ async function callOneLaw() {
                   ? c(key, i, Object.keys(key)[0])
                   : ''}
               </>
-            ))}
+            )})}
         </ScrollView>
       </Animated.View>
       {Boolean(searchResultCount) && find && searchResultCount > 1 && (
