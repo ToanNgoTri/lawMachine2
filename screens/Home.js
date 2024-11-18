@@ -31,8 +31,8 @@ export default function Home({}) {
 
 
 
-  const list1 = useRef(null);
-  useScrollToTop(list1);
+  const ScrollViewToScroll = useRef(null);
+  useScrollToTop(ScrollViewToScroll);
 
 
 
@@ -155,6 +155,7 @@ useEffect(() => {
 
 }, [])
 
+
   return (
     <>
 
@@ -217,7 +218,7 @@ useEffect(() => {
 
 
       <FlatList
-        ref={list1}
+        ref={ScrollViewToScroll}
         style={{          backgroundColor:'#EEEFE4',
         }}
         keyboardShouldPersistTaps="handled"

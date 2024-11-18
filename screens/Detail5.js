@@ -11,12 +11,13 @@ import {
   Dimensions,
   Modal,
   ActivityIndicator,
+  
 } from 'react-native';
 import {Dirs, FileSystem} from 'react-native-file-access';
 import React, {useState, useEffect, useRef, useContext} from 'react';
-import {useRoute} from '@react-navigation/native';
+import {useRoute,useNavigation} from '@react-navigation/native';
 import dataOrg from '../data/data.json';
-import {SafeAreaView} from 'react-native-safe-area-context';
+// import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Shadow} from 'react-native-shadow-2';
 import {ModalStatus} from '../App';
@@ -34,7 +35,7 @@ let eachSectionWithChapter = [];
 //lineHeight trong lines phải luôn nhỏ hơn trong highlight và View Hightlight
 
 
-export default function Detail({navigation}) {
+export default function Detail() {
   const inf = useContext(InfoDownloaded);
 
   // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
@@ -57,6 +58,8 @@ export default function Detail({navigation}) {
   const dispatch = useDispatch();
 
   const route = useRoute();
+
+  const navigation = useNavigation();
 
   async function StoreInternal() {
     async function k() {
@@ -186,7 +189,20 @@ export default function Detail({navigation}) {
   const [input, setInput] = useState(route.params ? route.params.input : '');
   const [valueInput, setValueInput] = useState('');
   const [find, setFind] = useState(route.params ? route.params.input? true : false: true);
+  // const [find, setFind] = useState(false);
 
+  // useEffect(() => {
+  //   if(route.params.input){
+  //     console.log(2);
+      
+  //     setTimeout(() => {
+  //       setFind(true)
+  //     }, 2000);
+  //   }
+  
+  // }, [loading])
+  // console.log('find',find);
+  
   const [go, setGo] = useState(route.params ? true : false);
 
   const [Content, setContent] = useState([]);
@@ -239,10 +255,6 @@ export default function Detail({navigation}) {
 
   const {loading, content, info} = useSelector(state => state['read']);
 
-// console.log('info',info);
-
-// console.log(route.params.screen);
-
 // async function callOneLaw() {
 //   let info = await fetch(`http://192.168.0.102:5000/getonelaw`,{
 //     method: 'POST',
@@ -256,12 +268,30 @@ export default function Detail({navigation}) {
 //   let respond = await info.json()
 //   return respond
 // }
+// console.log('Infomation',Info);
+
+
+async function callOneLaw() { // dùng để khi qua screen related Law khác khi quay về vẫn còn
+  let info = await fetch(`http://192.168.0.103:5000/getonelaw`,{
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body:JSON.stringify({screen:route.params.screen})
+  })
+  
+  let respond = await info.json()
+  return respond
+}
+
 
   useEffect(() => {
+    
 
-
-      setContent(content)
-      setInfo(info)
+    callOneLaw().then(res=>{setContent(res.content)
+      setInfo(res.info)})
+      
     
 
   }, [info])
@@ -297,6 +327,7 @@ export default function Detail({navigation}) {
   }
 
   useEffect(() => {
+    
     getContentExist().then(cont => {
       if (
         cont &&
@@ -320,7 +351,7 @@ export default function Detail({navigation}) {
     }).start();
 
     return()=>{
-      dispatch(loader())
+      // dispatch(loader())
       eachSectionWithChapter=[]
     }
   }, []);
@@ -406,7 +437,7 @@ export default function Detail({navigation}) {
               if (go) {
                 setTimeout(() => {
                   list.current.scrollTo({
-                    y: positionYArr[0] - 100, //- 57
+                    y: positionYArr[0] - 250, //- 57
                   });
                 }, 500);
               }
@@ -581,7 +612,7 @@ export default function Detail({navigation}) {
   useEffect(() => {
     if (currentSearchPoint != 0 && searchResultCount) {
       list.current.scrollTo({
-        y: positionYArr[currentSearchPoint - 1] - 100, //- 57
+        y: positionYArr[currentSearchPoint - 1] - 250, //- 57
       });
     }
   }, [currentSearchPoint]);
@@ -1051,7 +1082,7 @@ export default function Detail({navigation}) {
                 </View>
                 <View style={{flex: 1}}>
                   <Text style={styles.ModalInfoContent}>
-                    {Info && Info['lawDaySign']}
+                    {Info && new Date(Info['lawDaySign']).toLocaleDateString('vi-VN')}
                   </Text>
                 </View>
               </View>
@@ -1061,7 +1092,7 @@ export default function Detail({navigation}) {
                 </View>
                 <View style={{flex: 1}}>
                   <Text style={styles.ModalInfoContent}>
-                    {Info && Info['lawDayActive']}
+                    {Info && new Date(Info['lawDayActive']).toLocaleDateString('vi-VN')}
                   </Text>
                 </View>
               </View>
@@ -1082,7 +1113,7 @@ export default function Detail({navigation}) {
 
               <View style={styles.ModalInfoContainer}>
                 <View style={{width: '40%'}}>
-                  <Text style={styles.ModalInfoTitle}>Họ Tên người ký:</Text>
+                  <Text style={styles.ModalInfoTitle}>Tên người ký:</Text>
                 </View>
                 <View style={{flex: 1, paddingBottom: 10, paddingTop: 10}}>
                   {Info && !Array.isArray(Info['nameSign']) ? (
@@ -1159,29 +1190,37 @@ export default function Detail({navigation}) {
                       Info['lawRelated'].map((key, i) => {
                         let nameLaw = key
 
-                        let nameLaw2;
-                        // for (let a = 0; a < (inf.info).length; a++) {
-                        //   if (
-                        //     Object.values(inf.info)[a]['lawNameDisplay'].match(
-                        //       new RegExp(`^${key}`, 'gim'),
-                        //     )
-                        //   ) {
-                        //     nameLaw2 = (inf.info)[a];
-                        //     break;
-                        //   }else if(Object.values(inf.info)[a]['lawDescription'].match(
-                        //     new RegExp(`^${key}`, 'gim'),
-                        //   )){
-                        //     nameLaw2 = (inf.info)[a];
-                        //   }
-                        // }
+                        let LawHaveWord;
+                        let LawHaveNoWord;
+                        let correctIndex
+                        for (let a = 0; a < (inf.info).length; a++) {
+                          if (
+                           (inf.info)[a]['info']['lawNameDisplay'].match(
+                              new RegExp(`^${key}`, 'gim'),
+                            )
+                          ) {
+                            correctIndex = a
+                            LawHaveWord = (inf.info)[a]['info']['lawNameDisplay'];
+                            break;
+                          }else if((inf.info)[a]['info']['lawDescription'].match(
+                            new RegExp(`^${key}`, 'gim'),
+                          )){
+                            correctIndex = a
+                            LawHaveWord = (inf.info)[a]['info']['lawNameDisplay'];
+                          }else if((inf.info)[a]['info']['lawNumber'].match(
+                            new RegExp(`^${key}`, 'gim'),
+                          )){
+                            correctIndex = a
+                            LawHaveNoWord = (inf.info)[a]['info']['lawNameDisplay'];
+                          }
+                        }
+                        
+                        // console.log((inf.info)[a]);
                         return (
                           <TouchableOpacity
                             onPress={() => {
-                              if (Object.keys(inf.info).includes(nameLaw)) {
-                                navigation.navigate(nameLaw);
-                                ModalVisibleStatus.updateModalStatus(false);
-                              } else if (nameLaw2) {
-                                navigation.navigate(nameLaw2);
+                              if (LawHaveWord || LawHaveNoWord) {
+                                navigation.push(`accessLaw`, {screen: inf.info[correctIndex]._id});
                                 ModalVisibleStatus.updateModalStatus(false);
                               }
                             }}>
@@ -1189,19 +1228,20 @@ export default function Detail({navigation}) {
                               style={{
                                 ...styles.ModalInfoContentLawRelated,
                                 fontWeight:
-                                  Object.keys(inf.info).includes(nameLaw) ||
-                                  nameLaw2
+                                LawHaveNoWord ||
+                                  LawHaveWord 
                                     ? 'bold'
                                     : '300',
                               }}>
                               -{' '}
                               {
-                                // (inf.info).includes(nameLaw)
-                                //   ? inf.info[nameLaw]['lawNameDisplay']
-                                //   : nameLaw2
-                                //   ? inf.info[nameLaw2]['lawNameDisplay']
-                                //   : key
-                                inf.info[nameLaw] ? inf.info[nameLaw] : nameLaw
+                                LawHaveNoWord 
+                                  ? LawHaveNoWord
+                                  : LawHaveWord
+                                  ? LawHaveWord
+                                  : nameLaw
+
+                                // inf.info[nameLaw] ? inf.info[nameLaw] : nameLaw
                               }
                             </Text>
                           </TouchableOpacity>
@@ -1279,9 +1319,7 @@ export default function Detail({navigation}) {
             Content.map((key, i) => {
               if(i+1 == Content.length){
                 
-                // setTimeout(() => {
-                  dispatch(noLoading())
-                // }, 500);
+                  // dispatch(noLoading())
               }
               return (
               <>

@@ -34,12 +34,16 @@ function App() {
     setSearchLawRef(data);
   };
 
+  // const [linkLawRelated, setLinkLawRelated] = useState('');
+  // const updateLinkLawRelated = data => {
+  //   setLinkLawRelated(data);
+  // };
+
   
   return (
     <Provider store={store}>
       <ModalStatus.Provider value={{modalStatus, updateModalStatus}}>
       <RefOfSearchLaw.Provider value={{searchLawRef, updatesearchLawRef}}>
-
             <InfoDownloaded.Provider value={{info,updateInfo}}>
             <StackNavigator />
             </InfoDownloaded.Provider>

@@ -22,9 +22,9 @@ export const read = createSlice({
     },
 
     handle: (state,action) => {
-      state.content=action.payload.a['content'];
-      state.info=action.payload.a['info'];
-      state.loading= true;
+      state.content=action.payload.a;
+      // state.info=action.payload.a['info'];
+      state.loading= false;
     },
 
     noLoading: (state,action) => {
@@ -106,6 +106,7 @@ export function* mySaga(state,action){
 
 
 
+    // let info = yield fetch(`http://192.168.0.103:5000/getonelaw`,{
     let info = yield fetch(`http://192.168.0.103:5000/getonelaw`,{
       method: 'POST',
       headers: {
@@ -120,9 +121,10 @@ export function* mySaga(state,action){
 
 
 
-    yield put(handle({a}))
-
+    yield put(handle(a))
     
+    // yield put(noLoading())
+
   }catch(e){
 
   }

@@ -14,7 +14,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector, useDispatch} from 'react-redux';
 import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState, useRef, useContext} from 'react';
-import { useNavigation} from '@react-navigation/native';
+import { useNavigation,useScrollToTop} from '@react-navigation/native';
 import {InfoDownloaded} from '../App';
 
 // import {RefForSearch} from '../App';
@@ -48,6 +48,11 @@ export function Detail1({}) {
   const [warning, setWanring] = useState(false);
   
   const textInput = useRef(null)
+
+  const ScrollViewToScroll = useRef(null);
+
+  useScrollToTop(ScrollViewToScroll)
+
 
   const dispatch = useDispatch();
 
@@ -223,6 +228,7 @@ export function Detail1({}) {
       )}
 
       <ScrollView
+            ref={ScrollViewToScroll}
         keyboardShouldPersistTaps="handled"
         style={{backgroundColor: '#EEEFE4'}}>
         <View style={{backgroundColor: 'green'}}>
@@ -660,9 +666,9 @@ export function Detail1({}) {
                   Object.keys(SearchResult).map(
                     (key, i) => {
                       let nameLaw =
-                        key.info['lawNameDisplay']
+                      SearchResult[key]['lawNameDisplay']
                       let lawDescription =
-                      key.info['lawDescription']
+                      SearchResult[key]['lawDescription']
 
                       let inputSearchLawReg = inputFilter;
                       if (

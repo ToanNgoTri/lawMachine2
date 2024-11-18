@@ -7,12 +7,12 @@ import {
   TextInput,
   Keyboard,
   ActivityIndicator,
-  Animated
+  Animated,
 } from 'react-native';
 // import {handle2, searchLaw} from '../redux/fetchData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector, useDispatch} from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation,useScrollToTop} from '@react-navigation/native';
 import React, {useEffect, useState, useRef, useContext} from 'react';
 import {useNetInfo} from '@react-native-community/netinfo';
 import CheckBox from 'react-native-check-box';
@@ -31,24 +31,25 @@ export function Detail2({}) {
 
   const [checkedAllFilter, setCheckedAllFilter] = useState(true);
   const [choosenLaw, setChoosenLaw] = useState([]);
-  const [LawFilted, setLawFilted] = useState(false)
+  const [LawFilted, setLawFilted] = useState(false);
+  // console.log('LawFilted',LawFilted);
 
-  // const RefLawSearch = useContext(RefOfSearchLaw);
+  const [choosenKindLaw, setChoosenKindLaw] = useState([0, 1, 2]);
+
   const navigation = useNavigation();
 
-  const {loading2, info, input2} = useSelector(
-    state => state['searchLaw'],
-  );
+  const {loading2, info} = useSelector(state => state['searchLaw']);
 
   // RefLawSearch.updatesearchLawRef(list)
 
   const textInput = useRef(null);
 
+  const ScrollViewToScroll = useRef(null);
+  useScrollToTop(ScrollViewToScroll)
+
   const dispatch = useDispatch();
 
   const animated = useRef(new Animated.Value(0)).current;
-
-
 
   let Opacity = animated.interpolate({
     inputRange: [0, 100],
@@ -60,34 +61,37 @@ export function Detail2({}) {
     outputRange: [0, 1],
   });
 
-
   function LawFilterContent(array, obj) {
-    let contentFilted = {}
-    Object.keys(obj).filter(key=>{
-    if(array.includes(key)){
-      contentFilted[key] = obj[key]
-    }
-    })
-    setLawFilted(contentFilted)
+    let contentFilted = {};
+    Object.keys(obj).filter(key => {
+      if (array.includes(key)) {
+        contentFilted[key] = obj[key];
+      }
+    });
+    setLawFilted(contentFilted);
   }
 
   useEffect(() => {
-    if(info){
-      let lawObject = {}
-      info.map(law=>{
-        lawObject[law._id] = {'lawNameDisplay':law.info['lawNameDisplay'],'lawDescription':law.info['lawDescription']}
-      })
-      setSearchResult(lawObject)
+    if (info) {
+      let lawObject = {};
+      info.map((law, i) => {
+        // lawObject[i] = {[law._id]:{'lawNameDisplay':law.info['lawNameDisplay'],'lawDescription':law.info['lawDescription'],'lawDaySign':law.info['lawDaySign']}}
+        lawObject[law._id] = {
+          lawNameDisplay: law.info['lawNameDisplay'],
+          lawDescription: law.info['lawDescription'],
+          lawDaySign: law.info['lawDaySign'],
+        };
+      });
+
+      setSearchResult(lawObject);
+      setLawFilted(lawObject);
     }
-  }, [info])
+  }, [info]);
 
   useEffect(() => {
     setInputFilter('');
 
-    if (
-      choosenLaw.length ==
-      Object.keys(SearchResult || {}).length
-    ) {
+    if (choosenLaw.length == Object.keys(SearchResult || {}).length) {
       setCheckedAllFilter(true);
     } else {
       setCheckedAllFilter(false);
@@ -96,24 +100,100 @@ export function Detail2({}) {
 
   useEffect(() => {
     setChoosenLaw(
-      Object.keys(SearchResult).length
-        ? Object.keys(SearchResult)
-        : [],
+      Object.keys(SearchResult).length ? Object.keys(SearchResult) : [],
     );
   }, [SearchResult]);
-
 
   useEffect(() => {
     setWanring(false);
   }, [input]);
 
+  function OrderDaySign() {
+    let data = LawFilted;
+    let ArrayResult = [];
 
+    if (Object.keys(LawFilted).length) {
+      Object.keys(data).map((law, i) => {
+        ArrayResult[i] = {
+          [Object.keys(data)[Object.keys(data).length - i - 1]]:
+            data[Object.keys(data)[Object.keys(data).length - i - 1]],
+        };
+      });
+      let newArraySearch = [];
+      ArrayResult.map((key, i) => {
+        newArraySearch[i] = JSON.stringify(key);
+      });
+      newArraySearch = newArraySearch.join(',');
+      newArraySearch = newArraySearch.replace(/\}\}\,\{/gim, '},');
+      newArraySearch = newArraySearch.replace(/^\[\{/, '');
+      newArraySearch = newArraySearch.replace(/\}\}\]$/, '}');
+      // newArraySearch = newArraySearch.replace(/\\/g,'')
+      let newObjectSearch = JSON.parse(newArraySearch);
+      setLawFilted(newObjectSearch);
+    }
+  }
 
+  useEffect(() => {
+    chooseDisplayKindLaw();
+  }, [choosenKindLaw]);
 
+  function chooseDisplayKindLaw() {
+    // 1 là luật, 2 là nd, 3 là TT
+
+    let newResult = {};
+
+    if (choosenKindLaw.length) {
+      Object.keys(SearchResult).map((law, i) => {
+        let kindSample =
+          (choosenKindLaw.includes(0) ? 'Luật|Bộ luật' : '') +
+          (choosenKindLaw.includes(1) ? '|Nghị định' : '') +
+          (choosenKindLaw.includes(2) ? '|Thông tư' : '');
+        kindSample = kindSample.replace(/^\|/, '');
+        // console.log('kindSample',kindSample);
+
+        if (
+          SearchResult[law]['lawNameDisplay'].match(
+            new RegExp(`^(${kindSample})`, 'img'),
+          )
+        ) {
+          newResult[law] = SearchResult[law];
+        }
+      });
+      setLawFilted(newResult);
+      setChoosenLaw(Object.keys(newResult));
+    } else {
+      setLawFilted({});
+      setChoosenLaw([]);
+    }
+    //     if(choosenKindLaw.includes(0)){
+    //   console.log(1);
+    //   Object.keys(SearchResult).map( (law,i)=>{
+    //     if(SearchResult[law]['lawNameDisplay'].match(/^(Luật|Bộ Luật)/img)){
+    //       newResult[law] = SearchResult[law]
+    //       console.log('1a');
+
+    //     }
+    //   })
+    // }
+    // if(choosenKindLaw.includes(1)){
+    //   Object.keys(SearchResult).map( (law,i)=>{
+    //     if(SearchResult[law]['lawNameDisplay'].match(/^Nghị định/img)){
+    //       newResult[law] = SearchResult[law]
+    //     }
+    //   })
+    // }
+    // if(choosenKindLaw.includes(2)){
+    //   Object.keys(SearchResult).map( (law,i)=>{
+    //     if(SearchResult[law]['lawNameDisplay'].match(/^Thông tư/img)){
+    //       newResult[law] = SearchResult[law]
+    //     }
+    //   })
+    // }
+    // console.log('newResult',newResult)
+  }
 
   const netInfo = useNetInfo();
   let internetConnected = netInfo.isConnected;
-
 
   const NoneOfResutl = () => {
     return (
@@ -149,26 +229,27 @@ export function Detail2({}) {
               marginBottom: 15,
               fontWeight: 'bold',
             }}>
-            {internetConnected ? "Xin vui lòng đợi trong giây lát ..." :"Vui lòng kiểm tra kết nối mạng ..."}
+            {internetConnected
+              ? 'Xin vui lòng đợi trong giây lát ...'
+              : 'Vui lòng kiểm tra kết nối mạng ...'}
           </Text>
           <ActivityIndicator size="large" color="white"></ActivityIndicator>
         </View>
       )}
 
       <ScrollView
+      ref={ScrollViewToScroll}
         keyboardShouldPersistTaps="handled"
         style={{backgroundColor: '#EEEFE4'}}>
         <View style={{backgroundColor: 'green'}}>
           <Text style={styles.titleText}>{`Tìm kiếm văn bản`}</Text>
 
           <View style={styles.inputContainer}>
-            <View style={styles.containerBtb}>
+            <View style={{...styles.containerBtb, paddingTop: 10}}>
               <TouchableOpacity
                 style={{
                   ...styles.inputBtb,
-                  // right: -5,
                   backgroundColor: 'white',
-                  // width: 50,
                 }}
                 onPress={() => {
                   setShowFilter(true);
@@ -179,8 +260,7 @@ export function Detail2({}) {
                     duration: 500,
                     useNativeDriver: false,
                   }).start();
-                }}
-                >
+                }}>
                 <Ionicons
                   name="funnel-outline"
                   style={{...styles.inputBtbText, color: 'black'}}></Ionicons>
@@ -206,9 +286,7 @@ export function Detail2({}) {
                       alignItems: 'center',
                     }}>
                     {choosenLaw.length}
-
                   </Text>
-                  
                 </View>
               </TouchableOpacity>
             </View>
@@ -229,18 +307,26 @@ export function Detail2({}) {
                 }}>
                 <TextInput
                   ref={textInput}
-                  style={styles.inputArea}
+                  style={{...styles.inputArea}}
                   onChangeText={text => {
                     setInput(text);
                     // ;dispatch(type1(text))
                   }}
                   value={input}
+                  // onPress={()=>setTimeout(() => {
+                  //   textInput.current.focus()     // cần khác phục cái này, "autoBlur"
+                  // }, 200)}
+                  // autoFocus={true}
                   selectTextOnFocus={true}
                   placeholder="Nhập từ khóa..."
-                  onSubmitEditing={()=>dispatch({type:'searchContent',input:input})
-                }></TextInput>
+                  onSubmitEditing={() =>
+                    dispatch({type: 'searchLaw', input: input})
+                  }></TextInput>
                 <TouchableOpacity
-                  onPress={() => {setInput('');textInput.current.focus()}}
+                  onPress={() => {
+                    setInput('');
+                    textInput.current.focus();
+                  }}
                   style={{
                     width: '15%',
                     display: 'flex',
@@ -256,10 +342,6 @@ export function Detail2({}) {
                         color: 'black',
                         fontSize: 20,
                         paddingRight: 8,
-                        // textAlign: 'center',
-                        // width: 20,
-                        // height: 20,
-
                         // textAlign:'right'
                       }}></Ionicons>
                   )}
@@ -283,24 +365,95 @@ export function Detail2({}) {
                   height: 40,
                   top: 5,
                 }}
-                  onPress={async () => {
-                    Keyboard.dismiss();
-  
+                onPress={async () => {
+                  Keyboard.dismiss();
+
+                  if(input.match(/^(\s)*$/)){
+                    setWanring(true)
+                  }else{
                     dispatch({type: 'searchLaw', input: input});
-                  }}>
+
+                  }
+                  setChoosenKindLaw([0, 1, 2]);
+                }}>
                 <Ionicons
                   name="search-outline"
                   style={styles.inputBtbText}></Ionicons>
               </TouchableOpacity>
             </View>
           </View>
+          <View
+            style={{
+              justifyContent: 'space-evenly',
+              flexDirection: 'row',
+              alignItems: 'center',
+              width: '100%',
+              paddingBottom: 13,
+            }}>
+            {['Luật/Bộ Luật', 'Nghị định', 'Thông tư'].map((option, i) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (choosenKindLaw.includes(i)) {
+                      setChoosenKindLaw(choosenKindLaw.filter(a => a !== i));
+                    } else {
+                      setChoosenKindLaw([...choosenKindLaw, i]);
+                    }
+                  }}
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                  }}>
+                  <CheckBox
+                    onClick={() => {
+                      if (choosenKindLaw.includes(i)) {
+                        setChoosenKindLaw(choosenKindLaw.filter(a => a !== i));
+                      } else {
+                        setChoosenKindLaw([...choosenKindLaw, i]);
+                      }
+
+                      // chooseDisplayKindLaw()
+                    }}
+                    isChecked={choosenKindLaw.includes(i)}
+                    style={{}}
+                    uncheckedCheckBoxColor={'white'}
+                    checkedCheckBoxColor={'white'}
+                  />
+                  <Text style={{fontSize: 13, color: 'white'}}>{option}</Text>
+                </TouchableOpacity>
+              );
+            })}
+
+            <TouchableOpacity
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 100,
+                height: 25,
+                backgroundColor: 'white',
+                width: 50,
+                padding: 0,
+              }}
+              onPress={async () => {
+                Keyboard.dismiss();
+                OrderDaySign();
+              }}>
+              <Ionicons
+                name="swap-vertical-outline"
+                style={{
+                  ...styles.inputBtbText,
+                  fontSize: 19,
+                  color: 'black',
+                }}></Ionicons>
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={{marginTop: 1}}>
           {info == null ? (
             <></>
-          ) : (info).length ? (
-            Object.keys(LawFilted || SearchResult).map((detailId, i) => {  
-
+          ) : info.length ? (
+            Object.keys(LawFilted || SearchResult).map((detailId, i) => {
               return (
                 <TouchableOpacity
                   style={{
@@ -310,18 +463,20 @@ export function Detail2({}) {
                     backgroundColor: '#F9CC76',
                     marginBottom: 6,
                   }}
-                  onPress={() =>{
+                  onPress={() => {
                     // navigation.navigate(`${detailInfo._id}`)
-                    navigation.push(`accessLaw`, {screen: detailId})
-                  }
-                  }>
+                    navigation.push(`accessLaw`, {screen: detailId});
+                  }}>
                   <View style={styles.item}>
                     <Text style={styles.chapterText} key={`${i}a`}>
                       {SearchResult[detailId]['lawNameDisplay']}
                     </Text>
-                    {!SearchResult[detailId]['lawNameDisplay'].match(/^(luật|bộ luật|Hiến)/gim) && (
+                    {!SearchResult[detailId]['lawNameDisplay'].match(
+                      /^(luật|bộ luật|Hiến)/gim,
+                    ) && (
                       <Text style={styles.descriptionText}>
-                        {SearchResult[detailId] && SearchResult[detailId]['lawDescription']}
+                        {SearchResult[detailId] &&
+                          SearchResult[detailId]['lawDescription']}
                       </Text>
                     )}
                   </View>
@@ -457,33 +612,22 @@ export function Detail2({}) {
                 elevation: 10,
               }}
               onPress={() => {
-                if (
-                  choosenLaw.length ==
-                  Object.keys(SearchResult).length
-                ) {
+                if (choosenLaw.length == Object.keys(SearchResult).length) {
                   setCheckedAllFilter(false);
                   setChoosenLaw([]);
                 } else {
-                  setChoosenLaw(
-                    Object.keys(SearchResult),
-                  );
+                  setChoosenLaw(Object.keys(SearchResult));
                   setCheckedAllFilter(true);
                 }
                 // console.log(choosenLaw);
               }}>
               <CheckBox
                 onClick={() => {
-                  if (
-                    choosenLaw.length ==
-                    Object.keys(SearchResult)
-                      .length
-                  ) {
+                  if (choosenLaw.length == Object.keys(SearchResult).length) {
                     setCheckedAllFilter(false);
                     setChoosenLaw([]);
                   } else {
-                    setChoosenLaw(
-                      Object.keys(SearchResult),
-                    );
+                    setChoosenLaw(Object.keys(SearchResult));
                     setCheckedAllFilter(true);
                   }
                 }}
@@ -511,127 +655,102 @@ export function Detail2({}) {
                   // flexDirection:'row'
                 }}>
                 {SearchResult &&
-                  Object.keys(SearchResult).map(
-                    (key, i) => {
-                      let nameLaw =
-                        SearchResult[key]['lawNameDisplay']
-                      let lawDescription =
-                      SearchResult[key]['lawDescription']
+                  Object.keys(SearchResult).map((key, i) => {
+                    let nameLaw = SearchResult[key]['lawNameDisplay'];
+                    let lawDescription = SearchResult[key]['lawDescription'];
 
-                      let inputSearchLawReg = inputFilter;
-                      if (
-                        inputFilter.match(
-                          /(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/|\s?)/gim,
-                        )
-                      ) {
+                    let inputSearchLawReg = inputFilter;
+                    if (
+                      inputFilter.match(
+                        /(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/|\s?)/gim,
+                      )
+                    ) {
+                      inputSearchLawReg = inputFilter.replace(/\(/gim, '\\(');
 
-                        inputSearchLawReg = inputFilter.replace(
-                            /\(/gim,
-                            '\\(',
-                          );
+                      inputSearchLawReg = inputSearchLawReg.replace(
+                        /\)/gim,
+                        '\\)',
+                      );
 
-                          
+                      inputSearchLawReg = inputSearchLawReg.replace(
+                        /\\/gim,
+                        '.',
+                      );
 
-                          inputSearchLawReg = inputSearchLawReg.replace(
-                            /\)/gim,
-                            '\\)',
-                          );
+                      inputSearchLawReg = inputSearchLawReg.replace(
+                        /\./gim,
+                        '\\.',
+                      );
 
+                      inputSearchLawReg = inputSearchLawReg.replace(
+                        /\+/gim,
+                        '\\+',
+                      );
 
-                          inputSearchLawReg = inputSearchLawReg.replace(
-                            /\\/gim,
-                            '.',
-                          );
-
-
-                          inputSearchLawReg = inputSearchLawReg.replace(
-                            /\./gim,
-                            '\\.',
-                          );
-
-
-                          inputSearchLawReg = inputSearchLawReg.replace(
-                            /\+/gim,
-                            '\\+',
-                          );
-
-                          
-
-                          inputSearchLawReg = inputSearchLawReg.replace(
-                            /\?/gim,
-                            '\\?',
-                          );
-
-                        }
-                      if (
-                        nameLaw.match(new RegExp(inputSearchLawReg, 'igm')) ||
-                        lawDescription.match(
-                          new RegExp(inputSearchLawReg, 'igm'),
-                        )
-                      ) {
-                        return (
-                          <TouchableOpacity
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              paddingBottom: 10,
-                              width: '90%',
-                              alignItems: 'center',
-                            }}
-                            onPress={() => {
+                      inputSearchLawReg = inputSearchLawReg.replace(
+                        /\?/gim,
+                        '\\?',
+                      );
+                    }
+                    if (
+                      nameLaw.match(new RegExp(inputSearchLawReg, 'igm')) ||
+                      lawDescription.match(new RegExp(inputSearchLawReg, 'igm'))
+                    ) {
+                      return (
+                        <TouchableOpacity
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            paddingBottom: 10,
+                            width: '90%',
+                            alignItems: 'center',
+                          }}
+                          onPress={() => {
+                            if (key == undefined) {
+                            } else if (choosenLaw.includes(key)) {
+                              setChoosenLaw(
+                                choosenLaw.filter(a1 => a1 !== key),
+                                setCheckedAllFilter(false),
+                              );
+                            } else {
+                              setChoosenLaw([...choosenLaw, key]);
+                              if (
+                                choosenLaw.length ==
+                                Object.keys(SearchResult).length - 1
+                              ) {
+                                setCheckedAllFilter(true);
+                              }
+                            }
+                          }}>
+                          <CheckBox
+                            onClick={() => {
                               if (key == undefined) {
                               } else if (choosenLaw.includes(key)) {
                                 setChoosenLaw(
                                   choosenLaw.filter(a1 => a1 !== key),
-                                  setCheckedAllFilter(false),
                                 );
+                                setCheckedAllFilter(false);
                               } else {
                                 setChoosenLaw([...choosenLaw, key]);
                                 if (
                                   choosenLaw.length ==
-                                  Object.keys(
-                                    SearchResult
-                                  ).length -
-                                    1
+                                  Object.keys(SearchResult).length - 1
                                 ) {
                                   setCheckedAllFilter(true);
                                 }
                               }
                             }}
-                            >
-                            <CheckBox
-                              onClick={() => {
-                                if (key == undefined) {
-                                } else if (choosenLaw.includes(key)) {
-                                  setChoosenLaw(
-                                    choosenLaw.filter(a1 => a1 !== key),
-                                  );
-                                  setCheckedAllFilter(false);
-                                } else {
-                                  setChoosenLaw([...choosenLaw, key]);
-                                  if (
-                                    choosenLaw.length ==
-                                    Object.keys(
-                                      SearchResult,
-                                    ).length -
-                                      1
-                                  ) {
-                                    setCheckedAllFilter(true);
-                                  }
-                                }
-                              }}
-                              isChecked={choosenLaw.includes(key)}
-                              style={{}}
-                            />
+                            isChecked={choosenLaw.includes(key)}
+                            style={{}}
+                          />
 
-                            <Text style={{marginLeft: 5, color: 'black'}}>
-                              {nameLaw}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      }
-                    },
-                  )}
+                          <Text style={{marginLeft: 5, color: 'black'}}>
+                            {nameLaw}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    }
+                  })}
               </View>
             </ScrollView>
             <TouchableOpacity
@@ -639,7 +758,7 @@ export function Detail2({}) {
                 backgroundColor: 'green',
               }}
               onPress={() => {
-                LawFilterContent(choosenLaw,SearchResult)
+                LawFilterContent(choosenLaw, SearchResult);
                 let timeOut = setTimeout(() => {
                   setShowFilter(false);
                   return () => {};
@@ -667,18 +786,17 @@ export function Detail2({}) {
           </Animated.View>
         </>
       )}
-
     </>
   );
 }
 
 const styles = StyleSheet.create({
   titleText: {
-    fontSize: 30,
+    fontSize: 26,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 30,
+    marginTop: 10,
+    marginBottom: 15,
     textAlign: 'center',
     fontWeight: 'bold',
     color: 'white',
@@ -707,7 +825,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     // right: 5,
-    top: 10,
   },
   inputBtbText: {
     color: 'white',
@@ -812,4 +929,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
