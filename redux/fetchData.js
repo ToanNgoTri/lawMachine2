@@ -106,8 +106,8 @@ export function* mySaga(state,action){
 
 
 
-    // let info = yield fetch(`http://192.168.0.103:5000/getonelaw`,{
-    let info = yield fetch(`http://192.168.0.103:5000/getonelaw`,{
+    // let info = yield fetch(`http://192.168.1.4:5000/getonelaw`,{
+    let info = yield fetch(`http://192.168.1.4:5000/getonelaw`,{
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -144,7 +144,7 @@ export function* mySaga1(state,action){
     // })
     // let a = yield info.json()
 
-    let info = yield  fetch(`http://192.168.0.103:5000/searchcontent`,{
+    let info = yield  fetch(`http://192.168.1.4:5000/searchcontent`,{
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -166,7 +166,7 @@ export function* mySaga2(state,action){
   try{
     yield put(loader2())
 
-        let info = yield  fetch(`http://192.168.0.103:5000/searchlaw`,{
+        let info = yield  fetch(`http://192.168.1.4:5000/searchlaw`,{
           method: 'POST',
           headers: {
             Accept: 'application/json',

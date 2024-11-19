@@ -272,7 +272,7 @@ export default function Detail() {
 
 
 async function callOneLaw() { // dùng để khi qua screen related Law khác khi quay về vẫn còn
-  let info = await fetch(`http://192.168.0.103:5000/getonelaw`,{
+  let info = await fetch(`http://192.168.1.4:5000/getonelaw`,{
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -509,12 +509,12 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
   function setPositionYArtical({y, key3}) {
 
     if (
-      // true
-      tittleArray.length ||
-      tittleArray2.length ||
-      go ||
-      tittleArray[0] ||
-      tittleArray2[0]
+      true
+      // tittleArray.length ||
+      // tittleArray2.length ||
+      // go ||
+      // tittleArray[0] ||
+      // tittleArray2[0]
     ) {
       var contains = positionYArrArtical.some((elem, i) => {
         return key3 == Object.keys(elem);
@@ -653,12 +653,6 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
       setTittleArray2([]);
       Shrink();
     }
-    // Animated.timing(animatedForNavi, {
-    //   toValue:find ? 50 : 0,
-    //   duration: 1000,
-    //   useNativeDriver: false,
-    // }).start();
-    // setShowArticle(false)
     Keyboard.dismiss();
   }, [find]);
 
@@ -671,17 +665,17 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
         // style={
         //   showArticle ||
         //   find ||
-        //   (t == undefined
+        //   ((t == undefined
         //     ? !tittleArray.includes(i)
-        //     : !tittleArray2.includes(t)) ||
-        //   styles.content //////////////////////////////////////////////////////////////////
-        // }
+        //     : !tittleArray2.includes(t)) &&
+        //     styles.content) //////////////////////////////////////////////////////////////////
+        // }>
         style={
           showArticle ||
           find ||
           ((t == undefined
-            ? !tittleArray.includes(i)
-            : !tittleArray2.includes(t)) &&
+            ? tittleArray.includes(i)
+            : tittleArray2.includes(t)) &&
             styles.content) //////////////////////////////////////////////////////////////////
         }>
         {key[key1].map((key2, i2) => {
@@ -1495,7 +1489,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
             }}>
             {/* <Text style={styles.innerTab}>S</Text> */}
             <Ionicons
-              name="chevron-expand-outline"
+              name="chevron-collapse-outline"
               style={styles.innerTab}></Ionicons>
           </TouchableOpacity>
         )}
@@ -1519,7 +1513,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
             }}>
             {/* <Text style={styles.innerTab}>E</Text> */}
             <Ionicons
-              name="chevron-collapse-outline"
+              name="chevron-expand-outline"
               style={styles.innerTab}></Ionicons>
           </TouchableOpacity>
         )}
@@ -1552,7 +1546,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
 
             setTittleArray([]);
             setTittleArray2([]);
-            Shrink();
+            // Shrink();
             setGo(false);
           }}>
           {/* <Text style={styles.innerTab}>Find</Text> */}
@@ -1582,7 +1576,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
 
             setTittleArray([]);
             setTittleArray2([]);
-            Shrink();
+            // Shrink();
           }}>
           <Ionicons
             name="menu-outline"
@@ -1687,7 +1681,9 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                     // đây là hàng ảo để thêm margin
                   }
                 </View>
-                {(SearchArticalResult || positionYArrArtical).map((key, i) => (
+                {(SearchArticalResult || positionYArrArtical).map((key, i) => {
+                  
+                  return (
                   <TouchableOpacity
                     style={styles.listItem}
                     onPress={() => {
@@ -1701,7 +1697,8 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                     }}>
                     <Text style={styles.listItemText}>{Object.keys(key)}</Text>
                   </TouchableOpacity>
-                ))}
+                )}
+                )}
               </ScrollView>
             </Animated.View>
           </>

@@ -311,7 +311,7 @@ const StackNavigator = () => {
   const inf = useContext(InfoDownloaded);
 
   async function callAllSearchLaw() {
-    let info = await fetch(`http://192.168.0.103:5000/stackscreen`,{
+    let info = await fetch(`http://192.168.1.4:5000/stackscreen`,{
       method: 'POST',
       headers: {
         Accept: 'application/json',
