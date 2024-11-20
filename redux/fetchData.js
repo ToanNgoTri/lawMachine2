@@ -164,20 +164,35 @@ yield put(handle1(b))
 
 export function* mySaga2(state,action){
   try{
-    yield put(loader2())
+    // yield put(loader2())
 
-        let info = yield  fetch(`http://192.168.1.4:5000/searchlaw`,{
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body:JSON.stringify({input:state.input})
-        })
+    //     let info = yield  fetch(`http://192.168.1.4:5000/searchlaw`,{
+    //       method: 'POST',
+    //       headers: {
+    //         Accept: 'application/json',
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body:JSON.stringify({input:state.input})
+    //     })
       
       
-        let b = yield info.json()
+    //     let b = yield info.json()
         
+    yield put(loader2())
+    
+    let info = yield  fetch(`https://us-central1-project2-197c0.cloudfunctions.net/searchLaw?input=${state.input}`,{
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      // body:JSON.stringify({input:state.input})
+    })
+  
+  
+    let b = yield info.json()
+
+
     yield put(handle2({b}))
   }catch(e){
   }
