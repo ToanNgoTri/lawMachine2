@@ -185,7 +185,7 @@ const AppNavigators = () => {
     tabBarPosition='bottom'
       screenOptions={({route}) => ({
         tabBarPressColor:'#FFCC66',
-        animationEnabled: false,
+        // animationEnabled: false,
         animation: 'shift',
         lazy: true,
         tabBarIndicatorStyle:{backgroundColor:'red',top:0,margin:0,padding:0},

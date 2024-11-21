@@ -406,6 +406,7 @@ export function Detail2({}) {
                     justifyContent: 'center',
                     alignItems: 'center',
                     flexDirection: 'row',
+                    // width:75
                   }}>
                   <CheckBox
                     onClick={() => {
