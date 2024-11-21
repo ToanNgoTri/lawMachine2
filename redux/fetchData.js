@@ -107,13 +107,13 @@ export function* mySaga(state,action){
 
 
     // let info = yield fetch(`http://192.168.1.4:5000/getonelaw`,{
-    let info = yield fetch(`http://192.168.1.4:5000/getonelaw`,{
-      method: 'POST',
+    let info = yield fetch(`https://us-central1-project2-197c0.cloudfunctions.net/callOneLaw?screen=${state.lawName}`,{
+      method: 'GET',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body:JSON.stringify({screen:state.lawName})
+      // body:JSON.stringify({screen:state.lawName})
     })
   
   
@@ -144,13 +144,13 @@ export function* mySaga1(state,action){
     // })
     // let a = yield info.json()
 
-    let info = yield  fetch(`http://192.168.1.4:5000/searchcontent`,{
-      method: 'POST',
+    let info = yield  fetch(`https://us-central1-project2-197c0.cloudfunctions.net/searchContent?input=${state.input}`,{
+      method: 'GET',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body:JSON.stringify({input:state.input})
+      // body:JSON.stringify({input:state.input})
     })
   
   

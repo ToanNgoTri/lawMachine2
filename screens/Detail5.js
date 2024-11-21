@@ -272,15 +272,15 @@ export default function Detail() {
 
 
 async function callOneLaw() { // dùng để khi qua screen related Law khác khi quay về vẫn còn
-  let info = await fetch(`http://192.168.1.4:5000/getonelaw`,{
-    method: 'POST',
+  let info = await fetch(`https://us-central1-project2-197c0.cloudfunctions.net/callOneLaw?screen=${route.params.screen}`,{
+    method: 'GET',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body:JSON.stringify({screen:route.params.screen})
+    // body:JSON.stringify({screen:state.lawName})
   })
-  
+
   let respond = await info.json()
   return respond
 }

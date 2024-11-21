@@ -65,3 +65,42 @@ exports.searchContent = onRequest(async (req, res) => {
         // await client.close();
       }
     });
+
+
+    exports.callOneLaw = onRequest(async (req, res) => {
+
+      let a;
+
+      try {
+        const database = client.db("LawMachine");
+        const LawContent = database.collection("LawContent");
+        // Query for a movie that has the title 'Back to the Future'
+    
+        a = await LawContent.findOne({ _id: req.query.screen });
+      } finally {
+        // Ensures that the client will close when you finish/error
+        // await client.close();
+      }
+    
+      // console.log(a);
+      res.json(a)
+
+    });
+  
+
+    exports.stackscreen = onRequest(async (req, res) => {
+
+      try {
+        const database = client.db("LawMachine");
+        const LawSearch = database.collection("LawSearch");
+    
+        LawSearch.find({})
+          .project({ info: 1 })
+          .toArray()
+          .then((o) => res.json(o));
+      } finally {
+        // Ensures that the client will close when you finish/error
+        // await client.close();
+      }
+    
+    });

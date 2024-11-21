@@ -40,7 +40,7 @@ export function Detail2({}) {
 
   const {loading2, info} = useSelector(state => state['searchLaw']);
 
-  console.log('info',info);
+  // console.log('info',info);
   
   // RefLawSearch.updatesearchLawRef(list)
 
@@ -74,20 +74,20 @@ export function Detail2({}) {
   }
 
   useEffect(() => {
-    // if (info) {
-    //   let lawObject = {};
-    //   info.map((law, i) => {
-    //     // lawObject[i] = {[law._id]:{'lawNameDisplay':law.info['lawNameDisplay'],'lawDescription':law.info['lawDescription'],'lawDaySign':law.info['lawDaySign']}}
-    //     lawObject[law._id] = {
-    //       lawNameDisplay: law.info['lawNameDisplay'],
-    //       lawDescription: law.info['lawDescription'],
-    //       lawDaySign: law.info['lawDaySign'],
-    //     };
-    //   });
+    if (info) {
+      let lawObject = {};
+      info.map((law, i) => {
+        // lawObject[i] = {[law._id]:{'lawNameDisplay':law.info['lawNameDisplay'],'lawDescription':law.info['lawDescription'],'lawDaySign':law.info['lawDaySign']}}
+        lawObject[law._id] = {
+          lawNameDisplay: law.info['lawNameDisplay'],
+          lawDescription: law.info['lawDescription'],
+          lawDaySign: law.info['lawDaySign'],
+        };
+      });
 
-    //   setSearchResult(lawObject);
-    //   setLawFilted(lawObject);
-    // }
+      setSearchResult(lawObject);
+      setLawFilted(lawObject);
+    }
   }, [info]);
 
   useEffect(() => {

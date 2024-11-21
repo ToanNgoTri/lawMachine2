@@ -311,8 +311,8 @@ const StackNavigator = () => {
   const inf = useContext(InfoDownloaded);
 
   async function callAllSearchLaw() {
-    let info = await fetch(`http://192.168.1.4:5000/stackscreen`,{
-      method: 'POST',
+    let info = await fetch(`https://us-central1-project2-197c0.cloudfunctions.net/stackscreen`,{
+      method: 'GET',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -323,9 +323,7 @@ const StackNavigator = () => {
     let respond = await info.json()
     return respond
   }
-  
-    let AllSearchLaw
-  
+    
      useEffect(() => {
       callAllSearchLaw().then(res=>inf.updateInfo(res))
     }, [])
