@@ -216,9 +216,9 @@ export function Detail1({}) {
               fontWeight:'bold'
             }}
             >
-            {internetConnected ?<View ><Text style={{color:'white',fontWeight:'bold',textAlign:'center'}}>{`Đang tìm từ khóa trong số ${(Object.keys(inf.info)).length} văn bản`}</Text>
+            {internetConnected ?<View >
             <Text style={{color:'white',fontWeight:'bold',textAlign:'center'}}>
-             Quá trình có thể mất vài phút </Text></View> 
+            Xin vui lòng đợi trong giây lát ...</Text></View> 
               
               
               :"Vui lòng kiểm tra kết nối mạng ..."}
@@ -352,7 +352,9 @@ export function Detail1({}) {
                   borderRadius: 100,
                   height: 40,
                   top: 5,
-                }}
+                  borderWidth:2,
+                  borderColor:'#f67c1a'
+    }}
                 onPress={() => {
                   Keyboard.dismiss();
                   let inputSearchLawReg = input;
@@ -865,13 +867,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20,
   },
-  content: {
-    height: 0,
-    display: 'flex',
-    position: 'relative',
-    margin: 0,
-    overflow: 'hidden',
-  },
+  // content: {
+  //   height: 0,
+  //   display: 'flex',
+  //   position: 'relative',
+  //   margin: 0,
+  //   overflow: 'hidden',
+  // },
   item: {
     minHeight: 80,
     display: 'flex',
@@ -892,60 +894,60 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 14,
   },
-  chapterArrow: {
-    backgroundColor: 'black',
-    borderRadius: 25,
-    // alignItems:'flex-end',
-    display: 'flex',
-    right: 10,
-    position: 'absolute',
-    width: 30,
-    height: 30,
-    textAlign: 'center',
-    justifyContent: 'center',
+  // chapterArrow: {
+  //   backgroundColor: 'black',
+  //   borderRadius: 25,
+  //   // alignItems:'flex-end',
+  //   display: 'flex',
+  //   right: 10,
+  //   position: 'absolute',
+  //   width: 30,
+  //   height: 30,
+  //   textAlign: 'center',
+  //   justifyContent: 'center',
     
-  },
-  articleContainer: {
-    fontWeight: 'bold',
-    paddingBottom: 6,
-    paddingTop: 6,
-    color: 'white',
-    backgroundColor: '#66CCFF',
-    justifyContent: 'center',
-    // alignItems:'center',
-    display: 'flex',
-    textAlign: 'center',
-    borderBottomColor: 'white',
-    borderBottomWidth: 1,
-  },
-  article: {
-    color: 'white',
-    overflow: 'hidden',
-    paddingRight: 10,
-    paddingLeft: 10,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  blackBackground: {
-    backgroundColor: 'white',
-    color: 'black',
-    flexWrap: 'wrap',
-    // width:200,
-    overflow: 'hidden',
-    flex: 1,
-    display: 'flex',
-    paddingRight: 10,
-    paddingLeft: 10,
-    textAlign: 'justify',
-    paddingTop: 5,
-    paddingBottom: 10,
-  },
-  highlight: {
-    color: 'red',
-    backgroundColor: 'yellow',
-    textAlign: 'center',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  // },
+  // articleContainer: {
+  //   fontWeight: 'bold',
+  //   paddingBottom: 6,
+  //   paddingTop: 6,
+  //   color: 'white',
+  //   backgroundColor: '#66CCFF',
+  //   justifyContent: 'center',
+  //   // alignItems:'center',
+  //   display: 'flex',
+  //   textAlign: 'center',
+  //   borderBottomColor: 'white',
+  //   borderBottomWidth: 1,
+  // },
+  // article: {
+  //   color: 'white',
+  //   overflow: 'hidden',
+  //   paddingRight: 10,
+  //   paddingLeft: 10,
+  //   textAlign: 'center',
+  //   fontWeight: 'bold',
+  // },
+  // blackBackground: {
+  //   backgroundColor: 'white',
+  //   color: 'black',
+  //   flexWrap: 'wrap',
+  //   // width:200,
+  //   overflow: 'hidden',
+  //   flex: 1,
+  //   display: 'flex',
+  //   paddingRight: 10,
+  //   paddingLeft: 10,
+  //   textAlign: 'justify',
+  //   paddingTop: 5,
+  //   paddingBottom: 10,
+  // },
+  // highlight: {
+  //   color: 'red',
+  //   backgroundColor: 'yellow',
+  //   textAlign: 'center',
+  //   display: 'flex',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  // },
 });

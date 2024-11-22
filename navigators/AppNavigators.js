@@ -1,5 +1,5 @@
 import {NavigationContainer} from '@react-navigation/native';
-import {createStaticNavigation,useIsFocused} from '@react-navigation/native';
+import {useSelector, useDispatch} from 'react-redux';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 // import database from '@react-native-firebase/database';
@@ -9,7 +9,7 @@ import {Detail1} from '../screens/Detail1';
 import {Detail2} from '../screens/Detail2';
 // import Detail4 from '../screens/Detail4';
 import Detail5 from '../screens/Detail5';
-import {InfoDownloaded} from '../App';
+import {useNetInfo} from '@react-native-community/netinfo';
 import {ModalStatus} from '../App';
 import {
   Text,
@@ -188,10 +188,12 @@ const AppNavigators = () => {
         animationEnabled: false,
         animation: 'shift',
         lazy: true,
-        tabBarIndicatorStyle:{backgroundColor:'#336600',top:0,margin:0,padding:0},
+        tabBarIndicatorStyle:{backgroundColor:'#336600',top:-1,margin:0,padding:0},
         tabBarStyle: {
           postion: 'absolute',
           height:50,
+          borderWidth:.5,
+          borderColor:'#DDDDDD',
         },
       })}
     >
@@ -203,7 +205,8 @@ const AppNavigators = () => {
           tabBarIcon: ({focused, color, size}) => {
             return (
               <View
-                style={{alignItems: 'center',top:-5, minWidth: 80}}
+                style={{alignItems: 'center',top:-5, minWidth: 80
+                }}
                 >
                 <Ionicons
                   name="home-outline"
@@ -213,7 +216,7 @@ const AppNavigators = () => {
                 <Text
                   style={{
                     ...(focused ? styles.IconActive : styles.IconInActive),
-                    fontSize: 13,fontWeight:'bold'
+                    fontSize: 13,fontWeight:'bold',bottom:2
                   }}>
                   Đã tải xuống
                 </Text>
@@ -247,7 +250,7 @@ const AppNavigators = () => {
                 <Text
                   style={{
                     ...(focused ? styles.IconActive : styles.IconInActive),
-                    fontSize: 13,fontWeight:'bold'
+                    fontSize: 13,fontWeight:'bold',bottom:2
                   }}>
                   Tìm văn bản
                 </Text>
@@ -282,7 +285,7 @@ const AppNavigators = () => {
                 <Text
                   style={{
                     ...(focused ? styles.IconActive : styles.IconInActive),
-                    fontSize: 13,fontWeight:'bold'
+                    fontSize: 13,fontWeight:'bold',bottom:2
                   }}>
                   Tìm nội dung
                 </Text>
@@ -308,25 +311,35 @@ const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
 
   const ModalVisibleStatus = useContext(ModalStatus);
-  const inf = useContext(InfoDownloaded);
 
-  async function callAllSearchLaw() {
-    let info = await fetch(`https://us-central1-project2-197c0.cloudfunctions.net/stackscreen`,{
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      // body:JSON.stringify({screen:1})
-    })
+  const netInfo = useNetInfo();
+  let internetConnected = netInfo.isConnected;
+
+  const dispatch = useDispatch();
+
+
+  // async function callAllSearchLaw() {
+  //   let info = await fetch(`https://us-central1-project2-197c0.cloudfunctions.net/stackscreen`,{
+  //     method: 'GET',
+  //     headers: {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'application/json',
+  //     },
+  //     // body:JSON.stringify({screen:1})
+  //   })
     
-    let respond = await info.json()
-    return respond
-  }
+  //   let respond = await info.json()
+  //   return respond
+  // }
     
      useEffect(() => {
-      callAllSearchLaw().then(res=>inf.updateInfo(res))
-    }, [])
+      if(internetConnected){
+
+        // dispatch({type: 'stackscreen'})
+      }
+
+      // callAllSearchLaw().then(res=>inf.updateInfo(res))
+    }, [internetConnected])
      
   return (
     <NavigationContainer>
@@ -356,7 +369,7 @@ const StackNavigator = () => {
             headerTitle: props => (
               <TouchableOpacity
                 style={{
-                  backgroundColor: 'yellow',
+                  backgroundColor: 'green',
                   height: '60%',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -376,7 +389,7 @@ const StackNavigator = () => {
                     ModalVisibleStatus.updateModalStatus(true);
                   }}>
                   <Ionicons
-                    name="information-circle-outline"
+                    name="document-text-outline"
                     style={styles.IconInfo}></Ionicons>
                 </TouchableOpacity>
               </View>
@@ -390,20 +403,20 @@ const StackNavigator = () => {
 };
 
 const styles = StyleSheet.create({
-  tabItemActive: {
-    // backgroundColor:'red',
-    width: '100%',
-    // right:0,
-    // left:100,
-    height: '104%',
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderTopColor: 'red',
-    borderTopWidth: 4,
-    overflow: 'hidden',
-  },
+  // tabItemActive: {
+  //   // backgroundColor:'red',
+  //   width: '100%',
+  //   // right:0,
+  //   // left:100,
+  //   height: '104%',
+  //   position: 'relative',
+  //   display: 'flex',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   borderTopColor: 'red',
+  //   borderTopWidth: 4,
+  //   overflow: 'hidden',
+  // },
   tabItemInactive: {
     position: 'relative',
     // width: '100%',
@@ -414,7 +427,7 @@ const styles = StyleSheet.create({
   },
   IconActive: {
     fontSize: 24,
-    color: '#336600',
+    color: 'green',
     // transform:animatedValue
   },
   IconInActive: {

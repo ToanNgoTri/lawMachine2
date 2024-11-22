@@ -36,7 +36,7 @@ let eachSectionWithChapter = [];
 
 
 export default function Detail() {
-  const inf = useContext(InfoDownloaded);
+  // const inf = useContext(InfoDownloaded);
 
   // const [tittle, setTittle] = useState();     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
   const [tittleArray, setTittleArray] = useState([true]); // đây là 'phần thứ...' hoặc chương (nói chung là section cao nhất)
@@ -257,6 +257,7 @@ export default function Detail() {
 
 
   const {loading, content, info} = useSelector(state => state['read']);
+  const {loading3, info3} = useSelector(state => state['stackscreen']);
 
 // async function callOneLaw() {
 //   let info = await fetch(`http://192.168.0.102:5000/getonelaw`,{
@@ -963,7 +964,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                       justifyContent: 'center',
                     }}>
                     <Ionicons
-                      name="cloud-download-outline"
+                      name="save-outline"
                       style={{
                         color: '#009933',
                         fontSize: 25,
@@ -1190,34 +1191,34 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                         let LawHaveWord;
                         let LawHaveNoWord;
                         let correctIndex
-                        for (let a = 0; a < (inf.info).length; a++) {
+                        for (let a = 0; a < (info3).length; a++) {
                           if (
-                           (inf.info)[a]['info']['lawNameDisplay'].match(
+                           (info3)[a]['info']['lawNameDisplay'].match(
                               new RegExp(`^${key}`, 'gim'),
                             )
                           ) {
                             correctIndex = a
-                            LawHaveWord = (inf.info)[a]['info']['lawNameDisplay'];
+                            LawHaveWord = (info3)[a]['info']['lawNameDisplay'];
                             break;
-                          }else if((inf.info)[a]['info']['lawDescription'].match(
+                          }else if((info3)[a]['info']['lawDescription'].match(
                             new RegExp(`^${key}`, 'gim'),
                           )){
                             correctIndex = a
-                            LawHaveWord = (inf.info)[a]['info']['lawNameDisplay'];
-                          }else if((inf.info)[a]['info']['lawNumber'].match(
+                            LawHaveWord = (info3)[a]['info']['lawNameDisplay'];
+                          }else if((info3)[a]['info']['lawNumber'].match(
                             new RegExp(`^${key}`, 'gim'),
                           )){
                             correctIndex = a
-                            LawHaveNoWord = (inf.info)[a]['info']['lawNameDisplay'];
+                            LawHaveNoWord = (info3)[a]['info']['lawNameDisplay'];
                           }
                         }
                         
-                        // console.log((inf.info)[a]);
+                        // console.log((info3)[a]);
                         return (
                           <TouchableOpacity
                             onPress={() => {
                               if (LawHaveWord || LawHaveNoWord) {
-                                navigation.push(`accessLaw`, {screen: inf.info[correctIndex]._id});
+                                navigation.push(`accessLaw`, {screen: info3[correctIndex]._id});
                                 ModalVisibleStatus.updateModalStatus(false);
                               }
                             }}>
@@ -1238,7 +1239,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                                   ? LawHaveWord
                                   : nameLaw
 
-                                // inf.info[nameLaw] ? inf.info[nameLaw] : nameLaw
+                                // info3[nameLaw] ? info3[nameLaw] : nameLaw
                               }
                             </Text>
                           </TouchableOpacity>
@@ -1469,20 +1470,6 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                 onSubmitEditing={() =>
                   pushToSearch()
                 }></TextInput>
-              <Text
-                style={{
-                  flex:1,
-                  paddingLeft:3,
-                  // width: '23%',
-                  color: 'black',
-                  fontSize: 8,
-                  textAlign: 'right',
-                  paddingRight: 1,
-                }}>
-                {searchResultCount
-                  ? `${currentSearchPoint}/\n${searchResultCount}`
-                  : searchResultCount}
-              </Text>
               <TouchableOpacity
                 style={{color: 'white', fontSize: 16, width: '12%'}}
                 onPress={() => {
@@ -1501,7 +1488,31 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                     }}></Ionicons>
                 )}
               </TouchableOpacity>
-            </View>
+              <View style={{flexDirection:'column',justifyContent:'center',alignContent:'center',padding:0,left:0}}>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 8,
+                  textAlign: 'center',
+                }}>
+                {searchResultCount
+                  ? `${currentSearchPoint}`
+                  : searchResultCount}
+              </Text>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 8,
+                  textAlign: 'center',
+                  borderTopColor:'gray',
+                  borderTopWidth:1
+                }}>
+                {searchResultCount
+                  ? `${searchResultCount}`
+                  : searchResultCount}
+              </Text>
+              </View>
+ </View>
             <View style={{flex:1,justifyContent:'center',flexDirection:'row'}}>
             <TouchableOpacity
               style={styles.searchBtb}
@@ -1905,14 +1916,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    // marginTop: 3,
-    // marginBottom: 6,
-    backgroundColor: '#FAEBD7',
-    // width:'100%',
+    backgroundColor: '#FAEBD7', //#FAEBD7
     overflow: 'hidden',
     margin: 0,
-    // paddingTop: 3,
-    // paddingBottom: 4,
   },
   tabSearch: {
     display: 'flex',
@@ -1948,7 +1954,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     justifyContent: 'center',
     marginLeft:20,
-    marginRight:20
+    marginRight:20,
+    borderWidth:2,
+    borderColor:'green',
+    
   },
   listArticle: {
     position: 'absolute',

@@ -72,15 +72,11 @@ export const searchLaw = createSlice({
 }
 })
 
-
-export const offline = createSlice({    // không càn nữa
-  name: 'offline',     
+export const stackscreen = createSlice({    // không càn nữa
+  name: 'stackscreen',     
   initialState: {
     loading3: false,
-    // info3:null,
-    // content3:null,
-    info3:dataOrg['LawInfo'],
-    content3:dataOrg['LawContent'],
+    info3:[],
   },
   reducers: {
     loader3: (state,action) => {
@@ -89,8 +85,7 @@ export const offline = createSlice({    // không càn nữa
     },
 
     handle3: (state,action) => {
-      state.info3=action.payload.infoObject;
-      state.content3=action.payload.contentObject;
+      state.info3=action.payload.b;
       state.loading3= false;
 
     },
@@ -200,24 +195,27 @@ export function* mySaga2(state,action){
 
 
 
+
+
+
 export function* mySaga3(state,action){
-  try{
-    yield put(loader3())
-    // console.log('state',state.lawName);
-    
-    const FileInfoStringContent = yield ( async ()=> await FileSystem.readFile(Dirs.CacheDir+'/Content.txt','utf8'))
-    let contentObject = {...JSON.parse(FileInfoStringContent),...dataOrg['LawContent']}
-    
-    const FileInfoStringInfo = yield ( async ()=> await FileSystem.readFile(Dirs.CacheDir+'/Info.txt','utf8'))
-    let infoObject = {...JSON.parse(FileInfoStringInfo),...dataOrg['LawInfo']}
-    
-    yield put(handle3({contentObject,infoObject}))
+  yield put(loader3())
 
-    
-  }catch(e){
 
+    let info = yield fetch(`https://us-central1-project2-197c0.cloudfunctions.net/stackscreen`,{
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      // body:JSON.stringify({screen:1})
+    })
+    
+    let b = yield info.json()
+
+
+    yield put(handle3({b}))
   }
-}
 
 
 export function* saga(){
@@ -238,7 +236,7 @@ export function* saga2(){
 }
 
 export function* saga3(){
-  yield takeEvery('offline',mySaga3)
+  yield takeEvery('stackscreen',mySaga3)
 
 }
 
@@ -246,4 +244,4 @@ export function* saga3(){
 export const {loader,handle,noLoading} = read.actions;
 export const {loader1,handle1} = searchContent.actions;
 export const {loader2,handle2} = searchLaw.actions;
-export const {loader3,handle3} = offline.actions;
+export const {loader3,handle3} = stackscreen.actions;

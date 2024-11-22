@@ -178,7 +178,7 @@ useEffect(() => {
             alignItems: 'center',
           }}>
           <Ionicons
-            name="book-outline"
+            name="logo-buffer"
             style={{
               color: 'green' ,
               fontSize: 25,

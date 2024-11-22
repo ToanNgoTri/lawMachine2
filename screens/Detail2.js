@@ -16,15 +16,22 @@ import {useNavigation,useScrollToTop} from '@react-navigation/native';
 import React, {useEffect, useState, useRef, useContext} from 'react';
 import {useNetInfo} from '@react-native-community/netinfo';
 import CheckBox from 'react-native-check-box';
-// import {RefOfSearchLaw} from '../App';
+// import {InfoDownloaded} from '../App';
 
 
 export function Detail2({}) {
+  const {loading2, info} = useSelector(state => state['searchLaw']);
+// console.log('info',info);
+
+  const {loading3, info3} = useSelector(state => state['stackscreen']);
+  // console.log('info3',info3);
   const [input, setInput] = useState(undefined);
 
   const [warning, setWanring] = useState(false);
+  // const inf = useContext(InfoDownloaded);
 
-  const [SearchResult, setSearchResult] = useState([]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
+  const [SearchResult, setSearchResult] = useState(info3?convertResult(info3.slice(0,10)):[]); // đây Object là các luật, điểm, khoản có kết quả tìm kiếm
+// console.log('info3',info3);
 
   const [inputFilter, setInputFilter] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -38,13 +45,10 @@ export function Detail2({}) {
 
   const navigation = useNavigation();
 
-  const {loading2, info} = useSelector(state => state['searchLaw']);
 
-  // console.log('info',info);
-  
-  // RefLawSearch.updatesearchLawRef(list)
 
-  const textInput = useRef(null);
+  const textInput = useRef(null)
+
 
   const ScrollViewToScroll = useRef(null);
   useScrollToTop(ScrollViewToScroll)
@@ -74,19 +78,33 @@ export function Detail2({}) {
   }
 
   useEffect(() => {
+    if(info3){
+      setSearchResult(convertResult(info3.slice(0,10)));
+      setLawFilted(convertResult(info3.slice(0,10)));
+      // console.log('convertResult(info3.slice(0,10))',(info3.slice(0,10)));
+      // console.log('SearchResult',SearchResult);
+      
+    }
+  }, [info3])
+  
+  function convertResult(info){
+    let lawObject = {};
+    info.map((law, i) => {
+      // lawObject[i] = {[law._id]:{'lawNameDisplay':law.info['lawNameDisplay'],'lawDescription':law.info['lawDescription'],'lawDaySign':law.info['lawDaySign']}}
+      lawObject[law._id] = {
+        lawNameDisplay: law.info['lawNameDisplay'],
+        lawDescription: law.info['lawDescription'],
+        lawDaySign: law.info['lawDaySign'],
+      };
+    });
+return lawObject
+  }
+  
+  useEffect(() => {
     if (info) {
-      let lawObject = {};
-      info.map((law, i) => {
-        // lawObject[i] = {[law._id]:{'lawNameDisplay':law.info['lawNameDisplay'],'lawDescription':law.info['lawDescription'],'lawDaySign':law.info['lawDaySign']}}
-        lawObject[law._id] = {
-          lawNameDisplay: law.info['lawNameDisplay'],
-          lawDescription: law.info['lawDescription'],
-          lawDaySign: law.info['lawDaySign'],
-        };
-      });
 
-      setSearchResult(lawObject);
-      setLawFilted(lawObject);
+      setSearchResult(convertResult(info));
+      setLawFilted(convertResult(info));
     }
   }, [info]);
 
@@ -211,7 +229,7 @@ export function Detail2({}) {
 
   return (
     <>
-      {(loading2 || !internetConnected) && (
+      {(loading2 || loading3|| !internetConnected) && (
         <View
           style={{
             position: 'absolute',
@@ -312,13 +330,8 @@ export function Detail2({}) {
                   style={{...styles.inputArea}}
                   onChangeText={text => {
                     setInput(text);
-                    // ;dispatch(type1(text))
                   }}
                   value={input}
-                  // onPress={()=>setTimeout(() => {
-                  //   textInput.current.focus()     // cần khác phục cái này, "autoBlur"
-                  // }, 200)}
-                  // autoFocus={true}
                   selectTextOnFocus={true}
                   placeholder="Nhập từ khóa..."
                   onSubmitEditing={() =>
@@ -366,6 +379,8 @@ export function Detail2({}) {
                   borderRadius: 100,
                   height: 40,
                   top: 5,
+                  borderWidth:2,
+                  borderColor:'#f67c1a'
                 }}
                 onPress={async () => {
                   Keyboard.dismiss();
@@ -453,9 +468,9 @@ export function Detail2({}) {
           </View>
         </View>
         <View style={{marginTop: 1}}>
-          {info == null ? (
+          { ( !info3.length && info == null )? (
             <></>
-          ) : info.length ? (
+          ) : Object.keys(SearchResult).length || info3.length || info.length? (
             Object.keys(LawFilted || SearchResult).map((detailId, i) => {
               return (
                 <TouchableOpacity
@@ -843,15 +858,15 @@ const styles = StyleSheet.create({
     margin: 0,
     overflow: 'hidden',
   },
-  chapter: {
-    minHeight: 50,
-    justifyContent: 'space-around',
-    backgroundColor: '#F9CC76',
-    color: 'black',
-    alignItems: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-  },
+  // chapter: {
+  //   minHeight: 50,
+  //   justifyContent: 'space-around',
+  //   backgroundColor: '#F9CC76',
+  //   color: 'black',
+  //   alignItems: 'center',
+  //   display: 'flex',
+  //   flexDirection: 'column',
+  // },
   item: {
     minHeight: 80,
     // height: 120,
@@ -876,59 +891,59 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 14,
   },
-  chapterArrow: {
-    backgroundColor: 'black',
-    borderRadius: 25,
-    // alignItems:'flex-end',
-    display: 'flex',
-    right: 10,
-    position: 'absolute',
-    width: 30,
-    height: 30,
-    textAlign: 'center',
-    justifyContent: 'center',
-  },
-  articleContainer: {
-    fontWeight: 'bold',
-    paddingBottom: 6,
-    paddingTop: 6,
-    color: 'white',
-    backgroundColor: '#66CCFF',
-    justifyContent: 'center',
-    // alignItems:'center',
-    display: 'flex',
-    textAlign: 'center',
-    borderBottomColor: 'white',
-    borderBottomWidth: 1,
-  },
-  article: {
-    color: 'white',
-    overflow: 'hidden',
-    paddingRight: 10,
-    paddingLeft: 10,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  blackBackground: {
-    backgroundColor: 'white',
-    color: 'black',
-    flexWrap: 'wrap',
-    // width:200,
-    overflow: 'hidden',
-    flex: 1,
-    display: 'flex',
-    paddingRight: 10,
-    paddingLeft: 10,
-    textAlign: 'justify',
-    paddingTop: 5,
-    paddingBottom: 10,
-  },
-  highlight: {
-    color: 'red',
-    backgroundColor: 'yellow',
-    textAlign: 'center',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  // chapterArrow: {
+  //   backgroundColor: 'black',
+  //   borderRadius: 25,
+  //   // alignItems:'flex-end',
+  //   display: 'flex',
+  //   right: 10,
+  //   position: 'absolute',
+  //   width: 30,
+  //   height: 30,
+  //   textAlign: 'center',
+  //   justifyContent: 'center',
+  // },
+  // articleContainer: {
+  //   fontWeight: 'bold',
+  //   paddingBottom: 6,
+  //   paddingTop: 6,
+  //   color: 'white',
+  //   backgroundColor: '#66CCFF',
+  //   justifyContent: 'center',
+  //   // alignItems:'center',
+  //   display: 'flex',
+  //   textAlign: 'center',
+  //   borderBottomColor: 'white',
+  //   borderBottomWidth: 1,
+  // },
+  // article: {
+  //   color: 'white',
+  //   overflow: 'hidden',
+  //   paddingRight: 10,
+  //   paddingLeft: 10,
+  //   textAlign: 'center',
+  //   fontWeight: 'bold',
+  // },
+  // blackBackground: {
+  //   backgroundColor: 'white',
+  //   color: 'black',
+  //   flexWrap: 'wrap',
+  //   // width:200,
+  //   overflow: 'hidden',
+  //   flex: 1,
+  //   display: 'flex',
+  //   paddingRight: 10,
+  //   paddingLeft: 10,
+  //   textAlign: 'justify',
+  //   paddingTop: 5,
+  //   paddingBottom: 10,
+  // },
+  // highlight: {
+  //   color: 'red',
+  //   backgroundColor: 'yellow',
+  //   textAlign: 'center',
+  //   display: 'flex',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  // },
 });
