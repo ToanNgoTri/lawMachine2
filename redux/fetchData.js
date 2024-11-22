@@ -11,7 +11,7 @@ export const read = createSlice({
   initialState: {
     content:[],
     info:{},
-    loading: true
+    loading: false
   },
   reducers: {
     

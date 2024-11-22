@@ -185,10 +185,10 @@ const AppNavigators = () => {
     tabBarPosition='bottom'
       screenOptions={({route}) => ({
         tabBarPressColor:'#FFCC66',
-        // animationEnabled: false,
+        animationEnabled: false,
         animation: 'shift',
         lazy: true,
-        tabBarIndicatorStyle:{backgroundColor:'red',top:0,margin:0,padding:0},
+        tabBarIndicatorStyle:{backgroundColor:'#336600',top:0,margin:0,padding:0},
         tabBarStyle: {
           postion: 'absolute',
           height:50,
@@ -213,9 +213,9 @@ const AppNavigators = () => {
                 <Text
                   style={{
                     ...(focused ? styles.IconActive : styles.IconInActive),
-                    fontSize: 10,
+                    fontSize: 13,fontWeight:'bold'
                   }}>
-                  Downloaded
+                  Đã tải xuống
                 </Text>
               </View>
             );
@@ -247,9 +247,9 @@ const AppNavigators = () => {
                 <Text
                   style={{
                     ...(focused ? styles.IconActive : styles.IconInActive),
-                    fontSize: 10,
+                    fontSize: 13,fontWeight:'bold'
                   }}>
-                  Search Law
+                  Tìm văn bản
                 </Text>
               </View>
             );
@@ -282,9 +282,9 @@ const AppNavigators = () => {
                 <Text
                   style={{
                     ...(focused ? styles.IconActive : styles.IconInActive),
-                    fontSize: 10,
+                    fontSize: 13,fontWeight:'bold'
                   }}>
-                  Search Content
+                  Tìm nội dung
                 </Text>
               </View>
             );
@@ -413,12 +413,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   IconActive: {
-    fontSize: 23,
-    color: 'red',
+    fontSize: 24,
+    color: '#336600',
     // transform:animatedValue
   },
   IconInActive: {
-    fontSize: 23,
+    fontSize: 24,
     color: 'black',
   },
   IconInfo: {

@@ -210,11 +210,14 @@ export default function Detail() {
 
   const {width, height} = Dimensions.get('window');
   let heightDevice = height;
-  let widthDevice = width;
+  // let widthDevice = width;
+
+  const [widthDevice, setWidthDevice] = useState(width)
   Dimensions.addEventListener('change', ({window: {width, height}}) => {
     // console.log(`Width: ${width}, Height: ${height}`);
-    widthDevice = width;
+    // widthDevice = width;
     heightDevice = height;
+    setWidthDevice(width)
   });
 
   function pushToSearch() {
@@ -437,7 +440,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
               if (go) {
                 setTimeout(() => {
                   list.current.scrollTo({
-                    y: positionYArr[0] - 250, //- 57
+                    y: positionYArr[0] - heightDevice/2 , //- 57
                   });
                 }, 500);
               }
@@ -612,7 +615,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
   useEffect(() => {
     if (currentSearchPoint != 0 && searchResultCount) {
       list.current.scrollTo({
-        y: positionYArr[currentSearchPoint - 1] - 250, //- 57
+        y: positionYArr[currentSearchPoint - 1] - heightDevice/2 , //- 57
       });
     }
   }, [currentSearchPoint]);
@@ -629,7 +632,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
 
   let transY = animatedForNavi.interpolate({
     inputRange: [-100, 0, 80, 90, 100],
-    outputRange: [5, 5, -53, 0, 0],
+    outputRange: [0, 0, -45, 0, 0],
   });
 
   let transX = animatedForNavi.interpolate({
@@ -644,7 +647,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
 
   let MagginBottom = animatedForNavi.interpolate({
     inputRange: [-100, 0, 80, 90, 100],
-    outputRange: [45, 45, 100, 0, 0],
+    outputRange: [20, 20, 40, 0, 0],
   });
 
   useEffect(() => {
@@ -896,7 +899,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
             <View
               style={{
                 // marginTop:20,
-                backgroundColor: '#CCCCCC',
+                backgroundColor: 'white',// #CCCCCC
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -924,7 +927,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                   // borderWidth:4,
                   borderColor: 'black',
                   // borderRadius:10,
-                  // backgroundColor:'#528B8B',
+                  // backgroundColor:'white',
                 }}>
                 <Ionicons
                   name="close-outline"
@@ -939,7 +942,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
               <View
                 style={{
                   flexDirection: 'row',
-                  backgroundColor: '#CCCCCC',
+                  backgroundColor: 'white',
                   alignItems: 'center',
                   flex: 1,
                   justifyContent: 'flex-end',
@@ -1251,10 +1254,11 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                 style={{
                   padding: 5,
                   marginTop: 30,
-                  backgroundColor: '#778899',
+                  backgroundColor: 'white', //#778899
                   // backgroundColor: '#00CC33',
                   alignItems: 'center',
-                  width: 110,
+                  width: 100,
+                  height:35 ,
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1265,30 +1269,31 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                   shadowColor: 'black',
                   shadowOpacity: 1,
                   shadowOffset: {
-                    width: 10,
-                    height: 10,
+                    width: 5,
+                    height: 5,
                   },
                   shadowRadius: 4,
-                  elevation: 10,
+                  elevation: 2,
                 }}>
                 <Text
                   style={{
                     // backgroundColor: 'red',
-                    paddingLeft: 10,
-                    paddingRight: 5,
+                    // paddingLeft: 10,
+                    // paddingRight: 5,
                     fontSize: 15,
-                    color: 'white',
+                    color: 'black',
+                    fontWeight:'bold'
                   }}>
                   Đóng
                 </Text>
-                <Ionicons
+                {/* <Ionicons
                   name="log-out-outline"
                   style={{
-                    color: 'white',
+                    color: 'black',
                     fontSize: 25,
                     textAlign: 'center',
                     fontWeight: 'bold',
-                  }}></Ionicons>
+                  }}></Ionicons> */}
               </TouchableOpacity>
             </View>
           </View>
@@ -1350,7 +1355,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
             )})}
         </ScrollView>
       </Animated.View>
-      {Boolean(searchResultCount) && find && searchResultCount > 1 && (
+      {/* {Boolean(searchResultCount) && find && searchResultCount > 1 && (
         <Animated.View
           style={{
             right: 25,
@@ -1396,37 +1401,86 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
               }}></Ionicons>
           </TouchableOpacity>
         </Animated.View>
-      )}
+      )} */}
 
-      {
         <Animated.View
-          style={{...styles.findArea, transform: [{translateY: transY}]}}>
+          style={{...styles.findArea,width:widthDevice, transform: [{translateY: transY}]}}>
           <Shadow
             distance={17}
             startColor={'#A0A0A0'}
             sides={'top'}
             style={{...styles.searchView, width: widthDevice}}>
             {/* <View style={styles.searchView}> */}
+            
+<View style={{flexDirection:'row',width:'20%',justifyContent:'space-around',height:'100%',alignItems:'center',alignContent:'center'}}>
+
+            <TouchableOpacity
+            style={styles.tabSearch}
+            onPress={() => {
+              currentSearchPoint == 1
+                ? setCurrentSearchPoint(positionYArr.length)
+                : setCurrentSearchPoint(currentSearchPoint - 1);
+            }}>
+            <Ionicons
+              name="caret-up-outline"
+              style={{
+                paddingLeft:15,
+                paddingRight:15,
+                fontSize:18
+
+                // color: 'rgb(240,240,208)',
+                // textAlign: 'center',
+                // fontWeight: 'bold',
+                // fontSize: 25,
+              }}></Ionicons>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.tabSearch}
+            onPress={() => {
+              currentSearchPoint == positionYArr.length
+                ? setCurrentSearchPoint(1)
+                : setCurrentSearchPoint(currentSearchPoint + 1);
+            }}>
+            <Ionicons
+              name="caret-down-outline"
+              style={{
+                paddingLeft:15,
+                paddingRight:15,
+                fontSize:18
+                // color: 'rgb(240,240,208)',
+                // textAlign: 'center',
+                // fontWeight: 'bold',
+                // fontSize: 25,
+              }}></Ionicons>
+          </TouchableOpacity>
+          </View>
+
+
             <View style={styles.inputArea}>
               <TextInput
                 ref={textInputFind}
                 selectTextOnFocus={true}
-                style={{width: '65%', color: 'white'}}
+                style={{width: '75%', color: 'black',height:35,fontSize:13,padding:0}}
                 onChangeText={text => setInput(text)}
                 autoFocus={false}
                 value={input}
                 placeholder=" Vui lòng nhập từ khóa ..."
-                placeholderTextColor={'gray'}></TextInput>
+                placeholderTextColor={'gray'}
+                onSubmitEditing={() =>
+                  pushToSearch()
+                }></TextInput>
               <Text
                 style={{
-                  width: '23%',
-                  color: 'white',
-                  fontSize: 9,
+                  flex:1,
+                  paddingLeft:3,
+                  // width: '23%',
+                  color: 'black',
+                  fontSize: 8,
                   textAlign: 'right',
-                  paddingRight: 3,
+                  paddingRight: 1,
                 }}>
                 {searchResultCount
-                  ? `${currentSearchPoint}/${searchResultCount}`
+                  ? `${currentSearchPoint}/\n${searchResultCount}`
                   : searchResultCount}
               </Text>
               <TouchableOpacity
@@ -1439,7 +1493,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                   <Ionicons
                     name="close-circle-outline"
                     style={{
-                      color: 'white',
+                      color: 'black',
                       fontSize: 20,
                       textAlign: 'center',
                       width: '100%',
@@ -1448,6 +1502,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                 )}
               </TouchableOpacity>
             </View>
+            <View style={{flex:1,justifyContent:'center',flexDirection:'row'}}>
             <TouchableOpacity
               style={styles.searchBtb}
               onPress={() => {
@@ -1461,10 +1516,9 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                   fontSize: 18,
                 }}></Ionicons>
             </TouchableOpacity>
-            {/* </View> */}
+            </View>
           </Shadow>
         </Animated.View>
-      }
       <View style={styles.functionTab}>
         {!onlyArticle && (
           <TouchableOpacity
@@ -1784,7 +1838,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     bottom: 0,
     backgroundColor: 'white',
-    height: 45,
+    height: 35,
     paddingTop: 2,
     zIndex: 10,
     borderTopWidth: 2,
@@ -1857,40 +1911,44 @@ const styles = StyleSheet.create({
     // width:'100%',
     overflow: 'hidden',
     margin: 0,
-    paddingTop: 3,
-    paddingBottom: 4,
+    // paddingTop: 3,
+    // paddingBottom: 4,
   },
   tabSearch: {
     display: 'flex',
-    width: 55,
-    height: 55,
-    // marginTop:20,
-    borderRadius: 30,
-    backgroundColor: '#777777',
+    // width: 55,
+    height: '100%',
+    // borderRadius: 30,
+    // backgroundColor: '#777777',
     justifyContent: 'center',
+    alignItems:'center',
+
   },
   inputArea: {
-    width: '75%',
-    backgroundColor: 'black',
+    width: '55%',
+    backgroundColor: 'white',
     color: 'white',
+    padding:0,
     alignItems: 'center',
-    borderRadius: 13,
-    paddingLeft: 15,
-    paddingRight: 5,
+    paddingLeft: 5,
+    // paddingRight: 5,
     fontSize: 15,
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
   searchBtb: {
+    // flex:1,
     backgroundColor: '#111111',
     color: 'white',
     borderRadius: 30,
-    width: '18%',
-    height: 35,
+    width: 30,
+    height: 30,
     display: 'flex',
     alignItems: 'center',
     textAlign: 'center',
     justifyContent: 'center',
+    marginLeft:20,
+    marginRight:20
   },
   listArticle: {
     position: 'absolute',
