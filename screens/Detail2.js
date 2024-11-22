@@ -334,9 +334,18 @@ return lawObject
                   value={input}
                   selectTextOnFocus={true}
                   placeholder="Nhập từ khóa..."
-                  onSubmitEditing={() =>
-                    dispatch({type: 'searchLaw', input: input})
-                  }></TextInput>
+                  onSubmitEditing={() =>{
+                    Keyboard.dismiss();
+
+                    if(input.match(/^(\s)*$/)){
+                      setWanring(true)
+                    }else{
+                      dispatch({type: 'searchLaw', input: input});
+  
+                    }
+                    setChoosenKindLaw([0, 1, 2]);
+                  }
+                    }></TextInput>
                 <TouchableOpacity
                   onPress={() => {
                     setInput('');

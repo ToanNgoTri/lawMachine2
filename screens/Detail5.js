@@ -19,7 +19,6 @@ import {useRoute,useNavigation} from '@react-navigation/native';
 import dataOrg from '../data/data.json';
 // import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {Shadow} from 'react-native-shadow-2';
 import {ModalStatus} from '../App';
 import {useSelector, useDispatch} from 'react-redux';
 import {InfoDownloaded} from '../App';
@@ -186,24 +185,16 @@ export default function Detail() {
   const textInputArticle = useRef(null);
   const PositionYArrArticalForDev = useRef(null);
   PositionYArrArticalForDev.current = [];
-  const [input, setInput] = useState(route.params ? route.params.input : '');
+  // const [input, setInput] = useState('');
   const [valueInput, setValueInput] = useState('');
-  const [find, setFind] = useState(route.params ? route.params.input? true : false: true);
-  // const [find, setFind] = useState(false);
+  const [find, setFind] = useState();
+  
+  const [input, setInput] = useState(route.params ? route.params.input : '');
+  // const [find, setFind] = useState(route.params ? route.params.input? true : false: true);
+  // const [go, setGo] = useState(route.params ? true : false);
 
-  // useEffect(() => {
-  //   if(route.params.input){
-  //     console.log(2);
-      
-  //     setTimeout(() => {
-  //       setFind(true)
-  //     }, 2000);
-  //   }
-  
-  // }, [loading])
-  // console.log('find',find);
-  
-  const [go, setGo] = useState(route.params ? true : false);
+
+  const [go, setGo] = useState(false);
 
   const [Content, setContent] = useState([]);
   const [Info, setInfo] = useState({});
@@ -354,8 +345,24 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
       useNativeDriver: false,
     }).start();
 
+    if(route.params){
+      if(route.params.input){
+        setTimeout(()=>{pushToSearch()     
+          Animated.timing(animatedForNavi, {
+            toValue:   !find ? 80 : 0,
+            duration: 600,
+            useNativeDriver: false,
+          }).start();
+          setFind(true)
+    
+
+
+         },500 )
+
+}
+    }
+  
     return()=>{
-      // dispatch(loader())
       eachSectionWithChapter=[]
     }
   }, []);
@@ -1406,10 +1413,10 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
 
         <Animated.View
           style={{...styles.findArea,width:widthDevice, transform: [{translateY: transY}]}}>
-          <Shadow
-            distance={17}
-            startColor={'#A0A0A0'}
-            sides={'top'}
+          <View
+            // distance={10}
+            // startColor={'gray'}
+            // sides={'top'}
             style={{...styles.searchView, width: widthDevice}}>
             {/* <View style={styles.searchView}> */}
             
@@ -1427,9 +1434,8 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
               style={{
                 paddingLeft:15,
                 paddingRight:15,
-                fontSize:18
-
-                // color: 'rgb(240,240,208)',
+                fontSize:18,
+                color: '#888888',
                 // textAlign: 'center',
                 // fontWeight: 'bold',
                 // fontSize: 25,
@@ -1447,8 +1453,8 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
               style={{
                 paddingLeft:15,
                 paddingRight:15,
-                fontSize:18
-                // color: 'rgb(240,240,208)',
+                fontSize:18,
+                color: '#888888',
                 // textAlign: 'center',
                 // fontWeight: 'bold',
                 // fontSize: 25,
@@ -1528,7 +1534,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                 }}></Ionicons>
             </TouchableOpacity>
             </View>
-          </Shadow>
+          </View>
         </Animated.View>
       <View style={styles.functionTab}>
         {!onlyArticle && (
@@ -1909,8 +1915,8 @@ const styles = StyleSheet.create({
     // borderTopRightRadius:10,
     backgroundColor: '#A0A0A0',
     // overflow:'hidden'
-    borderTopWidth: 2,
-    borderTopColor: 'yellow',
+    borderTopWidth: .4,
+    borderTopColor: 'gray',
   },
   searchView: {
     flexDirection: 'row',

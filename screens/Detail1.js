@@ -15,10 +15,8 @@ import {useSelector, useDispatch} from 'react-redux';
 import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState, useRef, useContext} from 'react';
 import { useNavigation,useScrollToTop} from '@react-navigation/native';
-import {InfoDownloaded} from '../App';
+// import {InfoDownloaded} from '../App';
 
-// import {RefForSearch} from '../App';
-// import {loader1, handle1} from '../redux/fetchData';
 
 export function Detail1({}) {
 
@@ -26,7 +24,7 @@ export function Detail1({}) {
   
   const [input, setInput] = useState(undefined);
   // const [valueInput, setValueInput] = useState('');
-  const [valueInputForNav, setValueInputForNav] = useState('');
+  // const [valueInputForNav, setValueInputForNav] = useState('');
 
   const [inputFilter, setInputFilter] = useState('');
   const [showFilter, setShowFilter] = useState(false);
@@ -43,7 +41,7 @@ export function Detail1({}) {
   const [choosenLaw, setChoosenLaw] = useState([]);
   const [LawFilted, setLawFilted] = useState(false)
 
-  const inf = useContext(InfoDownloaded);
+  // const inf = useContext(InfoDownloaded);
 
   const [warning, setWanring] = useState(false);
   
@@ -307,7 +305,15 @@ export function Detail1({}) {
                   value={input}
                   selectTextOnFocus={true}
                   placeholder="Nhập từ khóa..."
-                  onSubmitEditing={()=>dispatch({type:'searchContent',input:input})
+                  onSubmitEditing={()=>{
+                                    Keyboard.dismiss();
+                    if(input.match(/^(\s)*$/)){
+                      setWanring(true)
+                    }else{
+                      dispatch({type:'searchContent',input:input})
+  
+                    }
+}
                 }></TextInput>
                 <TouchableOpacity
                   onPress={() => {setInput('');textInput.current.focus()}}
@@ -356,57 +362,55 @@ export function Detail1({}) {
                   borderColor:'#f67c1a'
     }}
                 onPress={() => {
-                  Keyboard.dismiss();
-                  let inputSearchLawReg = input;
-                  if (input) {
+                  // let inputSearchLawReg = input;
+                  // if (input) {
 
-                    inputSearchLawReg = input.replace(/\(/gim, '\\(');
-
-
-                    inputSearchLawReg = inputSearchLawReg.replace(
-                        /\)/gim,
-                        '\\)',
-                      );
+                  //   inputSearchLawReg = input.replace(/\(/gim, '\\(');
 
 
-                      inputSearchLawReg = inputSearchLawReg.replace(
-                        /\./gim,
-                        '\\.',
-                      );
+                  //   inputSearchLawReg = inputSearchLawReg.replace(
+                  //       /\)/gim,
+                  //       '\\)',
+                  //     );
 
 
-                      inputSearchLawReg = inputSearchLawReg.replace(
-                        /\+/gim,
-                        '\\+',
-                      );
+                  //     inputSearchLawReg = inputSearchLawReg.replace(
+                  //       /\./gim,
+                  //       '\\.',
+                  //     );
 
 
-                      inputSearchLawReg = inputSearchLawReg.replace(
-                        /\?/gim,
-                        '\\?',
-                      );
+                  //     inputSearchLawReg = inputSearchLawReg.replace(
+                  //       /\+/gim,
+                  //       '\\+',
+                  //     );
 
-                      // if (input.match(/\//gim)) {
-                    //   inputSearchLawReg = inputSearchLawReg.replace(/\//gim, '.');
-                    // }
 
-                    inputSearchLawReg = inputSearchLawReg.replace(
-                        /\\/gim,
-                        '.',
-                      );
+                  //     inputSearchLawReg = inputSearchLawReg.replace(
+                  //       /\?/gim,
+                  //       '\\?',
+                  //     );
 
+                  //     // if (input.match(/\//gim)) {
+                  //   //   inputSearchLawReg = inputSearchLawReg.replace(/\//gim, '.');
+                  //   // }
+
+                  //   inputSearchLawReg = inputSearchLawReg.replace(
+                  //       /\\/gim,
+                  //       '.',
+                  //     );
+
+                  //   }
+                  //   setValueInputForNav(input);
+                    
+                    Keyboard.dismiss();
+                    if(input.match(/^(\s)*$/)){
+                      setWanring(true)
+                    }else{
+                      dispatch({type:'searchContent',input:input})
+  
                     }
-                  Keyboard.dismiss();
-                  // setValueInput(inputSearchLawReg);
-                  setValueInputForNav(input);
-
-                  // Search(inputSearchLawReg);
-
-                  
-                  // run(inputSearchLawReg);
-                  // dispatch(handle1())
-                  
-                  dispatch({type:'searchContent',input:inputSearchLawReg})
+  
                 }}>
                 <Ionicons
                   name="search-outline"
@@ -450,7 +454,7 @@ export function Detail1({}) {
                       marginBottom:1
                                   }}
                     onPress={() => {
-                      navigation.push(`accessLaw`, {screen: key,input: valueInputForNav})
+                      navigation.push(`accessLaw`, {screen: key,input: input})
                       setName(i);
                     }}>
                       <View
