@@ -22,7 +22,7 @@ export default function Home({}) {
   const navigation = useNavigation();
 
 
-  const [Content, setContent] = useState('');
+  // const [Content, setContent] = useState('');
 
   const [Info, setInfo] = useState(false)
   
@@ -32,6 +32,8 @@ export default function Home({}) {
 
 
   const ScrollViewToScroll = useRef(null);
+  const textInput = useRef(null);
+
   useScrollToTop(ScrollViewToScroll);
 
 
@@ -59,11 +61,13 @@ export default function Home({}) {
     );
   };
 
+  console.log(Info);
+  
 
   useEffect(() => {
     setSearchLawResult(
-      Content &&
-        Object.keys(Content).filter(item => {
+      Info &&
+        Object.keys(Info).filter(item => {
           if (
             inputSearchLaw.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\s?)/gim)
           ) {
@@ -168,7 +172,8 @@ useEffect(() => {
           display: 'flex',
           alignItems: 'center',
           // backgroundColor:'#EEEFE4',
-          justifyContent:'space-between'
+          justifyContent:'space-between',
+          justifyContent:'flex-start'
 
         }}>
         <View
@@ -185,6 +190,7 @@ useEffect(() => {
             }}></Ionicons>
         </View>
         <TextInput
+        ref={textInput}
           onChangeText={text => setInputSearchLaw(text)}
           value={inputSearchLaw}
           style={inputSearchLaw ? styles.inputSearchArea : styles.placeholder}
@@ -192,16 +198,17 @@ useEffect(() => {
           placeholderTextColor={'gray'}
           
           keyboardAppearance=""></TextInput>
-        <TouchableOpacity
+      {inputSearchLaw && (  <TouchableOpacity
           onPress={() => {
             setInputSearchLaw('');
             Keyboard.dismiss();
+           textInput.current.focus()
           }}
           style={{width: '10%', 
           display: 'flex',
           // backgroundColor:'red',
           }}>
-          {inputSearchLaw && (
+          
             <Ionicons
               name="close-circle-outline"
               style={{color: 'black', 
@@ -212,8 +219,8 @@ useEffect(() => {
               paddingRight:10
 
             }}></Ionicons>
-          )}
         </TouchableOpacity>
+          )}
       </View>
 
 
@@ -415,13 +422,14 @@ const styles = StyleSheet.create({
 
   },
   inputSearchArea: {
+    fontSize: 18,
     paddingLeft: 10,
     paddingRight: 10,
-    fontSize: 18,
     color: 'black',
     width: '85%',
     alignItems: 'center',
     height: 50,
+
   },
   placeholder: {
     fontSize: 15,
@@ -431,5 +439,6 @@ const styles = StyleSheet.create({
     width: '85%',
     alignItems: 'center',
     height: 50,
+
   },
 });

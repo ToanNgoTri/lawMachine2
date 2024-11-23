@@ -11,18 +11,17 @@ import {
   Dimensions,
   Modal,
   ActivityIndicator,
-  
 } from 'react-native';
 import {Dirs, FileSystem} from 'react-native-file-access';
 import React, {useState, useEffect, useRef, useContext} from 'react';
-import {useRoute,useNavigation} from '@react-navigation/native';
+import {useRoute, useNavigation} from '@react-navigation/native';
 import dataOrg from '../data/data.json';
 // import {useNavigation} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {ModalStatus} from '../App';
 import {useSelector, useDispatch} from 'react-redux';
 import {InfoDownloaded} from '../App';
-import { loader,noLoading } from "../redux/fetchData";
+import {loader, noLoading} from '../redux/fetchData';
 
 let TopUnitCount; // là đơn vị lớn nhất vd là 'phần thứ' hoặc chương
 let articleCount = 0;
@@ -32,7 +31,6 @@ let sumChapterPrevious; // sum cộng dồn các phần trư của các chương
 
 let eachSectionWithChapter = [];
 //lineHeight trong lines phải luôn nhỏ hơn trong highlight và View Hightlight
-
 
 export default function Detail() {
   // const inf = useContext(InfoDownloaded);
@@ -129,7 +127,6 @@ export default function Detail() {
     );
     let infoObject = JSON.parse(FileInfoStringInfo1);
     console.log('infoObject', infoObject);
-
   }
 
   async function DeleteInternal() {
@@ -188,11 +185,10 @@ export default function Detail() {
   // const [input, setInput] = useState('');
   const [valueInput, setValueInput] = useState('');
   const [find, setFind] = useState();
-  
+
   const [input, setInput] = useState(route.params ? route.params.input : '');
   // const [find, setFind] = useState(route.params ? route.params.input? true : false: true);
   // const [go, setGo] = useState(route.params ? true : false);
-
 
   const [go, setGo] = useState(false);
 
@@ -203,12 +199,12 @@ export default function Detail() {
   let heightDevice = height;
   // let widthDevice = width;
 
-  const [widthDevice, setWidthDevice] = useState(width)
+  const [widthDevice, setWidthDevice] = useState(width);
   Dimensions.addEventListener('change', ({window: {width, height}}) => {
     // console.log(`Width: ${width}, Height: ${height}`);
     // widthDevice = width;
     heightDevice = height;
-    setWidthDevice(width)
+    setWidthDevice(width);
   });
 
   function pushToSearch() {
@@ -246,59 +242,54 @@ export default function Detail() {
   }
   const ModalVisibleStatus = useContext(ModalStatus);
 
-
   const {loading, content, info} = useSelector(state => state['read']);
   const {loading3, info3} = useSelector(state => state['stackscreen']);
 
-// async function callOneLaw() {
-//   let info = await fetch(`http://192.168.0.102:5000/getonelaw`,{
-//     method: 'POST',
-//     headers: {
-//       Accept: 'application/json',
-//       'Content-Type': 'application/json',
-//     },
-//     body:JSON.stringify({screen:route.params.screen})
-//   })
-  
-//   let respond = await info.json()
-//   return respond
-// }
-// console.log('Infomation',Info);
+  // async function callOneLaw() {
+  //   let info = await fetch(`http://192.168.0.102:5000/getonelaw`,{
+  //     method: 'POST',
+  //     headers: {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body:JSON.stringify({screen:route.params.screen})
+  //   })
 
+  //   let respond = await info.json()
+  //   return respond
+  // }
+  // console.log('Infomation',Info);
 
-async function callOneLaw() { // dùng để khi qua screen related Law khác khi quay về vẫn còn
-  let info = await fetch(`https://us-central1-project2-197c0.cloudfunctions.net/callOneLaw?screen=${route.params.screen}`,{
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    // body:JSON.stringify({screen:state.lawName})
-  })
+  async function callOneLaw() {
+    // dùng để khi qua screen related Law khác khi quay về vẫn còn
+    let info = await fetch(
+      `https://us-central1-project2-197c0.cloudfunctions.net/callOneLaw?screen=${route.params.screen}`,
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        // body:JSON.stringify({screen:state.lawName})
+      },
+    );
 
-  let respond = await info.json()
-  return respond
-}
-
-
-  useEffect(() => {
-    
-
-    callOneLaw().then(res=>{setContent(res.content)
-      setInfo(res.info)})
-      
-    
-
-  }, [info])
-  
+    let respond = await info.json();
+    return respond;
+  }
 
   useEffect(() => {
-    if(!exists){
+    callOneLaw().then(res => {
+      setContent(res.content);
+      setInfo(res.info);
+    });
+  }, [info]);
+
+  useEffect(() => {
+    if (!exists) {
       // dispatch(noLoading())
     }
-  }, [exists])
-  
-  
+  }, [exists]);
 
   async function getContentExist() {
     if (await FileSystem.exists(Dirs.CacheDir + '/Content.txt', 'utf8')) {
@@ -312,9 +303,9 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
       );
       if (FileInfoStringContent) {
         return {
-          _id:route.params.screen,
-          "content": JSON.parse(FileInfoStringContent),
-          "info": JSON.parse(FileInfoStringInfo),
+          _id: route.params.screen,
+          content: JSON.parse(FileInfoStringContent),
+          info: JSON.parse(FileInfoStringInfo),
         };
         // f = JSON.parse(FileInfoStringInfo)
       }
@@ -322,14 +313,17 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
   }
 
   useEffect(() => {
-    
     getContentExist().then(cont => {
       if (
         cont &&
-        Object.keys({...dataOrg['info'], ...cont.info}).includes(route.params.screen)
+        Object.keys({...dataOrg['info'], ...cont.info}).includes(
+          route.params.screen,
+        )
       ) {
         setInfo({...dataOrg['info'], ...cont.info}[route.params.screen]);
-        setContent({...dataOrg['content'], ...cont.content}[route.params.screen]);
+        setContent(
+          {...dataOrg['content'], ...cont.content}[route.params.screen],
+        );
       } else if (Object.keys(dataOrg['info']).includes(route.params.screen)) {
         setInfo(dataOrg['info'][route.params.screen]);
         setContent(dataOrg['content'][route.params.screen]);
@@ -345,31 +339,26 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
       useNativeDriver: false,
     }).start();
 
-    if(route.params){
-      if(route.params.input){
-        setTimeout(()=>{pushToSearch()     
+    if (route.params) {
+      if (route.params.input) {
+        setTimeout(() => {
+          pushToSearch();
           Animated.timing(animatedForNavi, {
-            toValue:   !find ? 80 : 0,
+            toValue: !find ? 80 : 0,
             duration: 600,
             useNativeDriver: false,
           }).start();
-          setFind(true)
-    
-
-
-         },500 )
-
-}
+          setFind(true);
+        }, 500);
+      }
     }
-  
-    return()=>{
-      eachSectionWithChapter=[]
-    }
+
+    return () => {
+      eachSectionWithChapter = [];
+    };
   }, []);
 
-  
   function collapse(a) {
-    
     // để collapse chương nếu không có mục 'phần thứ...' hoặc mục' phần thứ...' nếu có
     if (a == undefined) {
     } else if (tittleArray.includes(a)) {
@@ -420,105 +409,105 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
   // let c = 0;
   function highlight(para, word, i2) {
     // console.log('para',para);
-    
-    if(para[0][[0]]){     // đôi khi Điều ... không có khoản (nội dung chính trong điều) thì điều này giúp không load ['']
-    if (word.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
-      let inputRexgex = para[0].match(new RegExp(String(word), 'igmu'));
-      // let inputRexgex = para[0].match(new RegExp('hội', 'igmu'));
-      if (inputRexgex) {
-        searchResultCount += inputRexgex.length;
-        let searchedPara = para[0]
-          .split(new RegExp(String(word), 'igmu'))
-          // .split(new RegExp('hội', 'igmu'))
-          .reduce((prev, current, i) => {
-            if (!i) {
-              return [current];
-            }
 
-            function setPositionYSearch({y}) {
-              positionYArr.push(y + currentY);
-              positionYArr.sort((a, b) => {
-                if (a > b) {
-                  return 1;
-                } else {
-                  if (a < b) return -1;
-                }
-              });
-
-              if (go) {
-                setTimeout(() => {
-                  list.current.scrollTo({
-                    y: positionYArr[0] - heightDevice/2 , //- 57
-                  });
-                }, 500);
+    if (para[0][[0]]) {
+      // đôi khi Điều ... không có khoản (nội dung chính trong điều) thì điều này giúp không load ['']
+      if (word.match(/(\w+|\(|\)|\.|\+|\-|\,|\&|\?|\;|\!|\/)/gim)) {
+        let inputRexgex = para[0].match(new RegExp(String(word), 'igmu'));
+        // let inputRexgex = para[0].match(new RegExp('hội', 'igmu'));
+        if (inputRexgex) {
+          searchResultCount += inputRexgex.length;
+          let searchedPara = para[0]
+            .split(new RegExp(String(word), 'igmu'))
+            // .split(new RegExp('hội', 'igmu'))
+            .reduce((prev, current, i) => {
+              if (!i) {
+                return [current];
               }
-            }
 
-            return prev.concat(
-              <>
-                <View
-                  style={{
-                    backgroundColor: 'blue',
-                    flex: 1,
-                    alignSelf: 'center',
-                    padding: 0,
-                    margin: 0,
-                    overflow: 'visible',
-                    right: -50,
-                    height: go ? 9 : 1,
-                  }}
-                  onLayout={event => {
-                    event.target.measure(
-                      (x, y, width, height, pageX, pageY) => {
-                        setPositionYSearch({
-                          y: y + pageY,
-                        });
-                      },
-                    );
-                  }}></View>
-
-                <Text
-                  style={
-                    searchResultCount - inputRexgex.length + i - 1 <
-                      currentSearchPoint &&
-                    searchResultCount - inputRexgex.length + i >=
-                      currentSearchPoint
-                      ? styles.highlight1
-                      : styles.highlight
+              function setPositionYSearch({y}) {
+                positionYArr.push(y + currentY);
+                positionYArr.sort((a, b) => {
+                  if (a > b) {
+                    return 1;
+                  } else {
+                    if (a < b) return -1;
                   }
-                  key={`${i2}d`}>
-                  {inputRexgex[i - 1]}
-                </Text>
-                {/* </Text> */}
-              </>,
-              <Text
-                style={{
-                  position: 'relative',
-                  display: 'flex',
-                  margin: 0,
-                  lineHeight: 23,
-                }}>
-                {current}
-              </Text>,
-            );
-          }, []);
+                });
 
-        return searchedPara;
+                if (go) {
+                  setTimeout(() => {
+                    list.current.scrollTo({
+                      y: positionYArr[0] - heightDevice / 2, //- 57
+                    });
+                  }, 500);
+                }
+              }
+
+              return prev.concat(
+                <>
+                  <View
+                    style={{
+                      backgroundColor: 'blue',
+                      flex: 1,
+                      alignSelf: 'center',
+                      padding: 0,
+                      margin: 0,
+                      overflow: 'visible',
+                      right: -50,
+                      height: go ? 9 : 1,
+                    }}
+                    onLayout={event => {
+                      event.target.measure(
+                        (x, y, width, height, pageX, pageY) => {
+                          setPositionYSearch({
+                            y: y + pageY,
+                          });
+                        },
+                      );
+                    }}></View>
+
+                  <Text
+                    style={
+                      searchResultCount - inputRexgex.length + i - 1 <
+                        currentSearchPoint &&
+                      searchResultCount - inputRexgex.length + i >=
+                        currentSearchPoint
+                        ? styles.highlight1
+                        : styles.highlight
+                    }
+                    key={`${i2}d`}>
+                    {inputRexgex[i - 1]}
+                  </Text>
+                  {/* </Text> */}
+                </>,
+                <Text
+                  style={{
+                    position: 'relative',
+                    display: 'flex',
+                    margin: 0,
+                    lineHeight: 23,
+                  }}>
+                  {current}
+                </Text>,
+              );
+            }, []);
+
+          return searchedPara;
+        } else {
+          return para[0];
+        }
       } else {
         return para[0];
       }
-    } else {
-      return para[0];
-    }
 
-    // }
+      // }
     }
   }
 
   let positionYArrArticalDemo = positionYArrArtical;
 
   function setPositionYArtical({y, key3}) {
-
     if (
       true
       // tittleArray.length ||
@@ -571,7 +560,6 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
           articleCount = 0;
           PositionYArrArticalForDev.current = [];
         }
-
       }
     }
   }
@@ -611,19 +599,16 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
     setPositionYArr([]);
   }, [go]);
 
-
   useEffect(() => {
-    if(!loading && route.params.input){
-      pushToSearch()
+    if (!loading && route.params.input) {
+      pushToSearch();
     }
   }, [loading]);
-
-
 
   useEffect(() => {
     if (currentSearchPoint != 0 && searchResultCount) {
       list.current.scrollTo({
-        y: positionYArr[currentSearchPoint - 1] - heightDevice/2 , //- 57
+        y: positionYArr[currentSearchPoint - 1] - heightDevice / 2, //- 57
       });
     }
   }, [currentSearchPoint]);
@@ -640,7 +625,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
 
   let transY = animatedForNavi.interpolate({
     inputRange: [-100, 0, 80, 90, 100],
-    outputRange: [0, 0, -45, 0, 0],
+    outputRange: [0, 0, -44, 0, 0],
   });
 
   let transX = animatedForNavi.interpolate({
@@ -690,7 +675,6 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
             styles.content) //////////////////////////////////////////////////////////////////
         }>
         {key[key1].map((key2, i2) => {
-          
           return (
             <View
               onLayout={event => {
@@ -850,7 +834,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
       {}
     );
   };
-  
+
   // const d = (key, i) => {
   //   // dành cho phụ lục, danh mục
   //   return (
@@ -907,7 +891,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
             <View
               style={{
                 // marginTop:20,
-                backgroundColor: 'white',// #CCCCCC
+                backgroundColor: 'white', // #CCCCCC
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -1087,7 +1071,8 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                 </View>
                 <View style={{flex: 1}}>
                   <Text style={styles.ModalInfoContent}>
-                    {Info && new Date(Info['lawDaySign']).toLocaleDateString('vi-VN')}
+                    {Info &&
+                      new Date(Info['lawDaySign']).toLocaleDateString('vi-VN')}
                   </Text>
                 </View>
               </View>
@@ -1097,7 +1082,10 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                 </View>
                 <View style={{flex: 1}}>
                   <Text style={styles.ModalInfoContent}>
-                    {Info && new Date(Info['lawDayActive']).toLocaleDateString('vi-VN')}
+                    {Info &&
+                      new Date(Info['lawDayActive']).toLocaleDateString(
+                        'vi-VN',
+                      )}
                   </Text>
                 </View>
               </View>
@@ -1193,39 +1181,45 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                   <View style={{flex: 1, paddingBottom: 10, paddingTop: 10}}>
                     {Info &&
                       Info['lawRelated'].map((key, i) => {
-                        let nameLaw = key
+                        let nameLaw = key;
 
                         let LawHaveWord;
                         let LawHaveNoWord;
-                        let correctIndex
-                        for (let a = 0; a < (info3).length; a++) {
+                        let correctIndex;
+                        for (let a = 0; a < info3.length; a++) {
                           if (
-                           (info3)[a]['info']['lawNameDisplay'].match(
+                            info3[a]['info']['lawNameDisplay'].match(
                               new RegExp(`^${key}`, 'gim'),
                             )
                           ) {
-                            correctIndex = a
-                            LawHaveWord = (info3)[a]['info']['lawNameDisplay'];
+                            correctIndex = a;
+                            LawHaveWord = info3[a]['info']['lawNameDisplay'];
                             break;
-                          }else if((info3)[a]['info']['lawDescription'].match(
-                            new RegExp(`^${key}`, 'gim'),
-                          )){
-                            correctIndex = a
-                            LawHaveWord = (info3)[a]['info']['lawNameDisplay'];
-                          }else if((info3)[a]['info']['lawNumber'].match(
-                            new RegExp(`^${key}`, 'gim'),
-                          )){
-                            correctIndex = a
-                            LawHaveNoWord = (info3)[a]['info']['lawNameDisplay'];
+                          } else if (
+                            info3[a]['info']['lawDescription'].match(
+                              new RegExp(`^${key}`, 'gim'),
+                            )
+                          ) {
+                            correctIndex = a;
+                            LawHaveWord = info3[a]['info']['lawNameDisplay'];
+                          } else if (
+                            info3[a]['info']['lawNumber'].match(
+                              new RegExp(`^${key}`, 'gim'),
+                            )
+                          ) {
+                            correctIndex = a;
+                            LawHaveNoWord = info3[a]['info']['lawNameDisplay'];
                           }
                         }
-                        
+
                         // console.log((info3)[a]);
                         return (
                           <TouchableOpacity
                             onPress={() => {
                               if (LawHaveWord || LawHaveNoWord) {
-                                navigation.push(`accessLaw`, {screen: info3[correctIndex]._id});
+                                navigation.push(`accessLaw`, {
+                                  screen: info3[correctIndex]._id,
+                                });
                                 ModalVisibleStatus.updateModalStatus(false);
                               }
                             }}>
@@ -1233,14 +1227,11 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                               style={{
                                 ...styles.ModalInfoContentLawRelated,
                                 fontWeight:
-                                LawHaveNoWord ||
-                                  LawHaveWord 
-                                    ? 'bold'
-                                    : '300',
+                                  LawHaveNoWord || LawHaveWord ? 'bold' : '300',
                               }}>
                               -{' '}
                               {
-                                LawHaveNoWord 
+                                LawHaveNoWord
                                   ? LawHaveNoWord
                                   : LawHaveWord
                                   ? LawHaveWord
@@ -1266,7 +1257,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                   // backgroundColor: '#00CC33',
                   alignItems: 'center',
                   width: 100,
-                  height:35 ,
+                  height: 35,
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1290,7 +1281,7 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                     // paddingRight: 5,
                     fontSize: 15,
                     color: 'black',
-                    fontWeight:'bold'
+                    fontWeight: 'bold',
                   }}>
                   Đóng
                 </Text>
@@ -1319,48 +1310,46 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
           }}
           ref={list}
           showsVerticalScrollIndicator={true}>
-          <Text style={styles.titleText}>
-            {Info && Info['lawNameDisplay']}
-          </Text>
+          <Text style={styles.titleText}>{Info && Info['lawNameDisplay']}</Text>
           {Content &&
             Content.map((key, i) => {
-              if(i+1 == Content.length){
-                
-                  // dispatch(noLoading())
+              if (i + 1 == Content.length) {
+                // dispatch(noLoading())
               }
               return (
-              <>
-                {!Object.keys(key)[0].match(/^(Điều|Điều)/gim) && (
-                  <TouchableOpacity
-                    key={i}
-                    style={styles.chapter}
-                    onPress={() => {
-                      collapse(i);
-                      // setTittle(i);
-                    }}>
-                    <Text
-                      key={`${i}a`}
-                      style={{
-                        fontSize: 18,
-                        color: 'black',
-                        fontWeight: 'bold',
-                        padding: 9,
-                        textAlign: 'center',
+                <>
+                  {!Object.keys(key)[0].match(/^(Điều|Điều)/gim) && (
+                    <TouchableOpacity
+                      key={i}
+                      style={styles.chapter}
+                      onPress={() => {
+                        collapse(i);
+                        // setTittle(i);
                       }}>
-                      {Object.keys(key)[0].toUpperCase()}
-                    </Text>
-                  </TouchableOpacity>
-                )}
+                      <Text
+                        key={`${i}a`}
+                        style={{
+                          fontSize: 18,
+                          color: 'black',
+                          fontWeight: 'bold',
+                          padding: 9,
+                          textAlign: 'center',
+                        }}>
+                        {Object.keys(key)[0].toUpperCase()}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
 
-                {Object.keys(key)[0].match(/^phần thứ .*/gim)
-                  ? b(key, i, Object.keys(key)[0])
-                  : Object.keys(key)[0].match(/^chương .*/gim)
-                  ? a(key, i, Object.keys(key)[0])
-                  : Object.keys(key)[0].match(/^điều .*/gim)
-                  ? c(key, i, Object.keys(key)[0])
-                  : ''}
-              </>
-            )})}
+                  {Object.keys(key)[0].match(/^phần thứ .*/gim)
+                    ? b(key, i, Object.keys(key)[0])
+                    : Object.keys(key)[0].match(/^chương .*/gim)
+                    ? a(key, i, Object.keys(key)[0])
+                    : Object.keys(key)[0].match(/^điều .*/gim)
+                    ? c(key, i, Object.keys(key)[0])
+                    : ''}
+                </>
+              );
+            })}
         </ScrollView>
       </Animated.View>
       {/* {Boolean(searchResultCount) && find && searchResultCount > 1 && (
@@ -1411,73 +1400,91 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
         </Animated.View>
       )} */}
 
-        <Animated.View
-          style={{...styles.findArea,width:widthDevice, transform: [{translateY: transY}]}}>
+      <Animated.View
+        style={{
+          ...styles.findArea,
+          width: widthDevice,
+          transform: [{translateY: transY}],
+        }}>
+        <View
+          style={{...styles.searchView, width: widthDevice}}>
           <View
-            // distance={10}
-            // startColor={'gray'}
-            // sides={'top'}
-            style={{...styles.searchView, width: widthDevice}}>
-            {/* <View style={styles.searchView}> */}
-            
-<View style={{flexDirection:'row',width:'20%',justifyContent:'space-around',height:'100%',alignItems:'center',alignContent:'center'}}>
-
+            style={{
+              flexDirection: 'row',
+              width: '23%',
+              justifyContent: 'space-around',
+              height: '100%',
+              alignItems: 'center',
+              alignContent: 'center',
+            }}>
             <TouchableOpacity
-            style={styles.tabSearch}
-            onPress={() => {
-              currentSearchPoint == 1
-                ? setCurrentSearchPoint(positionYArr.length)
-                : setCurrentSearchPoint(currentSearchPoint - 1);
-            }}>
-            <Ionicons
-              name="caret-up-outline"
-              style={{
-                paddingLeft:15,
-                paddingRight:15,
-                fontSize:18,
-                color: '#888888',
-                // textAlign: 'center',
-                // fontWeight: 'bold',
-                // fontSize: 25,
-              }}></Ionicons>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.tabSearch}
-            onPress={() => {
-              currentSearchPoint == positionYArr.length
-                ? setCurrentSearchPoint(1)
-                : setCurrentSearchPoint(currentSearchPoint + 1);
-            }}>
-            <Ionicons
-              name="caret-down-outline"
-              style={{
-                paddingLeft:15,
-                paddingRight:15,
-                fontSize:18,
-                color: '#888888',
-                // textAlign: 'center',
-                // fontWeight: 'bold',
-                // fontSize: 25,
-              }}></Ionicons>
-          </TouchableOpacity>
+              style={styles.tabSearch}
+              onPress={() => {
+                currentSearchPoint == 1
+                  ? setCurrentSearchPoint(positionYArr.length)
+                  : setCurrentSearchPoint(currentSearchPoint - 1);
+              }}>
+              <Ionicons
+                name="caret-up-outline"
+                style={{
+                  paddingLeft: 15,
+                  paddingRight: 15,
+                  fontSize: 18,
+                  color: '#888888',
+                  // textAlign: 'center',
+                  // fontWeight: 'bold',
+                  // fontSize: 25,
+                }}></Ionicons>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{...styles.tabSearch}}
+              onPress={() => {
+                currentSearchPoint == positionYArr.length
+                  ? setCurrentSearchPoint(1)
+                  : setCurrentSearchPoint(currentSearchPoint + 1);
+              }}>
+              <Ionicons
+                name="caret-down-outline"
+                style={{
+                  paddingLeft: 15,
+                  paddingRight: 15,
+                  fontSize: 18,
+                  color: '#888888',
+                  
+
+                }}></Ionicons>
+            </TouchableOpacity>
           </View>
 
-
-            <View style={styles.inputArea}>
+          <View style={styles.inputArea}>
+            <View style={{flexDirection: 'row', width: '89%'}}>
               <TextInput
                 ref={textInputFind}
                 selectTextOnFocus={true}
-                style={{width: '75%', color: 'black',height:35,fontSize:13,padding:0}}
+                style={{
+                  width: '90%',
+                  color: 'black',
+                  height: 35,
+                  fontSize: 13,
+                  padding: 0,
+                  paddingLeft: 10,
+                }}
                 onChangeText={text => setInput(text)}
                 autoFocus={false}
                 value={input}
                 placeholder=" Vui lòng nhập từ khóa ..."
                 placeholderTextColor={'gray'}
-                onSubmitEditing={() =>
-                  pushToSearch()
-                }></TextInput>
+                onSubmitEditing={() => pushToSearch()}></TextInput>
               <TouchableOpacity
-                style={{color: 'white', fontSize: 16, width: '12%'}}
+                style={{
+                  color: 'white',
+                  fontSize: 16,
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'space-evenly',
+                  right: 0,
+                  alignItems: 'center',
+                }}
                 onPress={() => {
                   setInput('');
                   textInputFind.current.focus();
@@ -1494,12 +1501,23 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                     }}></Ionicons>
                 )}
               </TouchableOpacity>
-              <View style={{flexDirection:'column',justifyContent:'center',alignContent:'center',padding:0,left:0}}>
+            </View>
+            <View
+              style={{
+                flex:1,
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignContent: 'center',
+                padding: 0,
+                left: 0,
+                alignItems:'center'
+              }}>
               <Text
                 style={{
                   color: 'black',
                   fontSize: 8,
                   textAlign: 'center',
+                  // minWidth:18
                 }}>
                 {searchResultCount
                   ? `${currentSearchPoint}`
@@ -1510,16 +1528,16 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                   color: 'black',
                   fontSize: 8,
                   textAlign: 'center',
-                  borderTopColor:'gray',
-                  borderTopWidth:1
+                  borderTopColor: 'gray',
+                  borderTopWidth: 1,
+                  // minWidth:18,
                 }}>
-                {searchResultCount
-                  ? `${searchResultCount}`
-                  : searchResultCount}
+                {searchResultCount ? `${searchResultCount}` : searchResultCount}
               </Text>
-              </View>
- </View>
-            <View style={{flex:1,justifyContent:'center',flexDirection:'row'}}>
+            </View>
+          </View>
+          <View
+            style={{flex: 1, justifyContent: 'center', flexDirection: 'row'}}>
             <TouchableOpacity
               style={styles.searchBtb}
               onPress={() => {
@@ -1533,9 +1551,9 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                   fontSize: 18,
                 }}></Ionicons>
             </TouchableOpacity>
-            </View>
           </View>
-        </Animated.View>
+        </View>
+      </Animated.View>
       <View style={styles.functionTab}>
         {!onlyArticle && (
           <TouchableOpacity
@@ -1753,23 +1771,24 @@ async function callOneLaw() { // dùng để khi qua screen related Law khác kh
                   }
                 </View>
                 {(SearchArticalResult || positionYArrArtical).map((key, i) => {
-                  
                   return (
-                  <TouchableOpacity
-                    style={styles.listItem}
-                    onPress={() => {
-                      setShowArticle(false);
-                      list.current.scrollTo({y: Object.values(key) - 70});
-                      Animated.timing(animatedForNavi, {
-                        toValue: !showArticle ? -100 : 0,
-                        duration: 600,
-                        useNativeDriver: false,
-                      }).start();
-                    }}>
-                    <Text style={styles.listItemText}>{Object.keys(key)}</Text>
-                  </TouchableOpacity>
-                )}
-                )}
+                    <TouchableOpacity
+                      style={styles.listItem}
+                      onPress={() => {
+                        setShowArticle(false);
+                        list.current.scrollTo({y: Object.values(key) - 70});
+                        Animated.timing(animatedForNavi, {
+                          toValue: !showArticle ? -100 : 0,
+                          duration: 600,
+                          useNativeDriver: false,
+                        }).start();
+                      }}>
+                      <Text style={styles.listItemText}>
+                        {Object.keys(key)}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </ScrollView>
             </Animated.View>
           </>
@@ -1854,7 +1873,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     bottom: 0,
-    backgroundColor: 'white',
+    // backgroundColor: 'white',
+    backgroundColor: '#00CD66',
+
     height: 35,
     paddingTop: 2,
     zIndex: 10,
@@ -1895,36 +1916,33 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlign: 'center',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 19,
   },
   ActiveInner: {
-    color: 'green',
+    color: 'white',
     textAlign: 'center',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 19,
   },
   findArea: {
     display: 'flex',
-    // backgroundColor: '#AAAAAA',
     flexDirection: 'column',
     bottom: -10,
     position: 'absolute',
     right: 0,
     left: 0,
-    // borderTopLeftRadius:10,
-    // borderTopRightRadius:10,
-    backgroundColor: '#A0A0A0',
-    // overflow:'hidden'
-    borderTopWidth: .4,
+    borderTopWidth: 0.4,
     borderTopColor: 'gray',
   },
   searchView: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: '#FAEBD7', //#FAEBD7
+    backgroundColor: 'black', //#FAEBD7
     overflow: 'hidden',
     margin: 0,
+    paddingTop:1,
+    paddingBottom:.5,
   },
   tabSearch: {
     display: 'flex',
@@ -1933,24 +1951,24 @@ const styles = StyleSheet.create({
     // borderRadius: 30,
     // backgroundColor: '#777777',
     justifyContent: 'center',
-    alignItems:'center',
-
+    alignItems: 'center',
   },
   inputArea: {
-    width: '55%',
-    backgroundColor: 'white',
+    width: '58%',
+    backgroundColor: '#F5F5F5',
     color: 'white',
-    padding:0,
+    padding: 0,
     alignItems: 'center',
-    paddingLeft: 5,
+    // paddingLeft: 5,
     // paddingRight: 5,
     fontSize: 15,
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+    borderRadius:10,
+    // borderWidth:1
   },
   searchBtb: {
-    // flex:1,
-    backgroundColor: '#111111',
+    backgroundColor: '#008080',
     color: 'white',
     borderRadius: 30,
     width: 30,
@@ -1959,11 +1977,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     textAlign: 'center',
     justifyContent: 'center',
-    marginLeft:20,
-    marginRight:20,
-    borderWidth:2,
-    borderColor:'green',
-    
+    marginLeft: 20,
+    marginRight: 20,
+    borderWidth: 2,
+    borderColor: 'white',
   },
   listArticle: {
     position: 'absolute',
