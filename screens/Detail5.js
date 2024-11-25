@@ -1873,9 +1873,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     bottom: 0,
-    // backgroundColor: 'white',
     backgroundColor: '#00CD66',
-
     height: 35,
     paddingTop: 2,
     zIndex: 10,
